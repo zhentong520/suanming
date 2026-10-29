@@ -49,6 +49,15 @@ export function runMigrations() {
       created_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS report_messages (
+      id TEXT PRIMARY KEY,
+      report_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      role TEXT NOT NULL,
+      content TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS modules (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -160,6 +169,30 @@ export function runMigrations() {
       created_at TEXT NOT NULL,
       paid_at TEXT
     );
+
+    CREATE TABLE IF NOT EXISTS knowledge_chunks (
+      id TEXT PRIMARY KEY,
+      module TEXT,
+      title TEXT NOT NULL,
+      body TEXT NOT NULL,
+      source TEXT,
+      created_at TEXT NOT NULL
+    );
+    CREATE VIRTUAL TABLE IF NOT EXISTS knowledge_fts USING fts5(
+      title, body, content='knowledge_chunks', content_rowid='rowid', tokenize='trigram'
+    );
+    CREATE TRIGGER IF NOT EXISTS knowledge_chunks_ai AFTER INSERT ON knowledge_chunks BEGIN
+      INSERT INTO knowledge_fts(rowid, title, body) VALUES (new.rowid, new.title, new.body);
+    END;
+    CREATE TRIGGER IF NOT EXISTS knowledge_chunks_ad AFTER DELETE ON knowledge_chunks BEGIN
+      INSERT INTO knowledge_fts(knowledge_fts, rowid, title, body)
+      VALUES ('delete', old.rowid, old.title, old.body);
+    END;
+    CREATE TRIGGER IF NOT EXISTS knowledge_chunks_au AFTER UPDATE ON knowledge_chunks BEGIN
+      INSERT INTO knowledge_fts(knowledge_fts, rowid, title, body)
+      VALUES ('delete', old.rowid, old.title, old.body);
+      INSERT INTO knowledge_fts(rowid, title, body) VALUES (new.rowid, new.title, new.body);
+    END;
   `);
 
   runColumnMigrations(db);
@@ -181,6 +214,8 @@ function runIndexMigrations(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_payment_orders_user ON payment_orders(user_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_matches_profile_a ON matches(profile_id_a);
     CREATE INDEX IF NOT EXISTS idx_matches_profile_b ON matches(profile_id_b);
+    CREATE INDEX IF NOT EXISTS idx_report_messages_report ON report_messages(report_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_report_messages_user ON report_messages(user_id, created_at);
   `);
 }
 

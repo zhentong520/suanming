@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ReportPanel, ScrollCard } from "@/components/site/Guofeng";
 import { SharePanel } from "@/components/site/SharePanel";
+import { ReportAskPanel } from "@/components/site/ReportAskPanel";
 
 interface LifeInsights {
   disclaimer: string;
@@ -152,6 +153,7 @@ export default function ReportDetailPage() {
           </div>
           <SharePanel report={report.templateReport} moduleTitle={report.moduleName} />
           <ReportPanel report={report.templateReport} aiReport={report.aiReport} />
+          <ReportAskPanel reportId={report.id} />
         </ScrollCard>
       )}
 

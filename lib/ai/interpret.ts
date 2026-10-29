@@ -6,6 +6,7 @@ import { decryptSecret } from "./secret-crypto";
 import { getVolcEnvConfig } from "./volc-models";
 import { logUserOperation } from "../user/operations";
 import { buildAiEnhancePrompt } from "./fact-digest";
+import { compliantAiText } from "./compliance";
 import { getAiQuotaStatus } from "./quota";
 
 export async function isGlobalAiEnabled(): Promise<boolean> {
@@ -82,7 +83,8 @@ export async function maybeEnhanceWithAi(
         metadata: { providerId: provider.id, locale },
       });
     }
-    return text;
+    // 合规风控：违禁词替换 + 绝对化断语软化 + 显式 AI 生成标识
+    return compliantAiText(text);
   } catch {
     return undefined;
   }

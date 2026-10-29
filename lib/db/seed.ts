@@ -15,6 +15,7 @@ import { encryptSecret } from "../ai/secret-crypto";
 import { getVolcEnvConfig } from "../ai/volc-models";
 import { ensureAdminRoleByEmail } from "../ai/quota";
 import { adminPasswordLooksDefault, isProductionRuntime } from "../security/production-guards";
+import { seedKnowledge } from "./knowledge";
 
 export async function seedDatabase() {
   runMigrations();
@@ -83,6 +84,7 @@ export async function seedDatabase() {
   }
 
   await ensureVolcArkProvider(now);
+  seedKnowledge();
 
   const username = process.env.ADMIN_USERNAME ?? "admin";
   const existingAdmin = await db

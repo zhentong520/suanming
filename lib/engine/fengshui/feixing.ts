@@ -19,7 +19,7 @@ const LUO_SHU: Record<number, string> = {
 const STAR_NATURE: Record<number, { name: string; nature: string; tip: string }> = {
   1: { name: "一白贪狼", nature: "水·偏吉", tip: "利文昌桃花，宜静水、书房。" },
   2: { name: "二黑巨门", nature: "土·病符", tip: "宜化病符，忌长期坐卧。" },
-  3: { name: "三碧禄存", nature: "木·是非", tip: "防口舌官非，宜化解。" },
+  3: { name: "三碧禄存", nature: "木·是非", tip: "防口舌是非，宜静不宜争。" },
   4: { name: "四绿文曲", nature: "木·文昌", tip: "利学业考试、文书。" },
   5: { name: "五黄廉贞", nature: "土·大凶", tip: "五黄关煞，宜静不宜动土。" },
   6: { name: "六白武曲", nature: "金·偏吉", tip: "利权威财位，宜金属。" },
@@ -169,7 +169,7 @@ function buildFacingAdvice(yunStar: number, nianStar: number, period: number): s
   if (yunStar === wang || yunStar === 8 || (period === 9 && yunStar === 9)) {
     parts.push("向首逢当令旺星，大门/客厅朝此较利纳气。");
   } else if (yunStar === 5 || yunStar === 2) {
-    parts.push("向首逢病符五黄类，门口宜整洁少动土，可摆金属化解。");
+    parts.push("向首逢病符五黄类，门口宜整洁少动土，可置金属饰品以调匀气场。");
   } else {
     parts.push("向首星非最旺，宜保持通风采光，以家具布局补吉。");
   }

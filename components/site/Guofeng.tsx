@@ -179,7 +179,10 @@ export function ReportPanel({
       {aiReport && (
         <>
           <InkDivider />
-          <h4 className="report-ai-title">AI 解读</h4>
+          <h4 className="report-ai-title">
+            AI 解读
+            <span className="report-ai-badge">AI 生成 · 仅供文化娱乐参考</span>
+          </h4>
           <div className="report-section-body report-ai-body">{aiReport}</div>
         </>
       )}

@@ -174,7 +174,7 @@ export function interpretFeiXingClash(edges: FeiXingEdge[]): string {
     const ji = list.find((e) => e.hua === "忌");
     const lu = list.find((e) => e.hua === "禄");
     if (ji && lu && ji.fromPalace === lu.fromPalace) {
-      parts.push(`${src}禄忌同宫于${ji.fromPalace}，得失并存，宜主动化解。`);
+      parts.push(`${src}禄忌同宫于${ji.fromPalace}，得失并存，宜主动调整心态与策略。`);
     } else if (ji) {
       const opp = edges.find((e) => e.source === src && e.opposite && e.hua === "忌");
       parts.push(`${src}忌在${ji.fromPalace}${opp ? `冲${opp.toPalace}` : ""}，该宫事务多反复。`);

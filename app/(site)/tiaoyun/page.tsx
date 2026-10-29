@@ -6,8 +6,8 @@ export default function TiaoyunPage() {
     <Suspense>
       <GenericModulePage
         moduleId="tiaoyun"
-        title="医·灵治调运"
-        description="象数原理、五行净化、能量引导与改命层面——文化自学，不替代医疗"
+        title="医·调摄养生"
+        description="象数原理、五行养生、能量引导与自我提升——文化自学，不替代医疗"
         fields={[
           {
             name: "concern",
@@ -16,10 +16,10 @@ export default function TiaoyunPage() {
             required: true,
             defaultValue: "general",
             options: [
-              { value: "general", label: "综合调运总览" },
-              { value: "body", label: "身心倾向（象数·五行净化）" },
+              { value: "general", label: "综合调摄总览" },
+              { value: "body", label: "身心倾向（象数·五行养生）" },
               { value: "emotion", label: "情绪与能量（接纳引导）" },
-              { value: "luck", label: "运势阻滞（改命渠道）" },
+              { value: "luck", label: "状态起伏（自我提升渠道）" },
               { value: "home", label: "居家风水入口" },
               { value: "avatar", label: "头像 / 昵称气场" },
             ],

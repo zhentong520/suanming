@@ -231,7 +231,7 @@ function buildRemedy(missing: string[], element: string, strength: string): stri
   }
   parts.push(STRENGTH_MODIFIER[strength]?.advice ?? "");
   parts.push(ELEMENT_BALANCE[element] ?? "");
-  parts.push("以上补益仅供参考，心态积极、行善积德，方为改运之本。");
+  parts.push("以上调理仅供参考，心态积极、行善积德，方为立身之本。");
   return parts.join("");
 }
 
@@ -363,14 +363,14 @@ export function buildBaziInterpretation(bazi: BaziResult, gender?: string) {
       content: socialAnalysis(bazi.tenGods, el),
     },
     {
-      title: "开运建议",
+      title: "调摄建议",
       content: buildRemedy(bazi.missingElements, el, bazi.strength),
     },
     {
-      title: "改命四法与助运",
+      title: "修身四要与日常调理",
       content: [
-        "命运如地图：标出弯道与坑洞，不等于必然翻车。修行积德者，急弯处或遇可救之人，坑前或得梯子。",
-        "改命四法（了凡思路）：①积德行善 ②包容 ③和善 ④爱惜自己。天作孽犹可违；积善之家必有余庆。",
+        "命盘如地图：标出弯道与坑洞，不等于必然翻车。修身积德者，急弯处或遇可救之人，坑前或得梯子。",
+        "了凡四训的修身思路：①积德行善 ②包容 ③和善 ④爱惜自己。天作孽犹可违；积善之家必有余庆。",
         "天地人各三分：八字属天时参考，风水属地利，心念言行属人和。只信自己至少握住「人」这一分。",
         `今日可配合「五行人·助运」模块：按日支穿「我生」色，并尽量兼顾喜用${(bazi.yongShen?.usefulGods ?? []).join("、") || "—"}.`,
       ].join("\n\n"),

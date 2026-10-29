@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ScrollCard, ReportPanel } from "@/components/site/Guofeng";
 import { SharePanel } from "@/components/site/SharePanel";
+import { ReportAskPanel } from "@/components/site/ReportAskPanel";
 import { useOptionalUser } from "@/components/site/UserProvider";
 import { useLocale } from "@/components/site/LocaleProvider";
 
@@ -120,6 +121,7 @@ export function ModulePageShell({
           )}
           <SharePanel report={report} moduleTitle={title} />
           <ReportPanel report={report} aiReport={aiReport} />
+          {reportId && <ReportAskPanel reportId={reportId} />}
         </ScrollCard>
       )}
     </div>

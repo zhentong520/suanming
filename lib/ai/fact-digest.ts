@@ -2,6 +2,8 @@
  * 把引擎 facts 压成「关键事实清单」，供 AI 锚定，避免整包 JSON 幻觉。
  */
 
+import { buildKnowledgeContext } from "@/lib/db/knowledge";
+
 function pick(obj: Record<string, unknown>, keys: string[]): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const k of keys) {
@@ -128,6 +130,8 @@ export function buildAiEnhancePrompt(
 ): string {
   const digest = buildAiFactDigest(moduleId, facts);
   const reportClip = truncate(templateReport, 1800);
+  // RAG：按模块与事实摘要检索知识库，命中才注入
+  const knowledgeClip = buildKnowledgeContext(`${moduleId} ${digest}`, moduleId);
   if (locale === "en") {
     return `You are a senior interpreter of classical Chinese metaphysics for a general audience. Using the FACT LIST and BASE REPORT below, write a 500–800 word English supplement.
 
@@ -137,7 +141,8 @@ Hard rules:
 3. Structure: temperament → career → wealth → relationships → health → actionable advice (omit N/A)
 4. Keep traditional Chinese terms in Chinese with a short English gloss in parentheses when first used
 5. End with: "For cultural entertainment only."
-
+6. Compliance: no fortune-telling service promises (luck-changing, disaster-warding rituals); no absolute fate claims — use trend language instead
+${knowledgeClip ? `\n[KNOWLEDGE BASE REFERENCES (for context; never present general theory as the client's actual situation)]\n${knowledgeClip}\n` : ""}
 [FACT LIST]
 ${digest}
 
@@ -153,7 +158,8 @@ ${reportClip}`;
 3. 按「性格气质 → 事业 → 财运 → 感情 → 健康 → 行动建议」展开（不适用可省略）
 4. 语言具体、少套话，建议可执行
 5. 末尾注明「以上仅供文化娱乐参考」
-
+6. 合规要求：不得出现「改运、改命、消灾、破灾、开光、法事、转运」等玄学服务承诺表述；不得使用「必定、注定、百分之百」等绝对化断语；一律采用「倾向于、往往会、可留意」等趋势性措辞
+${knowledgeClip ? `\n【知识库参考（检索所得，仅供引用理论依据，不得将泛论直接断言为命主实情）】\n${knowledgeClip}\n` : ""}
 【关键事实清单】
 ${digest}
 

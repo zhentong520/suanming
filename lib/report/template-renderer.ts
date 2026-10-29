@@ -110,7 +110,7 @@ function moduleTitle(id: string): string {
     vedic: "吠陀占星",
     mbti: "MBTI 配对",
     "wuxing-ren": "五行人·助运",
-    tiaoyun: "医·灵治调运",
+    tiaoyun: "医·调摄养生",
   };
   return map[id] ?? id;
 }

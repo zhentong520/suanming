@@ -47,7 +47,7 @@ function enrichZodiac(f: Facts): Facts {
   const sections: ReadingSection[] = withBeginnerGuide(MODULE_INTROS.zodiac, [
     {
       title: "你的生肖",
-      content: `生肖：${f.zodiac}\n五行倾向：${f.element}\n${f.isTaiSui ? "⚠ 今年值太岁，宜谨慎行事、避免重大变动，可穿红、行善化解。" : "今年未值太岁，可按常规规划。"}`,
+      content: `生肖：${f.zodiac}\n五行倾向：${f.element}\n${f.isTaiSui ? "⚠ 今年值太岁，宜谨慎行事、避免重大变动，可穿红、多行善事，安稳为上。" : "今年未值太岁，可按常规规划。"}`,
     },
     { title: "性格特点", content: String(f.traits) },
     { title: "今年运势", content: String(f.fortune) },
@@ -768,7 +768,7 @@ function enrichFace(f: Facts): Facts {
     ...(cautions?.length
       ? [{ title: "注意事项", content: cautions.map((s, i) => `${i + 1}. ${s}`).join("\n") }]
       : []),
-    ...(f.advice ? [{ title: "改运建议", content: String(f.advice) }] : []),
+    ...(f.advice ? [{ title: "调摄建议", content: String(f.advice) }] : []),
     { title: "说明", content: String(f.caveat) },
   ]);
   return { ...f, sections };
@@ -831,7 +831,7 @@ function enrichPalm(f: Facts): Facts {
     ...(cautions?.length
       ? [{ title: "注意事项", content: cautions.map((s, i) => `${i + 1}. ${s}`).join("\n") }]
       : []),
-    ...(f.advice ? [{ title: "改运建议", content: String(f.advice) }] : []),
+    ...(f.advice ? [{ title: "调摄建议", content: String(f.advice) }] : []),
     { title: "说明", content: String(f.caveat) },
   ]);
   return { ...f, sections };

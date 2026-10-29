@@ -94,6 +94,16 @@ export const matches = sqliteTable("matches", {
   createdAt: text("created_at").notNull(),
 });
 
+/** 报告追问会话消息（role: user | assistant） */
+export const reportMessages = sqliteTable("report_messages", {
+  id: text("id").primaryKey(),
+  reportId: text("report_id").notNull(),
+  userId: text("user_id").notNull(),
+  role: text("role").notNull(),
+  content: text("content").notNull(),
+  createdAt: text("created_at").notNull(),
+});
+
 export const modules = sqliteTable("modules", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),

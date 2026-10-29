@@ -49,7 +49,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
   { id: "vedic", name: "吠陀占星", category: "术", description: "印度占星术", priority: "P3", path: "/vedic", requiresProfile: true, implemented: true, defaultEnabled: true, showOnHome: false, sortOrder: 30, aiPromptKey: "vedic" },
   { id: "mbti", name: "MBTI配对", category: "术", description: "MBTI趣味配对", priority: "P3", path: "/mbti", requiresProfile: false, implemented: true, defaultEnabled: true, showOnHome: false, sortOrder: 31, aiPromptKey: "mbti" },
   { id: "wuxing-ren", name: "五行人·助运", category: "术", description: "五行形神+天时穿衣助运", priority: "P1", path: "/wuxing-ren", requiresProfile: false, implemented: true, defaultEnabled: true, showOnHome: true, sortOrder: 32, aiPromptKey: "wuxing-ren" },
-  { id: "tiaoyun", name: "医·灵治调运", category: "术", description: "象数原理·五行净化·改命层面", priority: "P1", path: "/tiaoyun", requiresProfile: false, implemented: true, defaultEnabled: true, showOnHome: true, sortOrder: 33, aiPromptKey: "tiaoyun" },
+  { id: "tiaoyun", name: "医·调摄养生", category: "术", description: "象数原理·五行养生·文化自学层面", priority: "P1", path: "/tiaoyun", requiresProfile: false, implemented: true, defaultEnabled: true, showOnHome: true, sortOrder: 33, aiPromptKey: "tiaoyun" },
 ];
 
 export function getModuleDefinition(id: string): ModuleDefinition | undefined {
