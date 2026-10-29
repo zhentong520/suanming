@@ -30,6 +30,7 @@ export function ensureKnowledgeSchema() {
     CREATE VIRTUAL TABLE IF NOT EXISTS knowledge_fts USING fts5(
       title, body, content='knowledge_chunks', content_rowid='rowid', tokenize='trigram'
     );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_knowledge_module_title ON knowledge_chunks(module, title);
   `);
   schemaReady = true;
 }
@@ -42,12 +43,10 @@ function seedFilePath() {
   return p;
 }
 
-/** 导入种子语料（幂等：表为空才导入） */
+/** 导入种子语料（幂等 upsert：按 module+title 更新已有条目，新增缺失条目；保留管理端手工新增） */
 export function seedKnowledge() {
   ensureKnowledgeSchema();
   const sqlite = getSqlite();
-  const count = sqlite.prepare("SELECT COUNT(*) AS n FROM knowledge_chunks").get() as { n: number };
-  if (count.n > 0) return;
 
   const file = seedFilePath();
   if (!fs.existsSync(file)) {
@@ -57,17 +56,28 @@ export function seedKnowledge() {
   const seed = JSON.parse(fs.readFileSync(file, "utf-8")) as SeedFile;
   if (!Array.isArray(seed.chunks) || seed.chunks.length === 0) return;
 
-  const insert = sqlite.prepare(
+  const upsert = sqlite.prepare(
     `INSERT INTO knowledge_chunks (id, module, title, body, source, created_at)
-     VALUES (?, ?, ?, ?, 'seed', ?)`
+     VALUES (?, ?, ?, ?, 'seed', ?)
+     ON CONFLICT(module, title) DO UPDATE SET body = excluded.body
+     WHERE knowledge_chunks.body != excluded.body`
   );
   const now = new Date().toISOString();
-  sqlite.transaction(() => {
-    for (const c of seed.chunks) {
-      if (!c?.title || !c?.body) continue;
-      insert.run(crypto.randomUUID(), c.module ?? null, c.title, c.body, now);
-    }
-  })();
+  const { changed } = sqlite
+    .transaction((): { changed: number } => {
+      let changed = 0;
+      for (const c of seed.chunks) {
+        if (!c?.title || !c?.body) continue;
+        const res = upsert.run(crypto.randomUUID(), c.module ?? null, c.title, c.body, now);
+        changed += res.changes;
+      }
+      return { changed };
+    })();
+
+  const count = sqlite.prepare("SELECT COUNT(*) AS n FROM knowledge_chunks").get() as { n: number };
+  if (changed > 0) {
+    console.log(`[suanming:knowledge] 种子语料同步完成: 更新/新增 ${changed} 条，当前共 ${count.n} 条`);
+  }
 }
 
 /** 中文无分词器：对连续片段做滑窗取样，供 trigram/打分使用 */

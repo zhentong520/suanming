@@ -178,6 +178,8 @@ export function runMigrations() {
       source TEXT,
       created_at TEXT NOT NULL
     );
+    -- (module,title) 唯一约束：支持种子语料按条目幂等 upsert 更新
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_knowledge_module_title ON knowledge_chunks(module, title);
     CREATE VIRTUAL TABLE IF NOT EXISTS knowledge_fts USING fts5(
       title, body, content='knowledge_chunks', content_rowid='rowid', tokenize='trigram'
     );
