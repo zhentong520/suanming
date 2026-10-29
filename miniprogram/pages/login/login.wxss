@@ -1,0 +1,3 @@
+.tabs { display: flex; gap: 32rpx; margin-bottom: 12rpx; }
+.tab { color: #6b5c45; padding-bottom: 8rpx; }
+.tab.on { color: #b83a2f; border-bottom: 4rpx solid #b83a2f; }

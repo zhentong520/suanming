@@ -1,0 +1,26 @@
+{
+  "cards": [
+    { "name": "愚者", "meaning": "新的开始，冒险精神，无限可能。", "reversed": "鲁莽冲动，缺乏计划。" },
+    { "name": "魔术师", "meaning": "创造力，技能，意志力。", "reversed": "欺骗，技巧不足。" },
+    { "name": "女祭司", "meaning": "直觉，神秘，内在智慧。", "reversed": "隐藏的秘密，表面化。" },
+    { "name": "皇后", "meaning": "丰饶，母性，自然。", "reversed": "依赖，创造力受阻。" },
+    { "name": "皇帝", "meaning": "权威，结构，控制。", "reversed": "专制，僵化。" },
+    { "name": "教皇", "meaning": "传统，精神指引，信仰。", "reversed": "打破常规，个人信念。" },
+    { "name": "恋人", "meaning": "爱情，和谐，选择。", "reversed": "失衡，错误选择。" },
+    { "name": "战车", "meaning": "胜利，意志力，决心。", "reversed": "失控，方向不明。" },
+    { "name": "力量", "meaning": "勇气，耐心，内在力量。", "reversed": "自我怀疑，软弱。" },
+    { "name": "隐士", "meaning": "内省，独处，智慧。", "reversed": "孤立，拒绝帮助。" },
+    { "name": "命运之轮", "meaning": "转变，周期，命运。", "reversed": "坏运气，抗拒变化。" },
+    { "name": "正义", "meaning": "公平，真相，因果。", "reversed": "不公，逃避责任。" },
+    { "name": "倒吊人", "meaning": "牺牲，新视角，等待。", "reversed": "拖延，无谓牺牲。" },
+    { "name": "死神", "meaning": "结束，转变，新生。", "reversed": "抗拒改变，停滞。" },
+    { "name": "节制", "meaning": "平衡，适度，和谐。", "reversed": "失衡，过度。" },
+    { "name": "恶魔", "meaning": "束缚，欲望，物质。", "reversed": "释放，打破束缚。" },
+    { "name": "塔", "meaning": "突变，混乱，启示。", "reversed": "避免灾难，恐惧改变。" },
+    { "name": "星星", "meaning": "希望，灵感，宁静。", "reversed": "失望，缺乏信心。" },
+    { "name": "月亮", "meaning": "幻觉，恐惧，潜意识。", "reversed": "释放恐惧，真相显现。" },
+    { "name": "太阳", "meaning": "成功，喜悦，活力。", "reversed": "暂时挫折，过度乐观。" },
+    { "name": "审判", "meaning": "觉醒，重生，召唤。", "reversed": "自我怀疑，拒绝召唤。" },
+    { "name": "世界", "meaning": "完成，成就，整合。", "reversed": "未完成，缺乏收尾。" }
+  ]
+}

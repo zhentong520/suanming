@@ -1,0 +1,10 @@
+<view wx:if="{{error}}" class="error">{{error}}</view>
+<view class="card" wx:if="{{report}}">
+  <view style="font-weight:600;">{{report.moduleName || report.moduleId}}</view>
+  <view class="muted">{{report.createdAt}}</view>
+  <view class="report" style="margin-top:20rpx;">{{report.templateReport}}</view>
+  <view wx:if="{{report.aiReport}}" class="report" style="margin-top:24rpx;border-top:1rpx dashed #d4c4a8;padding-top:20rpx;">
+    <view style="font-weight:600;margin-bottom:8rpx;">AI 解读</view>
+    {{report.aiReport}}
+  </view>
+</view>

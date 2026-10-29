@@ -1,0 +1,74 @@
+body {
+  font-family: "Microsoft YaHei", "SimSun", "Noto Sans SC", sans-serif;
+  font-size: 11pt;
+  line-height: 1.6;
+  color: #2c2c2c;
+  max-width: 100%;
+}
+
+h1 {
+  color: #c23a2b;
+  font-size: 22pt;
+  border-bottom: 2px solid #d4c4a8;
+  padding-bottom: 8px;
+}
+
+h2 {
+  color: #c23a2b;
+  font-size: 16pt;
+  margin-top: 24px;
+  border-bottom: 1px solid #e8dcc8;
+  padding-bottom: 4px;
+}
+
+h3 {
+  color: #b8860b;
+  font-size: 13pt;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+  font-size: 10pt;
+}
+
+th, td {
+  border: 1px solid #d4c4a8;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+th {
+  background: #f5f0e6;
+  color: #c23a2b;
+}
+
+code {
+  background: #f5f0e6;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 9pt;
+}
+
+pre {
+  background: #f8f4ec;
+  border: 1px solid #d4c4a8;
+  padding: 12px;
+  font-size: 9pt;
+  overflow-x: auto;
+}
+
+blockquote {
+  border-left: 4px solid #c23a2b;
+  margin: 12px 0;
+  padding: 8px 16px;
+  background: #fffef9;
+  color: #666;
+}
+
+hr {
+  border: none;
+  border-top: 1px dashed #d4c4a8;
+  margin: 24px 0;
+}

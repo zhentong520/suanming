@@ -1,0 +1,15 @@
+{
+  "stylesheet": "docs/pdf-style.css",
+  "pdf_options": {
+    "format": "A4",
+    "margin": {
+      "top": "20mm",
+      "bottom": "20mm",
+      "left": "18mm",
+      "right": "18mm"
+    },
+    "printBackground": true
+  },
+  "document_title": "易道命理使用文档",
+  "body_class": "markdown-body"
+}

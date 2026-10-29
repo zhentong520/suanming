@@ -1,0 +1,424 @@
+{
+  "features": [
+    {
+      "feature": "额头饱满",
+      "meaning": "智慧较高，早年运势较顺，思考能力佳，利于学业与规划。",
+      "category": "三停·上停"
+    },
+    {
+      "feature": "额头窄",
+      "meaning": "早年多劳，宜后天勤勉补运，中年后可因经验翻身。",
+      "category": "三停·上停"
+    },
+    {
+      "feature": "发际整齐",
+      "meaning": "精神清朗，思绪有条理，利于文书与管理。",
+      "category": "三停·上停"
+    },
+    {
+      "feature": "发际较高",
+      "meaning": "思想开放，早年独立性强，宜防空想。",
+      "category": "三停·上停"
+    },
+    {
+      "feature": "发际较低",
+      "meaning": "压力感强，宜劳逸结合，护头皮与睡眠。",
+      "category": "三停·上停"
+    },
+    {
+      "feature": "印堂开阔",
+      "meaning": "命宫明朗，贵人运较好，遇事先能想通。",
+      "category": "十二宫·命宫"
+    },
+    {
+      "feature": "印堂有纹",
+      "meaning": "心事较多，宜疏导情绪，避免钻牛角尖。",
+      "category": "十二宫·命宫"
+    },
+    {
+      "feature": "印堂发暗",
+      "meaning": "近期压力偏大，宜静心调息再做决定。",
+      "category": "十二宫·命宫"
+    },
+    {
+      "feature": "印堂发亮",
+      "meaning": "近期机遇显现，宜主动推进重要事项。",
+      "category": "十二宫·命宫"
+    },
+    {
+      "feature": "眉清目秀",
+      "meaning": "性情温和，人缘佳，审美力好，社交场合得体。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "浓眉大眼",
+      "meaning": "性格外向，行动力强，敢作敢为，但需控急躁。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "眉尾上扬",
+      "meaning": "进取心强，不服输，事业上愿争先。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "眉尾下垂",
+      "meaning": "性情温顺，宜守成协作，忌过度压抑。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "眉间距宽",
+      "meaning": "格局开阔，待人宽厚，宜防疏忽细节。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "眉间距窄",
+      "meaning": "心思细腻，专注力强，宜防多疑。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "眉形弯曲",
+      "meaning": "柔中带刚，善于周旋，适合公关协调。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "眼神清亮",
+      "meaning": "神采足，判断力佳，利于决策与学习。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "眼神闪烁",
+      "meaning": "心思活络，宜专注一事，避免分心过甚。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "双眼皮分明",
+      "meaning": "表达欲强，形象亲和，利于展示与销售。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "眼尾上扬",
+      "meaning": "机敏灵活，机会嗅觉好，宜防轻率。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "眼袋明显",
+      "meaning": "思虑耗神，宜早睡护肝，减少熬夜。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "鼻梁高挺",
+      "meaning": "自尊心强，事业心重，中年运佳，适合扛责任。",
+      "category": "鼻"
+    },
+    {
+      "feature": "山根不断",
+      "meaning": "父母缘与早年根基较稳，抗压能力尚可。",
+      "category": "鼻"
+    },
+    {
+      "feature": "山根偏弱",
+      "meaning": "早年需自立，宜借贵人与平台成长。",
+      "category": "鼻"
+    },
+    {
+      "feature": "鼻头圆润",
+      "meaning": "财运较稳，善于积累，晚年丰足。",
+      "category": "鼻"
+    },
+    {
+      "feature": "鼻翼鼓起",
+      "meaning": "理财意识强，偏财机会时有，仍宜稳健。",
+      "category": "鼻"
+    },
+    {
+      "feature": "鼻头尖小",
+      "meaning": "财来财去，宜记账节流，培养储蓄习惯。",
+      "category": "鼻"
+    },
+    {
+      "feature": "鼻准丰润",
+      "meaning": "正财运佳，适合稳健投资与实业。",
+      "category": "鼻"
+    },
+    {
+      "feature": "嘴唇厚薄适中",
+      "meaning": "表达力佳，重情义，口才不错。",
+      "category": "口"
+    },
+    {
+      "feature": "唇色红润",
+      "meaning": "气血较旺，活力足，感情表达更直接。",
+      "category": "口"
+    },
+    {
+      "feature": "嘴角上扬",
+      "meaning": "乐观亲和，人缘旺，利于合作。",
+      "category": "口"
+    },
+    {
+      "feature": "嘴角下垂",
+      "meaning": "情绪内敛，宜主动表达，避免闷积。",
+      "category": "口"
+    },
+    {
+      "feature": "唇厚",
+      "meaning": "重情重义，口福不错，宜防言语冲动。",
+      "category": "口"
+    },
+    {
+      "feature": "唇薄",
+      "meaning": "表达精炼，决策干脆，宜防显得冷淡。",
+      "category": "口"
+    },
+    {
+      "feature": "人中深长",
+      "meaning": "生命力与子女缘较好，宜护肾养气。",
+      "category": "人中"
+    },
+    {
+      "feature": "人中浅短",
+      "meaning": "宜养息节欲，重大决定前多留缓冲。",
+      "category": "人中"
+    },
+    {
+      "feature": "下巴方圆",
+      "meaning": "晚年运稳，有领导力，能守成。",
+      "category": "下巴·下停"
+    },
+    {
+      "feature": "地阁丰满",
+      "meaning": "晚年衣食无忧，子女缘与居家运较佳。",
+      "category": "下巴·下停"
+    },
+    {
+      "feature": "下巴尖削",
+      "meaning": "晚年宜规划保障，避免孤立决策。",
+      "category": "下巴·下停"
+    },
+    {
+      "feature": "耳大有垂",
+      "meaning": "福气较厚，心智成熟，善听善学。",
+      "category": "耳"
+    },
+    {
+      "feature": "耳贴脑",
+      "meaning": "务实沉稳，不喜张扬，适合深耕专业。",
+      "category": "耳"
+    },
+    {
+      "feature": "耳轮分明",
+      "meaning": "听力与悟性佳，利于学习技艺。",
+      "category": "耳"
+    },
+    {
+      "feature": "耳色偏红",
+      "meaning": "近期人缘与行动力上升。",
+      "category": "耳"
+    },
+    {
+      "feature": "气色红润",
+      "meaning": "近期运势上扬，宜把握机会主动作为。",
+      "category": "气色"
+    },
+    {
+      "feature": "气色暗沉",
+      "meaning": "宜休整调养，暂缓重大决定。",
+      "category": "气色"
+    },
+    {
+      "feature": "气色黄滞",
+      "meaning": "消化与思虑负担重，宜清淡饮食。",
+      "category": "气色"
+    },
+    {
+      "feature": "气色青白",
+      "meaning": "宜防寒湿与情绪低落，多晒太阳。",
+      "category": "气色"
+    },
+    {
+      "feature": "颧骨适度",
+      "meaning": "权柄与执行力平衡，适合管理岗。",
+      "category": "颧骨"
+    },
+    {
+      "feature": "颧骨过高",
+      "meaning": "权威欲强，宜柔化沟通，防人际摩擦。",
+      "category": "颧骨"
+    },
+    {
+      "feature": "颧骨偏平",
+      "meaning": "宜借团队成事，少单打独斗。",
+      "category": "颧骨"
+    },
+    {
+      "feature": "法令清晰",
+      "meaning": "中晚年运路分明，责任心强。",
+      "category": "法令"
+    },
+    {
+      "feature": "法令深长",
+      "meaning": "中年责任加重，宜量力而为。",
+      "category": "法令"
+    },
+    {
+      "feature": "法令模糊",
+      "meaning": "中年变数多，宜持续学习增强韧性。",
+      "category": "法令"
+    },
+    {
+      "feature": "面型国字",
+      "meaning": "稳重可靠，适合管理与执行岗位。",
+      "category": "面型"
+    },
+    {
+      "feature": "面型瓜子",
+      "meaning": "灵敏细腻，适合创意与服务。",
+      "category": "面型"
+    },
+    {
+      "feature": "面型圆形",
+      "meaning": "包容亲和，人缘好，宜防优柔。",
+      "category": "面型"
+    },
+    {
+      "feature": "面型长形",
+      "meaning": "思虑深，适合研究策划。",
+      "category": "面型"
+    },
+    {
+      "feature": "天庭饱满",
+      "meaning": "早年贵人多，利于求学考试。",
+      "category": "十二宫·父母"
+    },
+    {
+      "feature": "父母宫明朗",
+      "meaning": "长辈缘佳，可得指引与资源。",
+      "category": "十二宫·父母"
+    },
+    {
+      "feature": "财帛宫丰润",
+      "meaning": "聚财能力强，宜稳健理财。",
+      "category": "十二宫·财帛"
+    },
+    {
+      "feature": "财帛宫偏窄",
+      "meaning": "财来需节制，忌冲动消费。",
+      "category": "十二宫·财帛"
+    },
+    {
+      "feature": "官禄宫清秀",
+      "meaning": "事业名望有机会，宜修专业口碑。",
+      "category": "十二宫·官禄"
+    },
+    {
+      "feature": "官禄宫有滞",
+      "meaning": "事业推进宜分阶段，忌急于求成。",
+      "category": "十二宫·官禄"
+    },
+    {
+      "feature": "夫妻宫清秀",
+      "meaning": "感情表达自然，婚恋可经营。",
+      "category": "十二宫·夫妻"
+    },
+    {
+      "feature": "夫妻宫有纹",
+      "meaning": "感情多思虑，宜坦诚沟通。",
+      "category": "十二宫·夫妻"
+    },
+    {
+      "feature": "子女宫圆满",
+      "meaning": "子女缘与创造力较好。",
+      "category": "十二宫·子女"
+    },
+    {
+      "feature": "迁移宫开阔",
+      "meaning": "外出发展机会多，宜把握平台。",
+      "category": "十二宫·迁移"
+    },
+    {
+      "feature": "疾厄宫平缓",
+      "meaning": "体质基础尚可，仍需规律作息。",
+      "category": "十二宫·疾厄"
+    },
+    {
+      "feature": "福德宫宽阔",
+      "meaning": "内心富足，兴趣能养心。",
+      "category": "十二宫·福德"
+    },
+    {
+      "feature": "田宅宫厚实",
+      "meaning": "置业置产意愿强，宜量入为出。",
+      "category": "十二宫·田宅"
+    },
+    {
+      "feature": "兄弟宫明朗",
+      "meaning": "手足朋友缘佳，可互助。",
+      "category": "十二宫·兄弟"
+    },
+    {
+      "feature": "奴仆宫清",
+      "meaning": "部属同事缘平稳，宜公平待人。",
+      "category": "十二宫·奴仆"
+    },
+    {
+      "feature": "两颧有神",
+      "meaning": "中年权柄显现，适合带团队。",
+      "category": "五岳"
+    },
+    {
+      "feature": "额岳分明",
+      "meaning": "思维层次清晰，利于规划。",
+      "category": "五岳"
+    },
+    {
+      "feature": "鼻岳居中",
+      "meaning": "中年枢纽运佳，承上启下。",
+      "category": "五岳"
+    },
+    {
+      "feature": "两颐丰满",
+      "meaning": "口福与人缘并存，社交利器。",
+      "category": "五岳"
+    },
+    {
+      "feature": "下颌有力",
+      "meaning": "决断力强，晚年能守成。",
+      "category": "五岳"
+    },
+    {
+      "feature": "皮肤细润",
+      "meaning": "保养意识强，形象加分。",
+      "category": "气色"
+    },
+    {
+      "feature": "抬头纹浅",
+      "meaning": "心事不重，心态较轻松。",
+      "category": "三停·上停"
+    },
+    {
+      "feature": "抬头纹深",
+      "meaning": "思虑早熟，宜学会放下。",
+      "category": "三停·上停"
+    },
+    {
+      "feature": "川字纹显",
+      "meaning": "近期烦心事多，宜运动疏导。",
+      "category": "十二宫·命宫"
+    },
+    {
+      "feature": "卧蚕明显",
+      "meaning": "桃花与亲和力显，宜自持。",
+      "category": "眉眼"
+    },
+    {
+      "feature": "笑肌自然",
+      "meaning": "亲和力强，利于谈判与服务。",
+      "category": "口"
+    },
+    {
+      "feature": "颈纹较少",
+      "meaning": "保养得宜，精气神尚可。",
+      "category": "气色"
+    }
+  ]
+}

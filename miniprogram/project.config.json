@@ -1,0 +1,14 @@
+{
+  "description": "易道命理小程序壳",
+  "packOptions": { "ignore": [] },
+  "setting": {
+    "es6": true,
+    "minified": true,
+    "urlCheck": false
+  },
+  "compileType": "miniprogram",
+  "appid": "touristappid",
+  "projectname": "suanming-miniprogram",
+  "miniprogramRoot": "./",
+  "libVersion": "3.5.5"
+}

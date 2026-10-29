@@ -1,0 +1,43 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/login",
+    "pages/modules/modules",
+    "pages/calc/calc",
+    "pages/profiles/profiles",
+    "pages/reports/reports",
+    "pages/report-detail/report-detail"
+  ],
+  "window": {
+    "navigationBarTitleText": "易道命理",
+    "navigationBarBackgroundColor": "#1a1208",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f7f1e6"
+  },
+  "tabBar": {
+    "color": "#6b5c45",
+    "selectedColor": "#b83a2f",
+    "backgroundColor": "#fffaf0",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/modules/modules",
+        "text": "术数"
+      },
+      {
+        "pagePath": "pages/profiles/profiles",
+        "text": "档案"
+      },
+      {
+        "pagePath": "pages/reports/reports",
+        "text": "历史"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,26 @@
+<view wx:if="{{!authed}}" class="card">
+  <view>请先登录</view>
+  <button class="btn-primary" bindtap="goLogin">去登录</button>
+</view>
+<block wx:else>
+  <view class="card">
+    <view style="font-weight:600;">新建档案</view>
+    <label class="label">名称<input class="input" value="{{form.name}}" data-k="name" bindinput="onForm" /></label>
+    <label class="label">性别
+      <picker mode="selector" range="{{genders}}" value="{{genderIndex}}" bindchange="onGender">
+        <view class="input">{{genders[genderIndex]}}</view>
+      </picker>
+    </label>
+    <label class="label">年<input class="input" type="number" value="{{form.birthYear}}" data-k="birthYear" bindinput="onForm" /></label>
+    <label class="label">月<input class="input" type="number" value="{{form.birthMonth}}" data-k="birthMonth" bindinput="onForm" /></label>
+    <label class="label">日<input class="input" type="number" value="{{form.birthDay}}" data-k="birthDay" bindinput="onForm" /></label>
+    <label class="label">时（0-23，可空）<input class="input" type="number" value="{{form.birthHour}}" data-k="birthHour" bindinput="onForm" /></label>
+    <button class="btn-primary" loading="{{creating}}" bindtap="create">保存并设为当前</button>
+  </view>
+  <view wx:if="{{error}}" class="error">{{error}}</view>
+  <view class="card" wx:for="{{profiles}}" wx:key="id">
+    <view style="font-weight:600;">{{item.name || '未命名'}} {{item.id===activeId?'（当前）':''}}</view>
+    <view class="muted">{{item.birthYear}}-{{item.birthMonth}}-{{item.birthDay}} · {{item.gender}}</view>
+    <button wx:if="{{item.id!==activeId}}" class="btn-ghost" size="mini" data-id="{{item.id}}" bindtap="setActive">设为当前</button>
+  </view>
+</block>

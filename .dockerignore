@@ -1,0 +1,15 @@
+# Git
+.git
+.gitignore
+.cursor
+.next
+node_modules
+data
+*.md
+!README.md
+miniprogram
+android
+docs
+agent-transcripts
+.env*
+!.env.example

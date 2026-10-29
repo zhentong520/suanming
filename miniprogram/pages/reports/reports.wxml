@@ -1,0 +1,16 @@
+<view wx:if="{{!authed}}" class="card">
+  <view>请先登录</view>
+  <button class="btn-primary" bindtap="goLogin">去登录</button>
+</view>
+<view wx:elif="{{error}}" class="error">{{error}}</view>
+<view wx:elif="{{!reports.length}}" class="card muted">暂无报告，先去测算吧。</view>
+<navigator
+  wx:for="{{reports}}"
+  wx:key="id"
+  class="card item"
+  url="/pages/report-detail/report-detail?id={{item.id}}"
+>
+  <view style="font-weight:600;">{{item.moduleName}}</view>
+  <view class="muted">{{item.createdAt}}</view>
+  <view class="muted">{{item.snippet}}</view>
+</navigator>

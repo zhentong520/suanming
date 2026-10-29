@@ -1,0 +1,56 @@
+page {
+  background: #f7f1e6;
+  color: #2a2118;
+  font-size: 28rpx;
+  line-height: 1.55;
+}
+
+.card {
+  margin: 24rpx;
+  padding: 28rpx;
+  background: #fffaf0;
+  border: 1rpx solid #d4c4a8;
+}
+
+.btn-primary {
+  background: #b83a2f;
+  color: #fff;
+  border-radius: 8rpx;
+  margin-top: 24rpx;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #b83a2f;
+  border: 1rpx solid #b83a2f;
+  border-radius: 8rpx;
+}
+
+.muted {
+  color: #6b5c45;
+  font-size: 24rpx;
+}
+
+.input {
+  border: 1rpx solid #d4c4a8;
+  padding: 16rpx 20rpx;
+  margin-top: 12rpx;
+  background: #fff;
+}
+
+.label {
+  display: block;
+  margin-top: 20rpx;
+  color: #4a3f30;
+}
+
+.error {
+  color: #b83a2f;
+  margin: 16rpx 24rpx;
+}
+
+.report {
+  white-space: pre-wrap;
+  font-size: 26rpx;
+  line-height: 1.7;
+}

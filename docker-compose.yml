@@ -1,0 +1,15 @@
+services:
+  suanming:
+    build: .
+    container_name: suanming
+    ports:
+      - "9111:9111"
+    env_file:
+      - .env.local
+    environment:
+      DATABASE_URL: file:./data/suanming.db
+      DATABASE_DIALECT: sqlite
+    volumes:
+      # 持久化 SQLite，避免重建容器丢数据
+      - ./data:/app/data
+    restart: unless-stopped

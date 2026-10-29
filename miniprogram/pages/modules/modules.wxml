@@ -1,0 +1,15 @@
+<view wx:if="{{!authed}}" class="card">
+  <view>请先登录后再测算</view>
+  <button class="btn-primary" bindtap="goLogin">去登录</button>
+</view>
+<view wx:else class="list">
+  <navigator
+    wx:for="{{modules}}"
+    wx:key="id"
+    class="card item"
+    url="/pages/calc/calc?id={{item.id}}"
+  >
+    <view class="name">{{item.name}}</view>
+    <view class="muted">{{item.requiresProfile ? '需档案' : '即问即测'}} · {{item.id}}</view>
+  </navigator>
+</view>

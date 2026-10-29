@@ -1,0 +1,424 @@
+{
+  "features": [
+    {
+      "feature": "生命线较长",
+      "meaning": "体质基础较好，耐力足，宜持续运动保养，避免透支。",
+      "category": "主线"
+    },
+    {
+      "feature": "生命线清晰",
+      "meaning": "生活节奏较稳，重大疾病少，注意情绪管理。",
+      "category": "主线"
+    },
+    {
+      "feature": "生命线有分叉",
+      "meaning": "人生阶段转换明显，宜在关键节点做规划。",
+      "category": "主线"
+    },
+    {
+      "feature": "生命线短浅",
+      "meaning": "宜加强锻炼与体检，避免透支体能。",
+      "category": "主线"
+    },
+    {
+      "feature": "生命线岛纹",
+      "meaning": "某阶段压力较大，宜及时调整节奏。",
+      "category": "主线"
+    },
+    {
+      "feature": "智慧线清晰",
+      "meaning": "思维条理，学习力强，利于专业深耕。",
+      "category": "主线"
+    },
+    {
+      "feature": "智慧线过长",
+      "meaning": "思虑偏多，宜防犹豫，决策时可设期限。",
+      "category": "主线"
+    },
+    {
+      "feature": "智慧线短直",
+      "meaning": "决断快，宜补信息再拍板。",
+      "category": "主线"
+    },
+    {
+      "feature": "智慧线下垂",
+      "meaning": "想象力强，宜落地执行配套。",
+      "category": "主线"
+    },
+    {
+      "feature": "智慧线断裂",
+      "meaning": "思绪转折大，宜分阶段学习转型。",
+      "category": "主线"
+    },
+    {
+      "feature": "感情线深长",
+      "meaning": "重情专一，感情投入深，宜选稳定对象。",
+      "category": "主线"
+    },
+    {
+      "feature": "感情线分叉",
+      "meaning": "感情选择较多，宜明确底线，避免纠缠。",
+      "category": "主线"
+    },
+    {
+      "feature": "感情线短",
+      "meaning": "情感表达含蓄，宜主动沟通。",
+      "category": "主线"
+    },
+    {
+      "feature": "感情线多细纹",
+      "meaning": "情绪敏感，宜稳定作息与倾诉。",
+      "category": "主线"
+    },
+    {
+      "feature": "事业线明显",
+      "meaning": "事业心强，有上升通道，适合目标管理。",
+      "category": "辅线"
+    },
+    {
+      "feature": "事业线断续",
+      "meaning": "职业路径多转折，宜积累可迁移技能。",
+      "category": "辅线"
+    },
+    {
+      "feature": "事业线深长",
+      "meaning": "事业主线清晰，宜长期深耕。",
+      "category": "辅线"
+    },
+    {
+      "feature": "太阳线显现",
+      "meaning": "名声与表现机会较好，适合展示型工作。",
+      "category": "辅线"
+    },
+    {
+      "feature": "太阳线模糊",
+      "meaning": "名声运平，宜靠实力慢慢积累。",
+      "category": "辅线"
+    },
+    {
+      "feature": "婚姻线清晰",
+      "meaning": "婚恋态度认真，关系可长久经营。",
+      "category": "辅线"
+    },
+    {
+      "feature": "婚姻线多条",
+      "meaning": "感情经历层次多，宜分清主次。",
+      "category": "辅线"
+    },
+    {
+      "feature": "婚姻线下垂",
+      "meaning": "感情易操心，宜边界清晰。",
+      "category": "辅线"
+    },
+    {
+      "feature": "财运线明显",
+      "meaning": "理财意识强，偏正财积累，忌冲动投机。",
+      "category": "辅线"
+    },
+    {
+      "feature": "财运线浅",
+      "meaning": "财运靠稳健，宜开源节流并行。",
+      "category": "辅线"
+    },
+    {
+      "feature": "健康线显现",
+      "meaning": "宜关注消化与压力管理。",
+      "category": "辅线"
+    },
+    {
+      "feature": "直觉线隐现",
+      "meaning": "第六感强，重要决定可冷静复核。",
+      "category": "辅线"
+    },
+    {
+      "feature": "金星丘丰满",
+      "meaning": "热情活力足，人际魅力佳，注意自律。",
+      "category": "丘位"
+    },
+    {
+      "feature": "金星丘平坦",
+      "meaning": "热情需刻意调动，宜社交拓展。",
+      "category": "丘位"
+    },
+    {
+      "feature": "木星丘高",
+      "meaning": "上进心与领导欲强，宜担当责任。",
+      "category": "丘位"
+    },
+    {
+      "feature": "木星丘低",
+      "meaning": "进取心待激，宜设小目标。",
+      "category": "丘位"
+    },
+    {
+      "feature": "土星丘稳",
+      "meaning": "耐心坚韧，适合长期事业与研究。",
+      "category": "丘位"
+    },
+    {
+      "feature": "土星丘过高",
+      "meaning": "责任感过重，宜学会放松。",
+      "category": "丘位"
+    },
+    {
+      "feature": "太阳丘隆",
+      "meaning": "艺术审美与表现力佳，利于创意行业。",
+      "category": "丘位"
+    },
+    {
+      "feature": "太阳丘平",
+      "meaning": "表现欲弱，宜适度曝光成果。",
+      "category": "丘位"
+    },
+    {
+      "feature": "水星丘活",
+      "meaning": "沟通力与商业头脑较好，适合谈判销售。",
+      "category": "丘位"
+    },
+    {
+      "feature": "水星丘弱",
+      "meaning": "表达可加强训练，利于职场。",
+      "category": "丘位"
+    },
+    {
+      "feature": "月丘丰润",
+      "meaning": "想象力强，直觉佳，宜防情绪波动。",
+      "category": "丘位"
+    },
+    {
+      "feature": "月丘低平",
+      "meaning": "务实偏多，宜保留一点想象空间。",
+      "category": "丘位"
+    },
+    {
+      "feature": "火星丘有力",
+      "meaning": "行动力与魄力足，宜控冲动。",
+      "category": "丘位"
+    },
+    {
+      "feature": "地丘厚实",
+      "meaning": "根基稳，适合置产与长期规划。",
+      "category": "丘位"
+    },
+    {
+      "feature": "拇指粗壮",
+      "meaning": "意志坚定，执行力强，适合拍板。",
+      "category": "手指"
+    },
+    {
+      "feature": "拇指柔弱",
+      "meaning": "主意易变，宜列清单执行。",
+      "category": "手指"
+    },
+    {
+      "feature": "食指偏长",
+      "meaning": "支配欲与目标感强，宜学习授权。",
+      "category": "手指"
+    },
+    {
+      "feature": "食指偏短",
+      "meaning": "宜增强主动性，少等指示。",
+      "category": "手指"
+    },
+    {
+      "feature": "中指端正",
+      "meaning": "责任心与原则感强，做事靠谱。",
+      "category": "手指"
+    },
+    {
+      "feature": "中指弯曲",
+      "meaning": "压力感强，宜调整期待。",
+      "category": "手指"
+    },
+    {
+      "feature": "无名指修长",
+      "meaning": "审美与人缘较好，利于公关与艺术。",
+      "category": "手指"
+    },
+    {
+      "feature": "无名指短",
+      "meaning": "务实为主，艺术兴趣可作调剂。",
+      "category": "手指"
+    },
+    {
+      "feature": "小指灵活",
+      "meaning": "口才与交际机敏，适合协调事务。",
+      "category": "手指"
+    },
+    {
+      "feature": "小指短弱",
+      "meaning": "表达可加强，合同宜书面确认。",
+      "category": "手指"
+    },
+    {
+      "feature": "指节分明",
+      "meaning": "思维细致，适合技术与分析。",
+      "category": "手指"
+    },
+    {
+      "feature": "指缝紧闭",
+      "meaning": "节俭谨慎，宜适度开放机会。",
+      "category": "手指"
+    },
+    {
+      "feature": "掌型偏方",
+      "meaning": "务实稳重，适合管理与技术落地。",
+      "category": "掌型"
+    },
+    {
+      "feature": "掌型偏长",
+      "meaning": "思维灵活，适合创意与策划。",
+      "category": "掌型"
+    },
+    {
+      "feature": "掌型圆锥",
+      "meaning": "敏感细腻，适合服务与艺术。",
+      "category": "掌型"
+    },
+    {
+      "feature": "掌型鼓形",
+      "meaning": "精力旺盛，宜控节奏防过劳。",
+      "category": "掌型"
+    },
+    {
+      "feature": "掌型原始",
+      "meaning": "行动直觉强，宜配计划。",
+      "category": "掌型"
+    },
+    {
+      "feature": "掌心凹陷",
+      "meaning": "承接他人情绪多，宜设边界。",
+      "category": "掌型"
+    },
+    {
+      "feature": "掌心厚实",
+      "meaning": "体力与抗压较好，适合实干。",
+      "category": "掌型"
+    },
+    {
+      "feature": "掌色红润",
+      "meaning": "气血较旺，近期行动力佳。",
+      "category": "气色"
+    },
+    {
+      "feature": "掌色偏白",
+      "meaning": "宜加强运动与营养，避免过劳。",
+      "category": "气色"
+    },
+    {
+      "feature": "掌色青滞",
+      "meaning": "循环与情绪需关注，宜运动发汗。",
+      "category": "气色"
+    },
+    {
+      "feature": "掌色黄",
+      "meaning": "消化负担或思虑过，宜清淡。",
+      "category": "气色"
+    },
+    {
+      "feature": "掌纹清晰",
+      "meaning": "思路清楚，事务处理有条理。",
+      "category": "气色"
+    },
+    {
+      "feature": "掌纹杂乱",
+      "meaning": "心事多，宜做减法聚焦。",
+      "category": "气色"
+    },
+    {
+      "feature": "左手主动",
+      "meaning": "行动与外在事业信息更显。",
+      "category": "左右手"
+    },
+    {
+      "feature": "右手主动",
+      "meaning": "规划与内在决策信息更显。",
+      "category": "左右手"
+    },
+    {
+      "feature": "双手差异大",
+      "meaning": "理想与现实落差大，宜对齐目标。",
+      "category": "左右手"
+    },
+    {
+      "feature": "戒指线显",
+      "meaning": "专情倾向，婚恋责任心强。",
+      "category": "辅线"
+    },
+    {
+      "feature": "干扰纹多",
+      "meaning": "杂事分心，宜整理优先级。",
+      "category": "辅线"
+    },
+    {
+      "feature": "十字纹显",
+      "meaning": "关键抉择点多，宜慎重。",
+      "category": "辅线"
+    },
+    {
+      "feature": "三角纹显",
+      "meaning": "某领域有专精潜力。",
+      "category": "辅线"
+    },
+    {
+      "feature": "岛纹出现",
+      "meaning": "阶段波折，宜休整再出发。",
+      "category": "辅线"
+    },
+    {
+      "feature": "锁链纹",
+      "meaning": "反复纠结，宜简化决策。",
+      "category": "辅线"
+    },
+    {
+      "feature": "流星纹",
+      "meaning": "突发灵感或机遇，宜记录落地。",
+      "category": "辅线"
+    },
+    {
+      "feature": "旅行线显",
+      "meaning": "外出移动机会多。",
+      "category": "辅线"
+    },
+    {
+      "feature": "子女线清晰",
+      "meaning": "子女缘或创意产出较显。",
+      "category": "辅线"
+    },
+    {
+      "feature": "性线明显",
+      "meaning": "情感能量强，宜疏导转化。",
+      "category": "辅线"
+    },
+    {
+      "feature": "腕线清晰",
+      "meaning": "根基与家庭支持感较好。",
+      "category": "辅线"
+    },
+    {
+      "feature": "腕线断裂",
+      "meaning": "阶段支持感弱，宜自建支持系统。",
+      "category": "辅线"
+    },
+    {
+      "feature": "虎口宽",
+      "meaning": "格局开阔，敢闯敢试。",
+      "category": "掌型"
+    },
+    {
+      "feature": "虎口窄",
+      "meaning": "谨慎保守，宜小步试错。",
+      "category": "掌型"
+    },
+    {
+      "feature": "掌根厚",
+      "meaning": "晚年与置产运有根基。",
+      "category": "丘位"
+    },
+    {
+      "feature": "掌根薄",
+      "meaning": "宜提前做财务规划。",
+      "category": "丘位"
+    }
+  ]
+}

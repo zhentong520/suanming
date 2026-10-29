@@ -1,0 +1,18 @@
+<view class="card" wx:if="{{mod}}">
+  <view style="font-size:36rpx;font-weight:600;">{{mod.name}}</view>
+  <view class="muted" wx:if="{{mod.hint}}">{{mod.hint}}</view>
+  <block wx:for="{{mod.fields}}" wx:key="key">
+    <label class="label">{{item.label}}
+      <input class="input" data-key="{{item.key}}" value="{{form[item.key]}}" placeholder="{{item.placeholder}}" bindinput="onField" />
+    </label>
+  </block>
+  <button class="btn-primary" loading="{{loading}}" bindtap="submit">开始测算</button>
+</view>
+<view wx:if="{{error}}" class="error">{{error}}</view>
+<view class="card" wx:if="{{report}}">
+  <view style="font-weight:600;margin-bottom:12rpx;">测算结果</view>
+  <view class="report">{{report}}</view>
+  <navigator wx:if="{{reportId}}" url="/pages/report-detail/report-detail?id={{reportId}}" class="muted" style="display:block;margin-top:16rpx;">
+    查看存档详情 →
+  </navigator>
+</view>

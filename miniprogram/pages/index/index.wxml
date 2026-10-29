@@ -1,0 +1,12 @@
+<view class="card">
+  <view style="font-size:40rpx;font-weight:600;">{{siteName}}</view>
+  <view class="muted" style="margin-top:12rpx;">一次建档 · 多术数复用</view>
+  <view wx:if="{{user}}" class="muted" style="margin-top:20rpx;">
+    已登录：{{user.displayName || user.email || user.phone}}
+  </view>
+  <button wx:if="{{!user}}" class="btn-primary" bindtap="goLogin">登录 / 注册</button>
+  <block wx:else>
+    <button class="btn-primary" bindtap="goModules">开始测算</button>
+    <button class="btn-ghost" bindtap="logout">退出登录</button>
+  </block>
+</view>
