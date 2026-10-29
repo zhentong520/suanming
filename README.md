@@ -4,8 +4,7 @@ Web 版命理测算平台，融合八字、紫微、测字、黄历、合婚、�
 
 📖 **完整使用文档：[docs/使用文档.md](docs/使用文档.md)**  
 📄 **PDF 版：[docs/易道命理使用文档.pdf](docs/易道命理使用文档.pdf)**  
-🗂️ **架构 / 需求 / 功能 / SQL / 待办（Agent Hub）**：[`E:/agent-hub/projects/suanming/INDEX.md`](file:///E:/agent-hub/projects/suanming/INDEX.md)  
-（业务仓仅运维文档 + [docs/文档索引.md](docs/文档索引.md) 短指针）
+🗂️ **运维文档索引**：[docs/文档索引.md](docs/文档索引.md)
 
 ## 功能
 
@@ -70,3 +69,7 @@ Body: { "profileId": "...", "params": { ... } }
 ## 免责声明
 
 本系统仅供文化研习与娱乐参考，不构成医疗、法律、金融建议。
+
+## 许可证
+
+本项目基于 [Apache License 2.0](LICENSE) 开源（含显式专利授权）。
