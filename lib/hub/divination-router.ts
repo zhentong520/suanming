@@ -394,9 +394,9 @@ export async function runModule(input: ModuleInput): Promise<ModuleOutput> {
     case "face": {
       const imageId = params.imageId ? String(params.imageId) : "";
       if (imageId && input.userId) {
-        const meta = getReadingImage(input.userId, imageId);
+        const meta = await getReadingImage(input.userId, imageId);
         if (!meta || meta.module !== "face") throw new Error("面相照片不存在或无权访问");
-        const dataUrl = readImageAsDataUrl(meta);
+        const dataUrl = await readImageAsDataUrl(meta);
         facts = (await computeFaceReadingFromImage(dataUrl, imageId, input.userId)) as unknown as Record<string, unknown>;
       } else {
         const featureStr = String(params.features ?? "");
@@ -408,9 +408,9 @@ export async function runModule(input: ModuleInput): Promise<ModuleOutput> {
     case "palm": {
       const imageId = params.imageId ? String(params.imageId) : "";
       if (imageId && input.userId) {
-        const meta = getReadingImage(input.userId, imageId);
+        const meta = await getReadingImage(input.userId, imageId);
         if (!meta || meta.module !== "palm") throw new Error("手相照片不存在或无权访问");
-        const dataUrl = readImageAsDataUrl(meta);
+        const dataUrl = await readImageAsDataUrl(meta);
         facts = (await computePalmReadingFromImage(dataUrl, imageId, input.userId)) as unknown as Record<string, unknown>;
       } else {
         const featureStr = String(params.features ?? "");

@@ -130,8 +130,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ mod
       const status = e.code === "insufficient_points" ? 402 : e.code === "user_disabled" ? 403 : 400;
       return NextResponse.json({ error: e.message, code: e.code }, { status });
     }
-    return NextResponse.json({ error: e instanceof Error ? e.message : "计算失败" }, { status: 400 });
+    return NextResponse.json({ error: toClientError(e) }, { status: 400 });
   }
+}
+
+/** 非业务异常不透传内部细节（路径/依赖信息），仅记录服务端日志 */
+function toClientError(e: unknown): string {
+  if (e instanceof Error && e.message) {
+    // 业务校验类错误为面向用户的中文文案；引擎/文件系统异常统一收敛
+    if (/^[\u4e00-\u9fa5]/.test(e.message) && !/ENOENT|EACCES|SQLITE|Error:/.test(e.message)) {
+      return e.message;
+    }
+    console.error("[suanming:v1] 模块计算异常:", e);
+  }
+  return "计算失败，请稍后重试";
 }
 
 export async function GET(_: Request, { params }: { params: Promise<{ module: string }> }) {

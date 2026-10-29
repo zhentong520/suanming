@@ -8,11 +8,12 @@ import {
   adminPasswordLooksDefault,
   authCookieSecure,
   jwtSecretLooksWeak,
+  resolveJwtSecret,
 } from "@/lib/security/production-guards";
 
 export const ADMIN_TOKEN_COOKIE = "admin_token";
 
-const secret = () => new TextEncoder().encode(process.env.JWT_SECRET ?? "dev-secret");
+const secret = () => new TextEncoder().encode(resolveJwtSecret());
 
 export async function verifyAdminCredentials(username: string, password: string) {
   const db = getDb();
@@ -34,6 +35,12 @@ export async function createAdminToken(userId: string, username: string, role: s
 export async function verifyAdminToken(token: string) {
   try {
     const { payload } = await jwtVerify(token, secret());
+    // 回查数据库：账号被删除后即使 token 签名有效也立即失效
+    const adminId = payload.sub;
+    if (!adminId) return null;
+    const db = getDb();
+    const [row] = await db.select().from(adminUsers).where(eq(adminUsers.id, adminId)).limit(1);
+    if (!row || row.username !== payload.username) return null;
     return payload;
   } catch {
     return null;

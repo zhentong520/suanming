@@ -11,6 +11,8 @@ export interface CompletionOptions {
   maxTokens?: number;
   temperature?: number;
   model?: string;
+  /** 请求超时毫秒数，默认文本 30s / 识图 60s */
+  timeoutMs?: number;
 }
 
 export type VisionContentPart =
@@ -58,7 +60,7 @@ export class StubAIProvider implements AIProvider {
 }
 
 export function createProvider(config: AIProviderConfig): AIProvider {
-  async function requestCompletion(body: Record<string, unknown>) {
+  async function requestCompletion(body: Record<string, unknown>, timeoutMs: number) {
     const response = await fetch(`${config.baseUrl.replace(/\/$/, "")}/chat/completions`, {
       method: "POST",
       headers: {
@@ -66,6 +68,8 @@ export function createProvider(config: AIProviderConfig): AIProvider {
         Authorization: `Bearer ${config.apiKey}`,
       },
       body: JSON.stringify(body),
+      // 防止上游挂起导致请求无限等待；超时后由调用方走模板回退
+      signal: AbortSignal.timeout(timeoutMs),
     });
     if (!response.ok) {
       const errText = await response.text().catch(() => "");
@@ -91,7 +95,7 @@ export function createProvider(config: AIProviderConfig): AIProvider {
         messages: [{ role: "user", content: prompt }],
         max_tokens: options?.maxTokens ?? config.maxTokens ?? 2048,
         temperature: options?.temperature ?? config.temperature ?? 0.7,
-      });
+      }, options?.timeoutMs ?? 30_000);
     },
     async completeVision(messages: VisionMessage[], options?: CompletionOptions) {
       return requestCompletion({
@@ -99,7 +103,7 @@ export function createProvider(config: AIProviderConfig): AIProvider {
         messages,
         max_tokens: options?.maxTokens ?? config.maxTokens ?? 2048,
         temperature: options?.temperature ?? config.temperature ?? 0.4,
-      });
+      }, options?.timeoutMs ?? 60_000);
     },
   };
 }

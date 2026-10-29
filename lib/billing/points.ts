@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { getDb, getSqlite } from "@/lib/db/client";
-import { pointLedger, users, aiGlobalSettings, aiModuleSwitches } from "@/lib/db/schema";
+import { users, aiGlobalSettings, aiModuleSwitches } from "@/lib/db/schema";
 import {
   costForKind,
   getBillingSettings,
@@ -161,25 +161,45 @@ export async function grantPoints(opts: {
   const amount = Math.floor(opts.amount);
   if (amount <= 0) throw new BillingError("赠送积分须为正数", "billing");
 
-  const db = getDb();
-  const [user] = await db.select().from(users).where(eq(users.id, opts.userId)).limit(1);
-  if (!user) throw new BillingError("用户不存在", "user_not_found");
-
-  const balance = (user.pointsBalance ?? 0) + amount;
+  const sqlite = getSqlite();
   const now = new Date().toISOString();
-  await db.update(users).set({ pointsBalance: balance, updatedAt: now }).where(eq(users.id, opts.userId));
-  await db.insert(pointLedger).values({
-    id: crypto.randomUUID(),
-    userId: opts.userId,
-    delta: amount,
-    balanceAfter: balance,
-    reason: opts.reason,
-    refType: opts.refType ?? null,
-    refId: opts.refId ?? null,
-    metaJson: opts.meta ? JSON.stringify(opts.meta) : null,
-    createdAt: now,
-  });
-  return { balance };
+
+  // 原子累加（CAS 风格），并发赠送不会互相覆盖；流水与余额同事务
+  const result = sqlite.transaction((): { balance: number } => {
+    const upd = sqlite
+      .prepare(
+        `UPDATE users
+         SET points_balance = points_balance + ?, updated_at = ?
+         WHERE id = ?`
+      )
+      .run(amount, now, opts.userId);
+    if (upd.changes === 0) throw new BillingError("用户不存在", "user_not_found");
+
+    const row = sqlite.prepare("SELECT points_balance FROM users WHERE id = ?").get(opts.userId) as {
+      points_balance: number;
+    };
+    const balance = row.points_balance;
+    sqlite
+      .prepare(
+        `INSERT INTO point_ledger
+         (id, user_id, delta, balance_after, reason, ref_type, ref_id, meta_json, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .run(
+        crypto.randomUUID(),
+        opts.userId,
+        amount,
+        balance,
+        opts.reason,
+        opts.refType ?? null,
+        opts.refId ?? null,
+        opts.meta ? JSON.stringify(opts.meta) : null,
+        now
+      );
+    return { balance };
+  })();
+
+  return result;
 }
 
 /**

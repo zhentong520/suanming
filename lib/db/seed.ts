@@ -14,6 +14,7 @@ import { MODULE_DEFINITIONS } from "../hub/module-registry";
 import { encryptSecret } from "../ai/secret-crypto";
 import { getVolcEnvConfig } from "../ai/volc-models";
 import { ensureAdminRoleByEmail } from "../ai/quota";
+import { adminPasswordLooksDefault, isProductionRuntime } from "../security/production-guards";
 
 export async function seedDatabase() {
   runMigrations();
@@ -91,8 +92,15 @@ export async function seedDatabase() {
     .limit(1);
 
   if (existingAdmin.length === 0) {
-    const password = process.env.ADMIN_PASSWORD ?? "admin123";
-    const hash = await bcrypt.hash(password, 10);
+    const password = process.env.ADMIN_PASSWORD ?? "";
+    // 生产环境禁止以默认/弱口令创建管理员，直接拒绝 seed
+    if (isProductionRuntime() && (!password || adminPasswordLooksDefault(password))) {
+      throw new Error(
+        "[suanming:security] 生产环境必须显式设置 ADMIN_PASSWORD（至少 8 位且非常见默认值），拒绝创建默认管理员。"
+      );
+    }
+    const resolvedPassword = password || "admin123";
+    const hash = await bcrypt.hash(resolvedPassword, 10);
     await db.insert(adminUsers).values({
       id: crypto.randomUUID(),
       username,

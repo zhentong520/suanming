@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { desc, eq } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
 import { ensureSeeded } from "../../init/route";
 import { getDb } from "@/lib/db/client";
 import { moduleStats, userOperations } from "@/lib/db/schema";
@@ -33,15 +33,15 @@ export async function GET(request: Request) {
     }));
 
   const days = 14;
-  const ops = await db
-    .select({
-      action: userOperations.action,
-      createdAt: userOperations.createdAt,
-    })
+  // 聚合下推 SQL：按上海时区分天计数，避免全量拉行到 JS；不再 LIMIT 截断漏计
+  const day13 = shanghaiDateKey(new Date(Date.now() - 13 * 86_400_000));
+  const cutoffIso = new Date(`${day13}T00:00:00+08:00`).toISOString();
+  const dayExpr = sql<string>`substr(datetime(${userOperations.createdAt}, '+8 hours'), 1, 10)`;
+  const grouped = await db
+    .select({ day: dayExpr.as("day"), count: sql<number>`count(*)`.as("count") })
     .from(userOperations)
-    .where(eq(userOperations.action, "module_calc"))
-    .orderBy(desc(userOperations.createdAt))
-    .limit(5000);
+    .where(and(eq(userOperations.action, "module_calc"), gte(userOperations.createdAt, cutoffIso)))
+    .groupBy(dayExpr);
 
   const dayMap = new Map<string, number>();
   for (let i = days - 1; i >= 0; i--) {
@@ -49,10 +49,9 @@ export async function GET(request: Request) {
     d.setDate(d.getDate() - i);
     dayMap.set(shanghaiDateKey(d), 0);
   }
-  for (const op of ops) {
-    const key = shanghaiDateKey(new Date(op.createdAt));
-    if (dayMap.has(key)) {
-      dayMap.set(key, (dayMap.get(key) ?? 0) + 1);
+  for (const row of grouped) {
+    if (dayMap.has(row.day)) {
+      dayMap.set(row.day, dayMap.get(row.day)! + Number(row.count));
     }
   }
   const dailyTrend = Array.from(dayMap.entries()).map(([date, count]) => ({ date, count }));

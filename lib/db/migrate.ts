@@ -163,7 +163,25 @@ export function runMigrations() {
   `);
 
   runColumnMigrations(db);
+  runIndexMigrations(db);
   db.close();
+}
+
+/** 高频查询路径的二级索引（幂等） */
+function runIndexMigrations(db: Database.Database) {
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_reports_user_created ON reports(user_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_reports_profile ON reports(profile_id);
+    CREATE INDEX IF NOT EXISTS idx_ops_action_created ON user_operations(action, created_at);
+    CREATE INDEX IF NOT EXISTS idx_ops_user_created ON user_operations(user_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_ops_profile ON user_operations(profile_id);
+    CREATE INDEX IF NOT EXISTS idx_ledger_user_created ON point_ledger(user_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_ledger_reason ON point_ledger(reason, created_at);
+    CREATE INDEX IF NOT EXISTS idx_profiles_user ON profiles(user_id);
+    CREATE INDEX IF NOT EXISTS idx_payment_orders_user ON payment_orders(user_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_matches_profile_a ON matches(profile_id_a);
+    CREATE INDEX IF NOT EXISTS idx_matches_profile_b ON matches(profile_id_b);
+  `);
 }
 
 function runColumnMigrations(db: Database.Database) {

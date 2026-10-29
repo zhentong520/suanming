@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { getDb } from "@/lib/db/client";
+import { getDb, getSqlite } from "@/lib/db/client";
 import { moduleStats } from "@/lib/db/schema";
 
 /** YYYY-MM-DD in Asia/Shanghai */
@@ -45,12 +45,15 @@ export async function reconcileTodayCounts() {
   const db = getDb();
   const todayKey = shanghaiDateKey();
   const stats = await db.select().from(moduleStats);
-  for (const stat of stats) {
-    if (stat.todayCount > 0 && !isSameShanghaiDay(stat.lastCalledAt, todayKey)) {
-      await db
-        .update(moduleStats)
-        .set({ todayCount: 0 })
-        .where(eq(moduleStats.moduleId, stat.moduleId));
-    }
-  }
+  const stale = stats.filter(
+    (s) => s.todayCount > 0 && !isSameShanghaiDay(s.lastCalledAt, todayKey)
+  );
+  if (stale.length === 0) return;
+
+  // 同一天重复打开 dashboard 不再产生写入；跨天归零合并进单事务
+  const sqlite = getSqlite();
+  sqlite.transaction(() => {
+    const upd = sqlite.prepare("UPDATE module_stats SET today_count = 0 WHERE module_id = ?");
+    for (const s of stale) upd.run(s.moduleId);
+  })();
 }

@@ -5,11 +5,11 @@ import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
 import { getDb } from "@/lib/db/client";
 import { users } from "@/lib/db/schema";
-import { authCookieSecure } from "@/lib/security/production-guards";
+import { authCookieSecure, resolveJwtSecret } from "@/lib/security/production-guards";
 
 export const USER_TOKEN_COOKIE = "user_token";
 
-const secret = () => new TextEncoder().encode(process.env.JWT_SECRET ?? "dev-secret");
+const secret = () => new TextEncoder().encode(resolveJwtSecret());
 
 export interface UserSession {
   userId: string;

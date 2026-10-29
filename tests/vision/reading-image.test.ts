@@ -35,12 +35,25 @@ describe("reading image upload", () => {
 
   it("saves and loads image metadata", async () => {
     const userId = "test-user-vision";
-    const file = mockFile("face.jpg", "image/jpeg", 4096);
+    const jpeg = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(4092, 1)]);
+    const file = new File([jpeg], "face.jpg", { type: "image/jpeg" });
     const saved = await saveReadingImage(userId, "face", file);
     expect(saved.module).toBe("face");
-    const loaded = getReadingImage(userId, saved.id);
+    expect(saved.mimeType).toBe("image/jpeg");
+    const loaded = await getReadingImage(userId, saved.id);
     expect(loaded?.id).toBe(saved.id);
     expect(loaded?.module).toBe("face");
+  });
+
+  it("rejects non-image content disguised as jpeg", async () => {
+    const userId = "test-user-vision";
+    const file = mockFile("fake.jpg", "image/jpeg", 4096);
+    await expect(saveReadingImage(userId, "face", file)).rejects.toThrow("不是有效的");
+  });
+
+  it("rejects path traversal image id", async () => {
+    const loaded = await getReadingImage("test-user-vision", "../etc/passwd");
+    expect(loaded).toBeNull();
   });
 });
 

@@ -17,6 +17,22 @@ export function adminPasswordLooksDefault(password = process.env.ADMIN_PASSWORD 
   return password === "admin123" || password === "admin" || password.length < 8;
 }
 
+/**
+ * 统一解析 JWT_SECRET：
+ * - 未配置或弱密钥时，生产环境直接抛错拒绝服务（防伪造 token）；
+ * - 开发环境回退 dev-secret 以保持本地开发体验。
+ */
+export function resolveJwtSecret(): string {
+  const s = (process.env.JWT_SECRET ?? "").trim();
+  if (s && !jwtSecretLooksWeak(s)) return s;
+  if (isProductionRuntime()) {
+    throw new Error(
+      "[suanming:security] JWT_SECRET 未配置或过弱，拒绝签发/校验令牌。请设置至少 16 位的强随机密钥。"
+    );
+  }
+  return "dev-secret";
+}
+
 /** User session cookies should be Secure on HTTPS production. */
 export function authCookieSecure(): boolean {
   if (process.env.AUTH_COOKIE_SECURE === "true") return true;

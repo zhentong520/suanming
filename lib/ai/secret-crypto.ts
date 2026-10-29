@@ -1,9 +1,10 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "crypto";
+import { resolveJwtSecret } from "@/lib/security/production-guards";
 
 const PREFIX = "enc:v1:";
 
 function getKey(): Buffer {
-  const secret = process.env.AI_KEY_SECRET || process.env.JWT_SECRET || "dev-secret";
+  const secret = process.env.AI_KEY_SECRET || resolveJwtSecret();
   return createHash("sha256").update(`suanming-ai-key:${secret}`).digest();
 }
 
