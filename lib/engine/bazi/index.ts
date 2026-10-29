@@ -1,4 +1,4 @@
-import { BirthInput, CalendarResult, buildLunarFromBirth } from "../calendar";
+import { BirthInput, CalendarResult, buildLunarFromBirth, eightCharFromBirth } from "../calendar";
 import { buildBirthChartCore } from "../shared/birth-chart";
 import { buildBaziInterpretation } from "./interpretation";
 import {
@@ -48,7 +48,7 @@ function pillarParts(gz: string): { gan: string; zhi: string } {
 
 export function computeBazi(input: BirthInput): BaziResult {
   const chart = buildBirthChartCore(input);
-  const { calendar, lunar, eightChar } = chart;
+  const { calendar, eightChar } = chart;
   const dayMaster = chart.dayMaster;
   const dayMasterElement = eightChar.getDayWuXing().replace(/[^金木水火土]/g, "") || "土";
 
@@ -133,7 +133,7 @@ export function computeBaziWithReading(input: BirthInput): BaziResult {
 export function computeBaziDayun(input: BirthInput) {
   const bazi = computeBazi(input);
   const { lunar } = buildLunarFromBirth(input);
-  const eightChar = lunar.getEightChar();
+  const eightChar = eightCharFromBirth(lunar, input);
   const yun = eightChar.getYun(input.gender === "女" ? 0 : 1);
   const daYunList = yun.getDaYun();
   const daYun = daYunList.slice(1, 9);

@@ -1,4 +1,4 @@
-import { BirthInput, buildLunarFromBirth, computeCalendar } from "../calendar";
+import { BirthInput, buildLunarFromBirth, computeCalendar, eightCharFromBirth } from "../calendar";
 import {
   julianDay,
   lahiriAyanamsa,
@@ -19,7 +19,7 @@ const GUA_WUXING = ["", "水", "土", "木", "木", "土", "金", "金", "土", 
 export function computeHeluo(input: BirthInput) {
   const cal = computeCalendar(input);
   const { lunar } = buildLunarFromBirth(input);
-  const eightChar = lunar.getEightChar();
+  const eightChar = eightCharFromBirth(lunar, input);
 
   const mingGong = eightChar.getMingGong();
   const taiYuan = eightChar.getTaiYuan();
@@ -74,7 +74,7 @@ const RASHI_CN = ["白羊", "金牛", "双子", "巨蟹", "狮子", "处女", "�
 export function computeQizheng(input: BirthInput) {
   const cal = computeCalendar(input);
   const { lunar, solar } = buildLunarFromBirth(input);
-  const eightChar = lunar.getEightChar();
+  const eightChar = eightCharFromBirth(lunar, input);
   const hour = input.hour ?? 12;
   const minute = input.minute ?? 0;
   const lon = input.longitude ?? 116.4;

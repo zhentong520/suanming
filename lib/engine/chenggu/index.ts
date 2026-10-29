@@ -1,6 +1,5 @@
 import { loadContentJson } from "@/lib/content/catalog";
-import { BirthInput } from "../calendar";
-import { buildLunarFromBirth } from "../calendar";
+import { BirthInput, buildLunarFromBirth, eightCharFromBirth } from "../calendar";
 
 interface ChengguEntry {
   weight: number;
@@ -44,7 +43,7 @@ function getSong(totalWeight: number): ChengguEntry {
 
 export function computeChenggu(input: BirthInput) {
   const { lunar } = buildLunarFromBirth(input);
-  const eightChar = lunar.getEightChar();
+  const eightChar = eightCharFromBirth(lunar, input);
 
   const yearWeight = lookupWeight("year", eightChar.getYear());
   const monthWeight = lookupWeight("month", String(input.month));

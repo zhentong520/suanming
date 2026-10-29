@@ -1,7 +1,7 @@
 /**
  * 统一出生事实：真太阳时 + 公历农历八字入口，减少各引擎各自解析漂移。
  */
-import { BirthInput, buildLunarFromBirth, computeCalendar, type CalendarResult } from "../calendar";
+import { BirthInput, eightCharFromBirth, buildLunarFromBirth, computeCalendar, type CalendarResult } from "../calendar";
 import type { Lunar, Solar } from "lunar-typescript";
 
 export interface BirthChartCore {
@@ -22,7 +22,7 @@ export interface BirthChartCore {
 export function buildBirthChartCore(input: BirthInput): BirthChartCore {
   const calendar = computeCalendar(input);
   const { lunar, solar } = buildLunarFromBirth(input);
-  const eightChar = lunar.getEightChar();
+  const eightChar = eightCharFromBirth(lunar, input);
   return {
     input,
     calendar,
