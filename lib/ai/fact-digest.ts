@@ -30,6 +30,7 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
     "dayMasterElement",
     "strength",
     "strengthScore",
+    "dstNote",
     "trueSolarNote",
     "hexagram",
     "fullName",

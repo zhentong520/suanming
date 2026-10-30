@@ -496,6 +496,9 @@ function enrichBaziDayun(f: Facts): Facts {
         .join("\n"),
     });
   }
+  if (f.dstNote) {
+    sections.unshift({ title: "夏令时校正", content: String(f.dstNote) });
+  }
   if (f.trueSolarNote) {
     sections.unshift({ title: "真太阳时", content: String(f.trueSolarNote) });
   }

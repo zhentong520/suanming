@@ -267,6 +267,7 @@ export function buildBaziInterpretation(bazi: BaziResult, gender?: string) {
         bazi.yongShen
           ? `喜用神：${bazi.yongShen.usefulGods.join("、")}｜忌神：${bazi.yongShen.avoidGods.join("、") || "无"}`
           : "",
+        bazi.dstNote ? `夏令时校正：${bazi.dstNote}` : "",
         bazi.trueSolarNote ? `真太阳时：${bazi.trueSolarNote}` : "",
         bazi.yongShen?.detail.notes?.length
           ? `旺衰依据：${bazi.yongShen.detail.notes.slice(0, 5).join("；")}`
