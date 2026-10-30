@@ -318,6 +318,27 @@ export function buildBaziInterpretation(bazi: BaziResult, gender?: string) {
           },
         ]
       : []),
+    ...(bazi.ganZhiGuanXi && bazi.ganZhiGuanXi.summary !== "四柱干支未见明显合冲刑害，以旺衰喜用为断。"
+      ? [
+          {
+            title: "干支关系",
+            content: [
+              `关系网：${bazi.ganZhiGuanXi.summary}。`,
+              ...[...bazi.ganZhiGuanXi.ganHe, ...bazi.ganZhiGuanXi.sanHe, ...bazi.ganZhiGuanXi.liuHe, ...bazi.ganZhiGuanXi.chong, ...bazi.ganZhiGuanXi.xing, ...bazi.ganZhiGuanXi.hai].map(
+                (r) => `${r.type}：${r.detail} — ${r.note}`
+              ),
+            ].join("\n"),
+          },
+        ]
+      : []),
+    ...(bazi.diShi
+      ? [
+          {
+            title: "十二长生",
+            content: `日主在四柱地支的状态：\n${bazi.diShi.map((d) => `${d.pillar}·${d.diShi}${d.note ? `（${d.note}）` : ""}`).join("\n")}\n\n十二长生描述日主气势在各柱的消长：长生帝旺处得力，墓绝病死处宜静。`,
+          },
+        ]
+      : []),
     {
       title: "性格禀赋",
       content: `${traits.personality}\n\n${STRENGTH_MODIFIER[bazi.strength]?.advice ?? ""}`,

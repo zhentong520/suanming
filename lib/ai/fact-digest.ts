@@ -57,6 +57,12 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
     lines.push(`缺五行: ${(facts.missingElements as string[]).join("、")}`);
   }
 
+  // 子平经典要素：干支关系网 + 十二长生
+  const gx = facts.ganZhiGuanXi as { summary?: string } | undefined;
+  if (gx?.summary) lines.push(`干支关系: ${gx.summary}`);
+  const ds = facts.diShi as Array<{ pillar: string; diShi: string }> | undefined;
+  if (ds?.length) lines.push(`十二长生: ${ds.map((d) => `${d.pillar}${d.diShi}`).join("、")}`);
+
   if (Array.isArray(facts.daYun)) {
     const cur = (facts.daYun as Array<Record<string, unknown>>).find((d) => d.isCurrent);
     if (cur) {

@@ -10,6 +10,7 @@ import {
   type YongShenResult,
 } from "./strength";
 import { computeShenSha, type ShenShaItem } from "./shensha";
+import { computeDiShi, computeGanZhiRelations } from "./guanxi";
 import { computeGeJu, type GeJuResult } from "./geju";
 import { Solar } from "lunar-typescript";
 
@@ -25,6 +26,8 @@ export interface BaziResult extends CalendarResult {
   yongShen?: YongShenResult;
   shenSha?: ShenShaItem[];
   geJu?: GeJuResult;
+  ganZhiGuanXi?: ReturnType<typeof computeGanZhiRelations>;
+  diShi?: Array<{ pillar: string; diShi: string; note: string }>;
   tongGen?: ReturnType<typeof analyzeTongGenTouGan>;
   sections?: Array<{ title: string; content: string }>;
   summary?: string;
@@ -96,6 +99,9 @@ export function computeBazi(input: BirthInput): BaziResult {
     dayZhi: d.zhi,
     timeZhi: t.zhi || undefined,
   });
+  // 子平经典要素：干支合冲刑害关系网 + 日主十二长生
+  const ganZhiGuanXi = computeGanZhiRelations(eightChar, calendar.timeKnown);
+  const diShi = computeDiShi(eightChar, calendar.timeKnown);
 
   return {
     ...calendar,
@@ -121,6 +127,8 @@ export function computeBazi(input: BirthInput): BaziResult {
     shenSha,
     geJu,
     tongGen,
+    ganZhiGuanXi,
+    diShi,
   };
 }
 

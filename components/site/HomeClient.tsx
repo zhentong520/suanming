@@ -106,21 +106,21 @@ export function HomeClient({
             <span className="feature-pill-icon">命</span>
             <div>
               <strong>{t("cat.命")}</strong>
-              <p>BaZi · Zi Wei · Chenggu</p>
+              <p>{locale === "en" ? "BaZi · Zi Wei · Chenggu" : "八字紫微 · 称骨论命 · 河洛理数"}</p>
             </div>
           </div>
           <div className="feature-pill">
             <span className="feature-pill-icon">卜</span>
             <div>
               <strong>{t("cat.卜")}</strong>
-              <p>I Ching · Liu Yao · Meihua</p>
+              <p>{locale === "en" ? "I Ching · Liu Yao · Meihua" : "周易占卜 · 六爻问事 · 梅花易数"}</p>
             </div>
           </div>
           <div className="feature-pill">
             <span className="feature-pill-icon">术</span>
             <div>
               <strong>{t("cat.术")}</strong>
-              <p>Almanac · Match · Name</p>
+              <p>{locale === "en" ? "Almanac · Match · Name" : "每日黄历 · 合婚配对 · 姓名五格"}</p>
             </div>
           </div>
         </div>
