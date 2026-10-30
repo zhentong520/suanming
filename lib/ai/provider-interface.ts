@@ -61,6 +61,11 @@ export class StubAIProvider implements AIProvider {
 
 export function createProvider(config: AIProviderConfig): AIProvider {
   async function requestCompletion(body: Record<string, unknown>, timeoutMs: number) {
+    // 方舟 deepseek 系默认开启思考且不支持在响应外单独计费，
+    // 思考 token 会挤占 max_tokens 导致输出截断；对报告生成类调用统一关闭
+    if (/deepseek/i.test(String(body.model ?? config.modelName))) {
+      body.thinking = { type: "disabled" };
+    }
     const response = await fetch(`${config.baseUrl.replace(/\/$/, "")}/chat/completions`, {
       method: "POST",
       headers: {
