@@ -7,6 +7,9 @@ Page({
     activeId: "",
     genders: ["男", "女"],
     genderIndex: 0,
+    ziSects: ["算当天（传统通行）", "算次日（换日派）"],
+    ziSectIndex: 0,
+    showDstHint: false,
     form: {
       name: "",
       birthYear: "1990",
@@ -26,10 +29,19 @@ Page({
     wx.navigateTo({ url: "/pages/login/login" });
   },
   onForm(e) {
-    this.setData({ [`form.${e.currentTarget.dataset.k}`]: e.detail.value });
+    const k = e.currentTarget.dataset.k;
+    const patch = { [`form.${k}`]: e.detail.value };
+    if (k === "birthYear") {
+      const y = Number(e.detail.value);
+      patch.showDstHint = y >= 1986 && y <= 1991;
+    }
+    this.setData(patch);
   },
   onGender(e) {
     this.setData({ genderIndex: Number(e.detail.value) });
+  },
+  onZiSect(e) {
+    this.setData({ ziSectIndex: Number(e.detail.value) });
   },
   async load() {
     try {
@@ -43,7 +55,7 @@ Page({
     }
   },
   async create() {
-    const { form, genders, genderIndex } = this.data;
+    const { form, genders, genderIndex, ziSectIndex } = this.data;
     this.setData({ creating: true, error: "" });
     try {
       await api.request({
@@ -57,6 +69,7 @@ Page({
           birthMonth: Number(form.birthMonth),
           birthDay: Number(form.birthDay),
           birthHour: form.birthHour === "" ? null : Number(form.birthHour),
+          ziSect: ziSectIndex === 1 ? 1 : 2,
           setAsActive: true,
         },
       });

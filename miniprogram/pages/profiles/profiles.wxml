@@ -15,6 +15,12 @@
     <label class="label">月<input class="input" type="number" value="{{form.birthMonth}}" data-k="birthMonth" bindinput="onForm" /></label>
     <label class="label">日<input class="input" type="number" value="{{form.birthDay}}" data-k="birthDay" bindinput="onForm" /></label>
     <label class="label">时（0-23，可空）<input class="input" type="number" value="{{form.birthHour}}" data-k="birthHour" bindinput="onForm" /></label>
+    <label class="label">晚子时流派
+      <picker mode="selector" range="{{ziSects}}" value="{{ziSectIndex}}" bindchange="onZiSect">
+        <view class="input">{{ziSects[ziSectIndex]}}</view>
+      </picker>
+    </label>
+    <view wx:if="{{showDstHint}}" class="muted" style="font-size:12px;line-height:1.6;">ℹ️ 1986–1991年中国实行夏令时：系统会自动把出生钟表时间回拨1小时再排盘，若出生时段恰逢夏令时起止，请在报告中核对校正说明。</view>
     <button class="btn-primary" loading="{{creating}}" bindtap="create">保存并设为当前</button>
   </view>
   <view wx:if="{{error}}" class="error">{{error}}</view>
