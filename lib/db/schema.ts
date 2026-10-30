@@ -67,6 +67,8 @@ export const profiles = sqliteTable("profiles", {
   birthLongitude: real("birth_longitude"),
   birthLatitude: real("birth_latitude"),
   birthLocation: text("birth_location"),
+  /** 晚子时（23:00-23:59）日柱流派：1=算次日，2=算当天（默认） */
+  ziSect: integer("zi_sect"),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });

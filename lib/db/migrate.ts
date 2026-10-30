@@ -226,6 +226,9 @@ function runColumnMigrations(db: Database.Database) {
   if (!profileCols.some((c) => c.name === "user_id")) {
     db.exec("ALTER TABLE profiles ADD COLUMN user_id TEXT");
   }
+  if (!profileCols.some((c) => c.name === "zi_sect")) {
+    db.exec("ALTER TABLE profiles ADD COLUMN zi_sect INTEGER");
+  }
   const reportCols = db.prepare("PRAGMA table_info(reports)").all() as Array<{ name: string }>;
   if (!reportCols.some((c) => c.name === "user_id")) {
     db.exec("ALTER TABLE reports ADD COLUMN user_id TEXT");

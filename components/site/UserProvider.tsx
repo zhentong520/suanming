@@ -17,6 +17,7 @@ export interface UserProfile {
   birthLongitude?: number | null;
   birthLatitude?: number | null;
   birthLocation?: string | null;
+  ziSect?: number | null;
   createdAt: string;
 }
 

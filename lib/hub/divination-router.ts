@@ -202,6 +202,7 @@ async function getProfileBirthInput(profileId: string): Promise<BirthInput> {
     longitude: profile.birthLongitude ?? undefined,
     latitude: profile.birthLatitude ?? undefined,
     location: profile.birthLocation ?? undefined,
+    ziSect: profile.ziSect === 1 ? 1 : 2,
   };
 }
 
@@ -303,6 +304,7 @@ export async function runModule(input: ModuleInput): Promise<ModuleOutput> {
         location: profileBRow.birthLocation ?? undefined,
         longitude: profileBRow.birthLongitude ?? undefined,
         latitude: profileBRow.birthLatitude ?? undefined,
+        ziSect: profileBRow.ziSect === 1 ? 1 : 2,
       };
       const result = computeMatchmaking(profileInput, profileB);
       facts = result as unknown as Record<string, unknown>;

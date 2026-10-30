@@ -961,6 +961,13 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.88rem;
 }
 
+.form-hint {
+  color: var(--muted, #7a6f5f);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0.25rem 0;
+}
+
 /* ── 报告面板 ── */
 .report-panel { margin-top: 0.25rem; }
 

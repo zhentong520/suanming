@@ -39,7 +39,9 @@ export default function ProfilesPage() {
   const [birthLocation, setBirthLocation] = useState("");
   const [birthLongitude, setBirthLongitude] = useState("");
   const [birthLatitude, setBirthLatitude] = useState("");
+  const [birthYear, setBirthYear] = useState("1990");
   const [cityKey, setCityKey] = useState(0);
+  const showDstHint = Number(birthYear) >= 1986 && Number(birthYear) <= 1991;
 
   function applyCity(city: ChinaCity | null) {
     if (!city) {
@@ -95,6 +97,7 @@ export default function ProfilesPage() {
           birthLocation: birthLocation || null,
           birthLongitude: birthLongitude || null,
           birthLatitude: birthLatitude || null,
+          ziSect: fd.get("ziSect") === "1" ? 1 : 2,
           setAsActive: true,
         }),
       });
@@ -168,7 +171,14 @@ export default function ProfilesPage() {
           </label>
           <label>
             {t("profiles.year")}
-            <input name="birthYear" type="number" required defaultValue={1990} />
+            <input
+              name="birthYear"
+              type="number"
+              required
+              defaultValue={1990}
+              value={birthYear}
+              onChange={(e) => setBirthYear(e.target.value)}
+            />
           </label>
           <label>
             {t("profiles.month")}
@@ -218,6 +228,18 @@ export default function ProfilesPage() {
               onChange={(e) => setBirthLatitude(e.target.value)}
             />
           </label>
+          <label>
+            晚子时流派
+            <select name="ziSect" defaultValue="2">
+              <option value="2">算当天（传统通行）</option>
+              <option value="1">算次日（换日派）</option>
+            </select>
+          </label>
+          {showDstHint && (
+            <p className="form-hint" style={{ gridColumn: "1 / -1" }}>
+              ℹ️ 1986–1991 年中国实行夏令时：系统会自动把出生钟表时间回拨 1 小时再排盘，若出生时段恰逢夏令时起止，请在报告中核对校正说明。
+            </p>
+          )}
           <button type="submit" className="btn-primary" disabled={creating}>
             {creating ? t("profiles.saving") : t("profiles.save")}
           </button>
