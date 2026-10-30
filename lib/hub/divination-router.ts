@@ -203,6 +203,7 @@ async function getProfileBirthInput(profileId: string): Promise<BirthInput> {
     latitude: profile.birthLatitude ?? undefined,
     location: profile.birthLocation ?? undefined,
     ziSect: profile.ziSect === 1 ? 1 : 2,
+    isLeapMonth: profile.leapMonth === true && profile.calendarType === "lunar",
   };
 }
 

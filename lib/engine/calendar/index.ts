@@ -19,6 +19,8 @@ export interface BirthInput {
    * 仅影响 23 点出生的日柱归属。
    */
   ziSect?: 1 | 2;
+  /** 农历输入时是否闰月（仅 calendarType=lunar 时生效） */
+  isLeapMonth?: boolean;
 }
 
 export interface CalendarResult {
@@ -29,6 +31,8 @@ export interface CalendarResult {
   ganZhiDay: string;
   ganZhiTime: string;
   shengXiao: string;
+  /** 立春口径生肖（命理主流，与八字年柱一致） */
+  zodiacLichun: string;
   constellation: string;
   naYin: string;
   wuXing: string[];
@@ -49,6 +53,12 @@ export interface CalendarResult {
 }
 
 const HOUR_NAMES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+
+/** 地支 → 生肖（立春口径生肖按八字年支推） */
+export const BRANCH_ZODIAC: Record<string, string> = {
+  子: "鼠", 丑: "牛", 寅: "虎", 卯: "兔", 辰: "龙", 巳: "蛇",
+  午: "马", 未: "羊", 申: "猴", 酉: "鸡", 戌: "狗", 亥: "猪",
+};
 
 /** 中国民用时区常用标准经线（东八区） */
 export const CHINA_STANDARD_MERIDIAN = 120;
@@ -164,7 +174,9 @@ export function buildLunarFromBirth(input: BirthInput): {
   let month = input.month;
   let day = input.day;
   if (input.calendarType === "lunar") {
-    const s = Lunar.fromYmd(input.year, input.month, input.day).getSolar();
+    // 闰月以负数月表示（lunar-typescript 约定）
+    const lunarMonth = input.isLeapMonth ? -Math.abs(input.month) : input.month;
+    const s = Lunar.fromYmd(input.year, lunarMonth, input.day).getSolar();
     year = s.getYear();
     month = s.getMonth();
     day = s.getDay();
@@ -260,6 +272,8 @@ export function computeCalendar(input: BirthInput): CalendarResult {
     ganZhiDay: eightChar.getDay(),
     ganZhiTime: timeKnown ? eightChar.getTime() : "未知",
     shengXiao: lunar.getYearShengXiao(),
+    /** 立春口径生肖（命理主流，与八字年柱一致） */
+    zodiacLichun: BRANCH_ZODIAC[eightChar.getYear().slice(1)] ?? lunar.getYearShengXiao(),
     constellation: solar.getXingZuo(),
     naYin: eightChar.getYearNaYin(),
     wuXing: [

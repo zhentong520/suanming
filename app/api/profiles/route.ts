@@ -49,6 +49,7 @@ export async function POST(request: Request) {
       body.birthLatitude != null && body.birthLatitude !== "" ? Number(body.birthLatitude) : null,
     birthLocation: body.birthLocation?.trim() ? String(body.birthLocation).trim() : null,
     ziSect: body.ziSect === 1 || body.ziSect === 2 ? Number(body.ziSect) : null,
+    leapMonth: body.calendarType === "lunar" && body.isLeapMonth === true,
     createdAt: now,
     updatedAt: now,
   });

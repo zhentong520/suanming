@@ -40,6 +40,7 @@ export default function ProfilesPage() {
   const [birthLongitude, setBirthLongitude] = useState("");
   const [birthLatitude, setBirthLatitude] = useState("");
   const [birthYear, setBirthYear] = useState("1990");
+  const [calendarType, setCalendarType] = useState("solar");
   const [cityKey, setCityKey] = useState(0);
   const showDstHint = Number(birthYear) >= 1986 && Number(birthYear) <= 1991;
 
@@ -88,12 +89,13 @@ export default function ProfilesPage() {
         body: JSON.stringify({
           name: fd.get("name"),
           gender: fd.get("gender"),
-          calendarType: fd.get("calendarType"),
           birthYear: fd.get("birthYear"),
           birthMonth: fd.get("birthMonth"),
           birthDay: fd.get("birthDay"),
           birthHour: fd.get("birthHour") || null,
           birthMinute: fd.get("birthMinute") || 0,
+          calendarType,
+          isLeapMonth: fd.get("isLeapMonth") === "on",
           birthLocation: birthLocation || null,
           birthLongitude: birthLongitude || null,
           birthLatitude: birthLatitude || null,
@@ -164,7 +166,7 @@ export default function ProfilesPage() {
           </label>
           <label>
             {t("profiles.calendar")}
-            <select name="calendarType" defaultValue="solar">
+            <select name="calendarType" value={calendarType} onChange={(e) => setCalendarType(e.target.value)}>
               <option value="solar">{t("profiles.solar")}</option>
               <option value="lunar">{t("profiles.lunar")}</option>
             </select>
@@ -196,6 +198,12 @@ export default function ProfilesPage() {
             {t("profiles.minute")}
             <input name="birthMinute" type="number" min={0} max={59} defaultValue={0} />
           </label>
+          {calendarType === "lunar" && (
+            <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <input name="isLeapMonth" type="checkbox" style={{ width: "auto" }} />
+              闰月（该年农历有闰此月时勾选）
+            </label>
+          )}
           <label>
             {t("profiles.city")}
             <CitySelect

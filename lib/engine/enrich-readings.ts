@@ -47,7 +47,7 @@ function enrichZodiac(f: Facts): Facts {
   const sections: ReadingSection[] = withBeginnerGuide(MODULE_INTROS.zodiac, [
     {
       title: "你的生肖",
-      content: `生肖：${f.zodiac}\n五行倾向：${f.element}\n${f.isTaiSui ? "⚠ 今年值太岁，宜谨慎行事、避免重大变动，可穿红、多行善事，安稳为上。" : "今年未值太岁，可按常规规划。"}`,
+      content: `生肖：${f.zodiac}${f.zodiacNote ? `\n（${f.zodiacNote}）` : ""}\n五行倾向：${f.element}\n${f.isTaiSui ? `⚠ 今年${f.taiSuiType ?? "值太岁"}，宜谨慎行事、避免重大变动，可穿红、多行善事，安稳为上。` : "今年未犯太岁，可按常规规划。"}`,
     },
     { title: "性格特点", content: String(f.traits) },
     { title: "今年运势", content: String(f.fortune) },

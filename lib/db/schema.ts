@@ -69,6 +69,8 @@ export const profiles = sqliteTable("profiles", {
   birthLocation: text("birth_location"),
   /** 晚子时（23:00-23:59）日柱流派：1=算次日，2=算当天（默认） */
   ziSect: integer("zi_sect"),
+  /** 农历生日是否闰月（calendarType=lunar 时生效） */
+  leapMonth: integer("leap_month", { mode: "boolean" }).default(false),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });

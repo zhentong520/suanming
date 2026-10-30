@@ -18,6 +18,7 @@ export interface UserProfile {
   birthLatitude?: number | null;
   birthLocation?: string | null;
   ziSect?: number | null;
+  leapMonth?: boolean | null;
   createdAt: string;
 }
 

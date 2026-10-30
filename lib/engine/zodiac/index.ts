@@ -1,15 +1,28 @@
 import { loadContentJson } from "@/lib/content/catalog";
-import { BirthInput, computeCalendar } from "../calendar";
+import { BirthInput, BRANCH_ZODIAC, computeCalendar } from "../calendar";
+import { Solar } from "lunar-typescript";
 
 const ZODIAC_LIST = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
+const BRANCH_OF: Record<string, string> = {
+  鼠: "子", 牛: "丑", 虎: "寅", 兔: "卯", 龙: "辰", 蛇: "巳",
+  马: "午", 羊: "未", 猴: "申", 鸡: "酉", 狗: "戌", 猪: "亥",
+};
+const CHONG: Record<string, string> = { 子: "午", 午: "子", 丑: "未", 未: "丑", 寅: "申", 申: "寅", 卯: "酉", 酉: "卯", 辰: "戌", 戌: "辰", 巳: "亥", 亥: "巳" };
+const XING: Record<string, string[]> = { 子: ["卯"], 卯: ["子"], 寅: ["巳", "申"], 巳: ["寅", "申"], 申: ["寅", "巳"], 丑: ["未", "戌"], 未: ["丑", "戌"], 戌: ["丑", "未"], 辰: ["辰"], 午: ["午"], 酉: ["酉"], 亥: ["亥"] };
+const HAI: Record<string, string> = { 子: "未", 未: "子", 丑: "午", 午: "丑", 寅: "巳", 巳: "寅", 卯: "辰", 辰: "卯", 申: "亥", 亥: "申", 酉: "戌", 戌: "酉" };
 
 export function getZodiacFromYear(year: number): string {
-  return ZODIAC_LIST[(year - 4) % 12];
+  // 立春口径：取该年年中（必在立春后）的八字年支
+  const solar = Solar.fromYmdHms(year, 6, 1, 12, 0, 0);
+  const branch = solar.getLunar().getEightChar().getYear().slice(1);
+  return BRANCH_ZODIAC[branch] ?? ZODIAC_LIST[(year - 4) % 12];
 }
 
 export function computeZodiac(input: BirthInput) {
   const calendar = computeCalendar(input);
-  const zodiac = calendar.shengXiao;
+  // 生肖双口径：命理主流为立春口径（与八字年柱一致）；春节口径作民俗参考
+  const zodiac = calendar.zodiacLichun;
+  const zodiacChunjie = calendar.shengXiao;
   const currentYear = new Date().getFullYear();
   const yearZodiac = getZodiacFromYear(currentYear);
   const rules = loadContentJson<Record<string, unknown>>("zodiac-rules.json");
@@ -23,10 +36,37 @@ export function computeZodiac(input: BirthInput) {
 
   const relations = (rules.relations as Record<string, string>)[zodiac] ?? "无特殊关系";
 
+  // 太岁判定（立春口径）：本命值太岁 / 六冲冲太岁 / 三刑刑太岁 / 六害害太岁
+  const birthBranch = BRANCH_OF[zodiac];
+  const yearBranch = BRANCH_OF[yearZodiac] ?? "";
+  let isTaiSui = false;
+  let taiSuiType = "";
+  if (birthBranch && yearBranch) {
+    if (birthBranch === yearBranch) {
+      isTaiSui = true;
+      taiSuiType = "值太岁（本命年）";
+    } else if (CHONG[birthBranch] === yearBranch) {
+      isTaiSui = true;
+      taiSuiType = "冲太岁";
+    } else if ((XING[birthBranch] ?? []).includes(yearBranch)) {
+      isTaiSui = true;
+      taiSuiType = "刑太岁";
+    } else if (HAI[birthBranch] === yearBranch) {
+      isTaiSui = true;
+      taiSuiType = "害太岁";
+    }
+  }
+
   return {
     zodiac,
+    zodiacChunjie,
+    zodiacNote:
+      zodiac === zodiacChunjie
+        ? undefined
+        : `民俗春节口径生肖为${zodiacChunjie}，命理立春口径为${zodiac}，本报告采用立春口径`,
     yearZodiac,
-    isTaiSui: zodiac === yearZodiac,
+    isTaiSui,
+    taiSuiType: taiSuiType || undefined,
     traits: info.traits,
     lucky: info.lucky,
     unlucky: info.unlucky,
