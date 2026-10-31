@@ -9,7 +9,8 @@ import { UserProvider } from "@/components/site/UserProvider";
 import { LocaleProvider } from "@/components/site/LocaleProvider";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { WeChatBodyClass, WeChatShareHint } from "@/components/site/WeChatShareHint";
-import { buildMetadataForPath } from "@/lib/seo/build-metadata";
+import { buildMetadataForPath, moduleIdFromPath } from "@/lib/seo/build-metadata";
+import { buildModuleJsonLd, buildWebsiteJsonLd } from "@/lib/seo/jsonld";
 import { getRequestLocale } from "@/lib/i18n/request-locale";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
@@ -22,7 +23,17 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const h = await headers();
+  const pathname = h.get("x-pathname") ?? "/";
   const locale = await getRequestLocale();
+
+  let jsonLd: Record<string, unknown> | null = null;
+  if (pathname === "/" || pathname === "") {
+    jsonLd = buildWebsiteJsonLd(locale);
+  } else {
+    const modId = moduleIdFromPath(pathname);
+    if (modId) jsonLd = buildModuleJsonLd(modId, locale);
+  }
   return (
     <ThemeProvider>
       <LocaleProvider initialLocale={locale}>
@@ -35,6 +46,12 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
             <Starfield />
             <MoonWidget />
             <SiteHeader />
+            {jsonLd ? (
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+              />
+            ) : null}
             <main className="site-main site-main--with-nav">{children}</main>
             <SiteFooter />
             <MobileNav />
