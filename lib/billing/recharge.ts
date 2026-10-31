@@ -24,6 +24,7 @@ import { and, eq } from "drizzle-orm";
 import { getDb, getSqlite } from "@/lib/db/client";
 import { paymentOrders, users } from "@/lib/db/schema";
 import { grantPoints } from "./points";
+import { wxQueryXpayOrder, type WxOrderQueryResult } from "@/lib/wechat/mini-session";
 
 export interface RechargePackage {
   id: string;
@@ -162,6 +163,85 @@ export async function buildVirtualPaymentPayload(opts: {
 }
 
 /**
+ * 回调发货安全模型（微信自建回调走「消息推送」协议，事件体无 AppKey 签名可本地验）：
+ *   收到回调 → 取订单引用 → 向微信 /xpay/query_order 查实单 →
+ *   微信侧确认支付成功且实付金额一致 → 才标记已支付并入账。
+ * 伪造回调因订单在微信侧不存在/未支付而无法触发发货。
+ */
+export async function fulfillRechargeOrderWithWxConfirm(opts: {
+  outTradeNo?: string;
+  wxOrderId?: string;
+  openid?: string;
+}): Promise<{
+  ok: boolean;
+  reason?: string;
+  alreadyPaid?: boolean;
+  points?: number;
+  userId?: string;
+}> {
+  const sqlite = getSqlite();
+
+  // 1) 定位订单：优先商户单号；仅微信内部单号时按 external_trade_no 兜底匹配
+  if (opts.wxOrderId && !opts.outTradeNo) {
+    const paidRow = sqlite
+      .prepare(
+        "SELECT id, user_id, points FROM payment_orders WHERE external_trade_no = ? AND status = 'paid'"
+      )
+      .get(opts.wxOrderId) as { id: string; user_id: string; points: number } | undefined;
+    if (paidRow) return { ok: true, alreadyPaid: true, userId: paidRow.user_id, points: paidRow.points };
+  }
+
+  const outTradeNo = opts.outTradeNo;
+  if (!outTradeNo) return { ok: false, reason: "missing order reference" };
+
+  const order = sqlite
+    .prepare("SELECT id, user_id, points, status, amount_yuan FROM payment_orders WHERE id = ?")
+    .get(outTradeNo) as
+    | { id: string; user_id: string; points: number; status: string; amount_yuan: number }
+    | undefined;
+  if (!order) return { ok: false, reason: "order not found" };
+  if (order.status === "paid") {
+    return { ok: true, alreadyPaid: true, userId: order.user_id, points: order.points };
+  }
+  if (order.status !== "pending") return { ok: false, reason: "invalid order status" };
+
+  // 2) query_order 实单确认（需要用户 openid）
+  const db = getDb();
+  const [user] = await db.select().from(users).where(eq(users.id, order.user_id)).limit(1);
+  if (!user?.wxOpenId) return { ok: false, reason: "user has no wx openid" };
+
+  let query: WxOrderQueryResult;
+  try {
+    query = await wxQueryXpayOrder({ openid: opts.openid ?? user.wxOpenId, orderId: order.id });
+  } catch (err) {
+    // 微信侧接口异常时不发货，等待回调重试
+    return { ok: false, reason: `query_order failed: ${(err as Error).message}` };
+  }
+  if (!query.paid) {
+    return {
+      ok: false,
+      reason: `wx order not paid (status=${query.orderStatus ?? "unknown"}${query.errmsg ? `, ${query.errmsg}` : ""})`,
+    };
+  }
+
+  // 3) 实付金额校验（分 → 元），与订单一致才发货
+  if (typeof query.paidFee === "number") {
+    const paidYuan = query.paidFee / 100;
+    if (Math.abs(paidYuan - order.amount_yuan) > 0.001) {
+      return { ok: false, reason: `wx paid_fee mismatch: ${paidYuan} vs ${order.amount_yuan}` };
+    }
+  }
+
+  // 4) 幂等发货
+  const result = await fulfillRechargeOrder({
+    outTradeNo: order.id,
+    externalTradeNo: query.wxOrderId ?? opts.wxOrderId,
+  });
+  if (!result.ok) return { ok: false, reason: "fulfill failed" };
+  return { ok: true, userId: result.userId, points: result.points, alreadyPaid: result.alreadyPaid };
+}
+
+/**
  * 发货：把订单标记为已支付并发放积分（幂等）。
  * 只有 status=pending 的订单会被受理；重复回调直接返回已处理。
  * expectedAmountYuan 提供时校验订单金额（支付宝渠道用），不符则拒绝发货。
@@ -208,27 +288,6 @@ export async function fulfillRechargeOrder(opts: {
   });
 
   return { ok: true, userId: row.user_id, points: row.points };
-}
-
-/**
- * 回调验签（可配）：
- * 默认宽松（联调期，靠订单状态与金额校验兜底）；
- * 设 WX_MINI_NOTIFY_STRICT=1 后启用严格验签：
- *   expected = hex( HMAC-SHA256( AppKey, uri + '&' + body ) )
- *   实际签名取 header「x-pay-sign」或 query「sig」。
- */
-export function verifyXpayNotifySignature(
-  uri: string,
-  body: string,
-  providedSig: string | null
-): boolean {
-  const strict = process.env.WX_MINI_NOTIFY_STRICT === "1";
-  if (!strict) return true;
-  const appKey =
-    payEnv() === 1 ? process.env.WX_MINI_SANDBOX_APPKEY?.trim() : process.env.WX_MINI_APPKEY?.trim();
-  if (!appKey || !providedSig) return false;
-  const expected = hmacHex(appKey, `${uri}&${body}`);
-  return expected === providedSig.trim().toLowerCase();
 }
 
 /** 查询用户充值订单（小程序「充值记录」） */

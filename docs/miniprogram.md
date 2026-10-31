@@ -43,9 +43,10 @@
 
 - 充值页 `pages/recharge`：档位 → `POST /api/pay/wechat/prepare`（建单+签名）→ `wx.requestVirtualPayment` → 服务端回调发货
 - 三档道具 productId：`points_60`（600 分）/ `points_300`（3000 分+赠 30）/ `points_980`（9800 分+赠 130）
-- **米大师后台必须**：①「道具管理」按上表建道具、单价与 `lib/billing/recharge.ts` 的 `priceFen` 完全一致；②开启「道具发货推送」，回调地址填 `<你的域名>/api/pay/wechat/notify`
-- 服务端 `.env`：`WX_MINI_OFFER_ID` / `WX_MINI_APPKEY`（现网）、可选 `WX_MINI_SANDBOX_APPKEY` + `WX_MINI_PAY_ENV=1`（沙箱联调）；上线建议 `WX_MINI_NOTIFY_STRICT=1` 开启回调验签
-- 发货一律以服务端回调为准：回调把订单 `pending → paid` 并幂等入账 `point_ledger`（reason=recharge）；前端 success 仅做余额刷新提示
+- **米大师后台必须**：「道具管理」按上表建道具、单价与 `lib/billing/recharge.ts` 的 `priceFen` 完全一致
+- **发货回调走「消息推送」通道**：小程序后台 → 开发 → 开发管理 → 消息推送 → 启用并填 `URL=<你的域名>/api/pay/wechat/notify`、`Token=WX_MINI_CALLBACK_TOKEN`（.env 同步配置）、数据格式 **JSON**、加密方式 **明文模式**；服务端实现 GET echostr 校验（SHA1 of Token）
+- 服务端 `.env`：`WX_MINI_OFFER_ID` / `WX_MINI_APPKEY`（现网）、可选 `WX_MINI_SANDBOX_APPKEY` + `WX_MINI_PAY_ENV=1`（沙箱联调）
+- **发货安全模型**：回调只作触发信号，服务端向微信 `/xpay/query_order` 实单确认（pay_sig 签名）支付成功且 `paid_fee` 与订单金额一致才入账——伪造回调无法触发发货；订单 `pending → paid` 幂等入账 `point_ledger`（reason=recharge），微信内部单号回填 `external_trade_no`
 - 联调注意：`signData` 由服务端序列化，小程序端**原样上送**（不得重新 JSON.stringify）；session_key 过期报 15007 时重新微信登录即可
 
 ### 质量抽查

@@ -1,53 +1,47 @@
 import { NextResponse } from "next/server";
-import {
-  fulfillRechargeOrder,
-  verifyXpayNotifySignature,
-} from "@/lib/billing/recharge";
+import { ensureSeeded } from "../../../init/route";
+import { verifyCallbackUrl, parseCallbackOrderRef } from "@/lib/wechat/mini-callback";
+import { fulfillRechargeOrderWithWxConfirm } from "@/lib/billing/recharge";
 
 export const runtime = "nodejs";
 
 /**
- * 微信虚拟支付发货回调（xpay_goods_deliver_notify / xpay_coin_pay_notify 类事件推送）。
- * 约定：attach 里透传业务订单号（outTradeNo），或直接用 body.outTradeNo。
- * 必须返回 { ErrCode: 0, ErrMsg: "success" }，否则微信会持续重试。
+ * 微信「消息推送」自建回调（虚拟支付发货/退款事件）。
+ *
+ * GET：小程序后台保存回调配置时的 URL 校验（SHA1 of Token，原样返回 echostr）。
+ * POST：事件通知。发货安全由服务端 /xpay/query_order 实单确认保证，
+ *       处理成功返回纯文本 "success"，否则微信按衰减策略重试（最多 15 次）。
  */
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   const url = new URL(request.url);
-  const uri = url.pathname;
+  const echostr = verifyCallbackUrl(url.searchParams);
+  if (echostr === null) {
+    return new NextResponse("fail", { status: 403 });
+  }
+  return new NextResponse(echostr, { status: 200 });
+}
+
+export async function POST(request: Request) {
+  await ensureSeeded();
   const bodyText = await request.text();
-
-  const providedSig =
-    request.headers.get("x-pay-sign") ?? url.searchParams.get("sig") ?? null;
-  if (!verifyXpayNotifySignature(uri, bodyText, providedSig)) {
-    return NextResponse.json({ ErrCode: -4, ErrMsg: "signature invalid" }, { status: 401 });
+  const ref = parseCallbackOrderRef(bodyText);
+  if (!ref || (!ref.outTradeNo && !ref.wxOrderId)) {
+    // 无订单引用（如异步事件通知/其他消息），按已处理应答避免无谓重试
+    return new NextResponse("success", { status: 200 });
   }
 
-  let body: {
-    OutTradeNo?: string;
-    outTradeNo?: string;
-    WxOrderId?: string;
-    wxOrderId?: string;
-    attach?: string;
-  };
   try {
-    body = JSON.parse(bodyText);
-  } catch {
-    return NextResponse.json({ ErrCode: -1, ErrMsg: "bad json" }, { status: 400 });
+    const result = await fulfillRechargeOrderWithWxConfirm({
+      outTradeNo: ref.outTradeNo,
+      wxOrderId: ref.wxOrderId,
+      openid: ref.openid,
+    });
+    if (!result.ok) {
+      // 订单不存在/未支付/微信侧异常 → 让微信重试（衰减策略）
+      return new NextResponse(`fail: ${result.reason ?? "unknown"}`, { status: 400 });
+    }
+    return new NextResponse("success", { status: 200 });
+  } catch (err) {
+    return new NextResponse(`fail: ${(err as Error).message}`, { status: 500 });
   }
-
-  const outTradeNo = body.OutTradeNo ?? body.outTradeNo ?? body.attach ?? "";
-  if (!outTradeNo) {
-    return NextResponse.json({ ErrCode: -1, ErrMsg: "missing out_trade_no" }, { status: 400 });
-  }
-
-  const result = await fulfillRechargeOrder({
-    outTradeNo,
-    externalTradeNo: body.WxOrderId ?? body.wxOrderId,
-  });
-
-  if (!result.ok) {
-    return NextResponse.json({ ErrCode: -1, ErrMsg: "order not found" }, { status: 404 });
-  }
-
-  return NextResponse.json({ ErrCode: 0, ErrMsg: "success" });
 }
