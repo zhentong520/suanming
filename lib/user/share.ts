@@ -9,6 +9,7 @@ import { reports, shareTokens } from "@/lib/db/schema";
 import { getModuleDefinition } from "@/lib/hub/module-registry";
 
 export interface SharedReportView {
+  moduleId: string;
   moduleName: string;
   templateReport: string;
   aiReport: string | null;
@@ -82,6 +83,7 @@ export async function getSharedReport(token: string): Promise<SharedReportView |
   if (!row) return null;
   const def = getModuleDefinition(row.moduleId);
   return {
+    moduleId: row.moduleId,
     moduleName: def?.name ?? row.moduleId,
     templateReport: row.templateReport,
     aiReport: row.aiReport ?? null,

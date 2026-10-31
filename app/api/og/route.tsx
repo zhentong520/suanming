@@ -5,10 +5,10 @@ import { getModuleDefinition } from "@/lib/hub/module-registry";
 export const runtime = "edge";
 
 const CATEGORY_STYLE: Record<string, { bg: string; accent: string; label: string }> = {
-  命: { bg: "#1a1210", accent: "#b83a2f", label: "观命之理" },
-  卜: { bg: "#101418", accent: "#5a6d94", label: "决疑问卦" },
-  相: { bg: "#181610", accent: "#a67c2e", label: "察形知意" },
-  术: { bg: "#101612", accent: "#3d5a4c", label: "日用术数" },
+  命: { bg: "#1d1420", accent: "#d45048", label: "观命之理" },
+  卜: { bg: "#131625", accent: "#8a97c9", label: "决疑问卦" },
+  相: { bg: "#1a1720", accent: "#c9a86a", label: "察形知意" },
+  术: { bg: "#121815", accent: "#5da885", label: "日用术数" },
 };
 
 export async function GET(req: NextRequest) {
@@ -32,37 +32,26 @@ export async function GET(req: NextRequest) {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: `linear-gradient(145deg, ${style.bg} 0%, #0a0908 100%)`,
+          background: `radial-gradient(ellipse 70% 45% at 50% 0%, rgba(138, 151, 201, 0.14), transparent), radial-gradient(ellipse 50% 35% at 80% 90%, rgba(90, 60, 140, 0.18), transparent), linear-gradient(175deg, #17131f 0%, #120f19 55%, #0d0b13 100%)`,
           fontFamily: "serif",
+          border: "2px solid rgba(201, 168, 106, 0.4)",
         }}
       >
+        {/* 星点：box-shadow 多点模拟 */}
         <div
           style={{
             position: "absolute",
-            top: 40,
-            left: 60,
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
+            top: 0,
+            left: 0,
+            width: 2,
+            height: 2,
+            borderRadius: 2,
+            backgroundColor: "rgba(227, 193, 134, 0.5)",
+            boxShadow:
+              "140px 90px 0 1px rgba(227,193,134,0.35), 320px 200px 0 0 rgba(227,193,134,0.25), 520px 70px 0 1px rgba(227,193,134,0.4), 760px 150px 0 0 rgba(227,193,134,0.3), 980px 110px 0 1px rgba(227,193,134,0.35), 240px 420px 0 1px rgba(227,193,134,0.28), 1080px 380px 0 1px rgba(227,193,134,0.32), 880px 520px 0 0 rgba(227,193,134,0.26), 120px 520px 0 1px rgba(227,193,134,0.3), 640px 560px 0 1px rgba(227,193,134,0.22), 420px 40px 0 0 rgba(227,193,134,0.3), 1120px 250px 0 1px rgba(227,193,134,0.3)",
           }}
-        >
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              border: `3px solid ${style.accent}`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: style.accent,
-              fontSize: 32,
-              transform: "rotate(-6deg)",
-            }}
-          >
-            {glyph}
-          </div>
-          <span style={{ color: "#8a8070", fontSize: 22, letterSpacing: 4 }}>{style.label}</span>
-        </div>
+        />
+        {/* 印章 */}
         <div
           style={{
             width: 120,
@@ -75,24 +64,47 @@ export async function GET(req: NextRequest) {
             fontSize: 64,
             marginBottom: 32,
             transform: "rotate(-6deg)",
+            boxShadow: `0 0 40px ${style.accent}33`,
           }}
         >
           易
         </div>
-        <div style={{ fontSize: 56, color: "#f5efe4", letterSpacing: 8, marginBottom: 16 }}>{title}</div>
-        <div style={{ fontSize: 26, color: "#a09888", letterSpacing: 2, maxWidth: 900, textAlign: "center" }}>
+        <div
+          style={{
+            fontSize: 58,
+            color: "#e8ddc4",
+            letterSpacing: 8,
+            marginBottom: 16,
+            textShadow: "0 0 24px rgba(201, 168, 106, 0.4)",
+          }}
+        >
+          {title}
+        </div>
+        <div style={{ fontSize: 26, color: "#a89b80", letterSpacing: 2, maxWidth: 900, textAlign: "center" }}>
           {desc}
         </div>
+        {/* 底部金线 + 站名 */}
         <div
           style={{
             position: "absolute",
-            bottom: 48,
-            fontSize: 22,
-            color: style.accent,
-            letterSpacing: 6,
+            bottom: 72,
+            left: 260,
+            width: 680,
+            height: 2,
+            background: "linear-gradient(90deg, transparent, rgba(201, 168, 106, 0.6), transparent)",
+            display: "flex",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: 30,
+            fontSize: 24,
+            color: "#c9a86a",
+            letterSpacing: 8,
           }}
         >
-          易道命理
+          易 道 命 理 · 知 命 而 不 惑
         </div>
       </div>
     ),

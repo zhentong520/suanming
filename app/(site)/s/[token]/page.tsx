@@ -9,9 +9,22 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: Promise<{ token: string }> }): Promise<Metadata> {
   const { token } = await params;
   const report = await getSharedReport(token).catch(() => null);
+  if (!report) {
+    return { title: "分享链接已失效", robots: { index: false, follow: false } };
+  }
+  const ogParams = new URLSearchParams({
+    module: report.moduleId,
+    title: `${report.moduleName}测算结果`,
+    desc: "好友分享的一份测算结果 · 点击查看",
+  });
   return {
-    title: report ? `${report.moduleName}测算结果 · 分享` : "分享链接已失效",
+    title: `${report.moduleName}测算结果 · 分享`,
     robots: { index: false, follow: false },
+    openGraph: {
+      title: `${report.moduleName}测算结果 · 易道命理`,
+      description: "好友分享的一份测算结果，点击查看详情。",
+      images: [{ url: `/api/og?${ogParams.toString()}` }],
+    },
   };
 }
 

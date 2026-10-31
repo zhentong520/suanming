@@ -1391,10 +1391,16 @@ a { color: inherit; text-decoration: none; }
 
 /* ── 报告节标题纹样 ── */
 .report-section-title::after {
-  content: "";
+  content: "◆";
   flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, var(--border), transparent);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 1em;
+  font-size: 0.45rem;
+  color: var(--gold);
+  opacity: 0.55;
+  background: linear-gradient(90deg, var(--border) 0%, transparent 94%) no-repeat 0 center / 100% 1px;
   margin-left: 0.25rem;
 }
 
