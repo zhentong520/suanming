@@ -2300,35 +2300,47 @@ body.is-wechat .site-header {
   padding-top: env(safe-area-inset-top, 0px);
 }
 
-/* ── 夜观模式（深墨 + 鎏金） ── */
+/* ── 夜观模式（玄紫黑 + 鎏金星宿 · 神秘氛围） ── */
 [data-theme="night"] {
-  --paper: #141210;
-  --paper-warm: #1c1814;
-  --paper-deep: #242018;
-  --ink: #e8e0d4;
-  --ink-light: #c4b8a8;
-  --ink-muted: #8a8070;
+  --paper: #131019;
+  --paper-warm: #1a1522;
+  --paper-deep: #221b2e;
+  --ink: #e8ddc4;
+  --ink-light: #c0b294;
+  --ink-muted: #8a7d64;
   --cinnabar: #d45048;
   --cinnabar-light: #e86858;
-  --gold: #c9a04a;
-  --gold-light: #ddb564;
-  --jade: #5a8a72;
-  --jade-light: #72a088;
-  --indigo: #6a7a9a;
-  --indigo-light: #8898b8;
-  --border: #3a3428;
-  --border-light: #2a241c;
-  --shadow-ink: rgba(0, 0, 0, 0.35);
-  --shadow-warm: rgba(212, 80, 72, 0.2);
+  --gold: #c9a86a;
+  --gold-light: #e3c186;
+  --jade: #5da885;
+  --jade-light: #7cc2a0;
+  --indigo: #8a97c9;
+  --indigo-light: #a9b3d9;
+  --border: #3d3450;
+  --border-light: #2b2438;
+  --shadow-ink: rgba(0, 0, 0, 0.55);
+  --shadow-warm: rgba(212, 80, 72, 0.28);
   --background: var(--paper);
   --foreground: var(--ink);
 }
 
 [data-theme="night"] .site-shell {
   background:
-    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(201, 160, 74, 0.06), transparent),
-    radial-gradient(ellipse 50% 30% at 80% 90%, rgba(212, 80, 72, 0.04), transparent),
-    linear-gradient(175deg, #161412 0%, #121010 50%, #0e0c0a 100%);
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(138, 151, 201, 0.07), transparent),
+    radial-gradient(ellipse 45% 35% at 78% 85%, rgba(90, 60, 140, 0.12), transparent),
+    radial-gradient(ellipse 50% 30% at 15% 60%, rgba(201, 168, 106, 0.05), transparent),
+    url("data:image/svg+xml,%3Csvg width='140' height='140' viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e3c186'%3E%3Ccircle cx='18' cy='24' r='0.9' fill-opacity='0.18'/%3E%3Ccircle cx='64' cy='9' r='0.6' fill-opacity='0.14'/%3E%3Ccircle cx='108' cy='36' r='1.1' fill-opacity='0.2'/%3E%3Ccircle cx='34' cy='82' r='0.7' fill-opacity='0.13'/%3E%3Ccircle cx='86' cy='70' r='0.9' fill-opacity='0.16'/%3E%3Ccircle cx='126' cy='104' r='0.6' fill-opacity='0.14'/%3E%3Ccircle cx='12' cy='122' r='0.8' fill-opacity='0.15'/%3E%3Ccircle cx='56' cy='112' r='1.0' fill-opacity='0.18'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(175deg, #17131f 0%, #120f19 50%, #0d0b13 100%);
+}
+
+[data-theme="night"] .hero-title {
+  color: var(--gold-light);
+  text-shadow: 0 0 24px rgba(201, 168, 106, 0.35), 0 0 60px rgba(138, 151, 201, 0.15);
+}
+
+[data-theme="night"] .hero-ornament {
+  color: var(--gold);
+  opacity: 0.08;
 }
 
 [data-theme="night"] .site-header {
@@ -2417,8 +2429,99 @@ body.is-wechat .site-header {
 }
 
 [data-theme="night"] .site-header-profile-chip {
-  background: rgba(201, 160, 74, 0.1);
-  border-color: rgba(201, 160, 74, 0.25);
+  background: rgba(201, 168, 106, 0.1);
+  border-color: rgba(201, 168, 106, 0.25);
+}
+
+/* 玄金神秘 · 新组件与遗留浅色块覆盖 */
+[data-theme="night"] .pillar-col {
+  background: linear-gradient(180deg, rgba(38, 31, 52, 0.9), rgba(26, 21, 36, 0.85));
+  border-color: var(--border-light);
+}
+
+[data-theme="night"] .pillar-col--day {
+  background: linear-gradient(180deg, rgba(58, 36, 44, 0.92), rgba(40, 25, 34, 0.88));
+  border-color: var(--cinnabar);
+  box-shadow: 0 4px 18px rgba(212, 80, 72, 0.25);
+}
+
+[data-theme="night"] .pillar-gan,
+[data-theme="night"] .pillar-zhi {
+  text-shadow: 0 0 14px rgba(201, 168, 106, 0.2);
+}
+
+[data-theme="night"] .dayun-cell {
+  background: linear-gradient(180deg, rgba(38, 31, 52, 0.9), rgba(26, 21, 36, 0.85));
+  border-color: var(--border-light);
+}
+
+[data-theme="night"] .dayun-cell--current {
+  background: linear-gradient(180deg, rgba(58, 36, 44, 0.92), rgba(40, 25, 34, 0.88));
+  box-shadow: 0 4px 18px rgba(212, 80, 72, 0.25);
+}
+
+[data-theme="night"] .liunian-chip {
+  background: rgba(26, 21, 36, 0.75);
+  border-color: var(--border-light);
+}
+
+[data-theme="night"] .almanac-row { border-bottom-color: rgba(61, 52, 80, 0.6); }
+
+[data-theme="night"] .insights-table th { color: var(--gold); border-bottom-color: var(--border); }
+[data-theme="night"] .insights-table td { border-bottom-color: rgba(61, 52, 80, 0.6); }
+
+[data-theme="night"] .module-steps {
+  background: rgba(201, 168, 106, 0.07);
+  border-color: rgba(201, 168, 106, 0.25);
+  color: var(--ink-light);
+}
+
+[data-theme="night"] .report-section-title::after {
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+[data-theme="night"] .report-section--header .report-section-title {
+  text-shadow: 0 0 18px rgba(212, 80, 72, 0.3);
+}
+
+[data-theme="night"] .report-section--chart { border-bottom-color: var(--border); }
+
+[data-theme="night"] .scroll-card {
+  border-color: rgba(201, 168, 106, 0.16);
+}
+
+[data-theme="night"] .active-profile-hint {
+  color: var(--gold-light);
+}
+
+[data-theme="night"] .report-ask-msg--user {
+  background: rgba(138, 151, 201, 0.18);
+}
+
+[data-theme="night"] .fortune-item {
+  border-color: var(--border-light);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="night"] .fortune-item:hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="night"] .site-footer {
+  border-top-color: var(--border);
+}
+
+[data-theme="night"] .disclaimer {
+  color: var(--ink-muted);
+}
+
+[data-theme="night"] .bamboo-divider span {
+  background: linear-gradient(180deg, var(--indigo), transparent);
+}
+
+[data-theme="night"] .page-header-line {
+  background: linear-gradient(90deg, transparent, var(--cinnabar), var(--gold), transparent);
+  opacity: 0.4;
 }
 
 /* ── 分享面板 ── */

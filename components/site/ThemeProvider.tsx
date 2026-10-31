@@ -27,12 +27,12 @@ function resolveTheme(mode: ThemeMode): "light" | "night" {
 function applyTheme(resolved: "light" | "night") {
   document.documentElement.dataset.theme = resolved;
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", resolved === "night" ? "#141210" : "#f5efe4");
+  if (meta) meta.setAttribute("content", resolved === "night" ? "#131019" : "#f5efe4");
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mode, setModeState] = useState<ThemeMode>("auto");
-  const [resolved, setResolved] = useState<"light" | "night">("light");
+  const [resolved, setResolved] = useState<"light" | "night">("night");
 
   const setMode = useCallback((next: ThemeMode) => {
     setModeState(next);
@@ -50,7 +50,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as ThemeMode | null;
-    const initial = stored === "light" || stored === "night" || stored === "auto" ? stored : "auto";
+    const initial = stored === "light" || stored === "night" || stored === "auto" ? stored : "night";
     setModeState(initial);
     const r = resolveTheme(initial);
     setResolved(r);
