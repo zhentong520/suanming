@@ -42,8 +42,8 @@ const NAJIA: Record<string, string[]> = {
   兑: ["丁巳", "丁卯", "丁丑", "丁亥", "丁酉", "丁未"],
 };
 
-const SHENG: Record<string, string> = { 木: "火", 火: "土", 土: "金", 金: "水", 水: "木" };
-const KE: Record<string, string> = { 木: "土", 土: "水", 水: "火", 火: "金", 金: "木" };
+export const SHENG: Record<string, string> = { 木: "火", 火: "土", 土: "金", 金: "水", 水: "木" };
+export const KE: Record<string, string> = { 木: "土", 土: "水", 水: "火", 火: "金", 金: "木" };
 
 /** 八纯卦爻阴阳（初→上，1阳0阴） */
 const PURE_LINES: Record<string, number[]> = {
@@ -128,16 +128,28 @@ export function linesToTrigrams(lines: number[]): { upper: string; lower: string
   return { lower: names[lowerBits] ?? "坤", upper: names[upperBits] ?? "乾" };
 }
 
-export function liuQinOf(dayGan: string, yaoGan: string): string {
-  const dm = STEM_WX[dayGan] ?? "土";
-  const ox = STEM_WX[yaoGan] ?? "土";
-  if (dm === ox) return "兄弟";
-  if (SHENG[dm] === ox) return "子孙";
-  if (KE[dm] === ox) return "妻财";
-  if (KE[ox] === dm) return "官鬼";
-  if (SHENG[ox] === dm) return "父母";
+/**
+ * 六亲：以爻之地支五行对本日干五行论生克（通行规则——纳甲六亲取支五行，
+ * 如乾卦壬申爻，申金对甲木日干为我克＝妻财，而非以天干壬水论）。
+ */
+/**
+ * 六亲：以爻之地支五行对本宫五行论生克（京房正统——六亲按宫，
+ * 如乾宫属金：子水=子孙、寅木=妻财、午火=官鬼、辰戌土=父母、申酉金=兄弟；
+ * 如此「子孙生妻财、兄弟克妻财」的四神生克链方能成立）。
+ */
+export function liuQinOf(palaceWx: string, zhiWx: string): string {
+  if (palaceWx === zhiWx) return "兄弟";
+  if (SHENG[palaceWx] === zhiWx) return "子孙";
+  if (KE[palaceWx] === zhiWx) return "妻财";
+  if (KE[zhiWx] === palaceWx) return "官鬼";
+  if (SHENG[zhiWx] === palaceWx) return "父母";
   return "兄弟";
 }
+
+/** 八卦宫五行 */
+export const TRIGRAM_WX: Record<string, string> = {
+  乾: "金", 兑: "金", 离: "火", 震: "木", 巽: "木", 坎: "水", 艮: "土", 坤: "土",
+};
 
 /** 京房八宫世应 */
 export function shiYingPositions(
@@ -198,11 +210,11 @@ export function detectLiuChongHe(upper: string, lower: string): { chong: boolean
 /** 伏神：本宫纯卦六亲中，飞象所无者，伏于对应爻下 */
 export function findFuShen(
   palace: string,
-  dayGan: string,
   flying: YaoDetail[]
 ): FuShen[] {
   const pureNa = NAJIA[palace];
   if (!pureNa) return [];
+  const palaceWx = TRIGRAM_WX[palace] ?? "金";
   const flyingQin = new Set(flying.map((y) => y.liuQin));
   const allQin = ["父母", "兄弟", "子孙", "妻财", "官鬼"];
   const missing = allQin.filter((q) => !flyingQin.has(q));
@@ -212,7 +224,7 @@ export function findFuShen(
       const najia = pureNa[i];
       const gan = najia[0];
       const zhi = najia[1];
-      if (liuQinOf(dayGan, gan) === q) {
+      if (liuQinOf(palaceWx, ZHI_WX[zhi] ?? "土") === q) {
         result.push({
           liuQin: q,
           najia,
@@ -292,14 +304,14 @@ export function buildLiuyaoNajia(input: {
       najia,
       gan,
       zhi,
-      liuQin: liuQinOf(input.dayGan, gan),
+      liuQin: liuQinOf(input.dayGan, ZHI_WX[zhi] ?? "土"),
       moving: moving.has(pos),
       isShi: pos === shi,
       isYing: pos === ying,
     });
   }
 
-  const fuShen = findFuShen(palace, input.dayGan, yao);
+  const fuShen = findFuShen(palace, yao);
   for (const f of fuShen) {
     const host = yao[f.underPosition - 1];
     if (host) host.fuShen = f;
@@ -307,6 +319,11 @@ export function buildLiuyaoNajia(input: {
 
   const liuChongHe = detectLiuChongHe(upper, lower);
   const dayChen = dayChenRelation(input.dayZhi ?? "子", yao);
+
+  const palaceWx = TRIGRAM_WX[palace] ?? "金";
+  for (const y of yao) {
+    y.liuQin = liuQinOf(palaceWx, ZHI_WX[y.zhi] ?? "土");
+  }
 
   return { yao, upper, lower, shi, ying, palace, role, fuShen, liuChongHe, dayChen };
 }

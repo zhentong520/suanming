@@ -177,6 +177,32 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
     lines.push(`六亲摘要: ${JSON.stringify(facts.liuQin)}`);
   }
 
+  // 六爻断卦引擎（《增删卜易》四神 + 《卜筮正宗》歌诀）
+  const dg = facts.duanGua as {
+    yongShen?: { label?: string; note?: string };
+    yong?: { name?: string; liuQin?: string; najia?: string; score?: number; notes?: string[] };
+    yuan?: { name?: string; liuQin?: string; najia?: string; score?: number } | null;
+    ji?: { name?: string; liuQin?: string; najia?: string; score?: number; moving?: boolean } | null;
+    liLiang?: string[];
+    huaYao?: string[];
+    conclusion?: { level?: string; text?: string; basis?: string };
+    chiShi?: string;
+  } | undefined;
+  if (dg?.conclusion) {
+    if (dg.yongShen?.label) {
+      lines.push(
+        `断卦用神: ${dg.yongShen.label}${dg.yong?.name ? `（${dg.yong.name}${dg.yong.liuQin}${dg.yong.najia}·旺衰评分${dg.yong.score}）` : ""}`
+      );
+    }
+    if (dg.yong?.notes?.length) lines.push(`用神旺衰明细: ${dg.yong.notes.join("；")}`);
+    if (dg.yuan) lines.push(`元神: ${dg.yuan.name}${dg.yuan.liuQin}（评分${dg.yuan.score}）`);
+    if (dg.ji) lines.push(`忌神: ${dg.ji.name}${dg.ji.liuQin}（评分${dg.ji.score}${dg.ji.moving ? "·动" : ""}）`);
+    if (dg.liLiang?.length) lines.push(`力量清单(增删卜易): ${dg.liLiang.join("；")}`);
+    if (dg.huaYao?.length) lines.push(`动爻变化: ${dg.huaYao.join("；")}`);
+    if (dg.chiShi) lines.push(`持世诀: ${dg.chiShi}`);
+    lines.push(`卦断【${dg.conclusion.level}】: ${dg.conclusion.text}（依据：${dg.conclusion.basis}）`);
+  }
+
   if (typeof facts.scores === "object" && facts.scores) {
     lines.push(`评分: ${JSON.stringify(facts.scores)}`);
   }
@@ -244,10 +270,10 @@ const STYLE_ZIWEI: PromptStyle = {
 const STYLE_DIVINATION: PromptStyle = {
   structure: "所问之事复述 → 卦象/牌面/课体分析 → 趋势与应期 → 行动建议",
   tone: "断事口吻：就事论事，紧扣卦爻、世应、用神或牌面正逆位，不泛谈人生整体",
-  focus: "把「本卦/变卦、六亲、用神旺衰」或牌阵位置作为推断依据，结论落到「此事当下怎么做」",
+  focus: "把「本卦/变卦、六亲、断卦引擎的用神旺衰/元神忌神力量清单/动爻变化/卦断结论」作为推断依据，结论落到「此事当下怎么做」",
   structureEn: "restate the question → hexagram/spread analysis → trend and timing → actionable advice",
   toneEn: "answer the specific question: stick to hexagram lines, relevant spirits, or spread positions; avoid general life readings",
-  focusEn: "base the reading on the primary/changed hexagram, six relatives, or spread positions; land on what to do now",
+  focusEn: "base the reading on the primary/changed hexagram, six relatives, the yong-shen strength verdict, and the engine conclusion; land on what to do now",
 };
 
 const STYLE_NAME: PromptStyle = {

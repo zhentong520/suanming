@@ -13,6 +13,7 @@ import {
 } from "../shared/iching-lines";
 import { lunarFromDate, xiaoliurenGong } from "../shared/lunar-advanced";
 import { buildLiuyaoNajia, liuQinSummary } from "./liuyao-najia";
+import { analyzeLiuyao } from "./liuyao-engine";
 
 function hashQuestion(q: string): number {
   return hashString(q);
@@ -62,8 +63,10 @@ export function computeLiuyao(question?: string, date?: Date, manualLines?: YaoL
     : buildLinesFromSeed(seedFromDate(d, hashQuestion(question ?? "") + 7));
   const { benGua, bianGua, changingYao, dongYaoCount } = deriveHexagramsFromLines(lines);
   const lunar = lunarFromDate(d);
-  const dayGan = lunar.getEightChar().getDayGan();
-  const dayZhi = lunar.getEightChar().getDayZhi();
+  const ec = lunar.getEightChar();
+  const dayGan = ec.getDayGan();
+  const dayZhi = ec.getDayZhi();
+  const monthZhi = ec.getMonthZhi();
   const binaryLines = lines.map((l) => (l.value === 7 || l.value === 9 ? 1 : 0));
   const movingPositions = lines.filter((l) => l.changing).map((l) => l.position);
   const najia = buildLiuyaoNajia({
@@ -71,6 +74,23 @@ export function computeLiuyao(question?: string, date?: Date, manualLines?: YaoL
     dayGan,
     dayZhi,
     changingYao: movingPositions,
+  });
+
+  // 断卦引擎（《增删卜易》四神 + 《卜筮正宗》歌诀）：变卦纳甲供回头生克/进退神
+  const changedBinary = binaryLines.map((b, i) =>
+    movingPositions.includes(i + 1) ? (b ? 0 : 1) : b
+  );
+  const changedNajia =
+    movingPositions.length > 0
+      ? buildLiuyaoNajia({ lines: changedBinary, dayGan, dayZhi }).yao
+      : [];
+  const duanGua = analyzeLiuyao({
+    question: question ?? "",
+    dayGan,
+    dayZhi,
+    monthZhi,
+    najia,
+    changedNajia,
   });
 
   const reading = buildHexagramReading(benGua, {
@@ -113,6 +133,8 @@ export function computeLiuyao(question?: string, date?: Date, manualLines?: YaoL
     fuShen: najia.fuShen,
     liuChongHe: najia.liuChongHe,
     dayChen: najia.dayChen,
+    monthZhi,
+    duanGua,
     manual: Boolean(manualLines),
     liuQin: {
       世应: `世在第${najia.shi}爻，应在第${najia.ying}爻（${najia.palace}宫${najia.role}）`,
@@ -134,8 +156,23 @@ export function computeLiuyao(question?: string, date?: Date, manualLines?: YaoL
           najia.dayChen,
         ].join("\n"),
       },
+      {
+        title: "断卦（《增删卜易》四神）",
+        content: [
+          `用神：${duanGua.yongShen.label}（${duanGua.yongShen.note}）${duanGua.yongNote ? `——${duanGua.yongNote}` : ""}`,
+          duanGua.yong
+            ? `用神${duanGua.yong.name}${duanGua.yong.liuQin}${duanGua.yong.najia} 旺衰评分 ${duanGua.yong.score}（${duanGua.yong.beast}临之）：${duanGua.yong.notes.join("；")}`
+            : "用神取世爻参断",
+          duanGua.yuan ? `元神（生用神者）${duanGua.yuan.name}${duanGua.yuan.liuQin} 评分 ${duanGua.yuan.score}` : "元神不上卦",
+          duanGua.ji ? `忌神（克用神者）${duanGua.ji.name}${duanGua.ji.liuQin} 评分 ${duanGua.ji.score}${duanGua.ji.moving ? "（动）" : ""}` : "忌神不上卦",
+          ...(duanGua.liLiang.length ? ["力量清单：" + duanGua.liLiang.join("；")] : []),
+          ...duanGua.huaYao,
+          `持世诀：${duanGua.chiShi}`,
+          `结论【${duanGua.conclusion.level}】：${duanGua.conclusion.text}\n依据：${duanGua.conclusion.basis}`,
+        ].join("\n"),
+      },
     ],
-    summary: `本卦${reading.hexagram}（${reading.fullName}），${dongYaoCount}爻动变${bianGua}。${liuQinText}`,
+    summary: `本卦${reading.hexagram}（${reading.fullName}），${dongYaoCount}爻动变${bianGua}。${liuQinText} 用神取${duanGua.yongShen.label}，卦断【${duanGua.conclusion.level}】。`,
   };
 }
 
