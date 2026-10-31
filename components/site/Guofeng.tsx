@@ -164,6 +164,8 @@ export interface PillarGridFacts {
   diShi?: Array<{ pillar: string; diShi: string }>;
   zodiacLichun?: string;
   dayMaster?: string;
+  daYun?: DayunItem[];
+  liuNian?: LiunianItem[];
 }
 
 /** 四柱排盘卡：十神 / 天干 / 地支 / 藏干 / 纳音 / 十二长生 */
@@ -194,6 +196,62 @@ export function PillarGrid({ facts }: { facts: PillarGridFacts }) {
   );
 }
 
+export interface DayunItem {
+  ganZhi: string;
+  startAge: number;
+  endAge: number;
+  startYear: number;
+  endYear: number;
+  isCurrent?: boolean;
+  yongShenLabel?: string;
+}
+
+export interface LiunianItem {
+  year: number;
+  ganZhi: string;
+  yongShenLabel?: string;
+}
+
+const YUN_LABEL_CLASS: Record<string, string> = { 吉: "yun-label--ji", 凶: "yun-label--xiong", 平: "yun-label--ping" };
+
+/** 大运时间线：横向流式，当前大运高亮；下方附当前运十二流年 */
+export function DayunTimeline({ daYun, liuNian }: { daYun: DayunItem[]; liuNian?: LiunianItem[] }) {
+  if (!Array.isArray(daYun) || daYun.length === 0) return null;
+  const currentLiuNian = liuNian && liuNian.length > 0 ? liuNian : undefined;
+
+  return (
+    <div className="dayun-wrap">
+      <div className="dayun-strip">
+        {daYun.map((d) => (
+          <div key={`${d.ganZhi}-${d.startYear}`} className={clsx("dayun-cell", d.isCurrent && "dayun-cell--current")}>
+            {d.isCurrent && <span className="dayun-current-seal">当前</span>}
+            <span className="dayun-ages">
+              {d.startAge}–{d.endAge}岁
+            </span>
+            <span className="dayun-ganzhi">
+              <em>{d.ganZhi[0]}</em>
+              <em>{d.ganZhi[1]}</em>
+            </span>
+            <span className={clsx("yun-label", YUN_LABEL_CLASS[d.yongShenLabel ?? ""])}>{d.yongShenLabel ?? "平"}</span>
+            <span className="dayun-years">
+              {d.startYear}–{d.endYear}
+            </span>
+          </div>
+        ))}
+      </div>
+      {currentLiuNian && (
+        <div className="liunian-row">
+          {currentLiuNian.map((l) => (
+            <span key={`${l.year}-${l.ganZhi}`} className={clsx("liunian-chip", YUN_LABEL_CLASS[l.yongShenLabel ?? ""])}>
+              {l.year} {l.ganZhi}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ReportPanel({
   report,
   aiReport,
@@ -216,6 +274,14 @@ export function ReportPanel({
               日主 {facts.dayMaster} · 立春生肖 {facts.zodiacLichun}
             </p>
           )}
+        </div>
+      )}
+      {Array.isArray(facts?.daYun) && facts!.daYun!.length > 0 && (
+        <div className="report-section report-section--chart">
+          <h4 className="report-section-title" style={{ textAlign: "center", marginBottom: "0.85rem" }}>
+            大运流年
+          </h4>
+          <DayunTimeline daYun={facts!.daYun!} liuNian={facts!.liuNian} />
         </div>
       )}
       {sections.map((sec, i) => (

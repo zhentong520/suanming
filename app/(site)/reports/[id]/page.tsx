@@ -214,7 +214,7 @@ export default function ReportDetailPage() {
                 <p className="page-desc">暂无流年表（八字大运模块或补全出生时辰后更完整）。</p>
               ) : (
                 <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", fontSize: "0.9rem" }}>
+                  <table className="insights-table">
                     <thead>
                       <tr>
                         <th align="left">时段</th>

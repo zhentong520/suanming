@@ -1070,6 +1070,134 @@ a { color: inherit; text-decoration: none; }
   .pillar-gan, .pillar-zhi { font-size: 1.5rem; }
 }
 
+/* ── 大运时间线 ── */
+.dayun-wrap { max-width: 720px; margin: 0 auto; }
+
+.dayun-strip {
+  display: flex;
+  gap: 0.55rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.15rem 0.5rem;
+  scrollbar-width: thin;
+}
+
+.dayun-cell {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.16rem;
+  min-width: 4.6rem;
+  padding: 0.75rem 0.5rem 0.7rem;
+  background: linear-gradient(180deg, rgba(255, 253, 249, 0.95), rgba(250, 245, 236, 0.85));
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+}
+
+.dayun-cell--current {
+  border-color: var(--cinnabar);
+  box-shadow: 0 3px 12px var(--shadow-warm);
+  background: linear-gradient(180deg, rgba(255, 250, 245, 0.98), rgba(252, 240, 234, 0.92));
+}
+
+.dayun-current-seal {
+  position: absolute;
+  top: -0.55rem;
+  right: -0.3rem;
+  background: var(--cinnabar);
+  color: #fff;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  padding: 0.08rem 0.35rem;
+  border-radius: 3px;
+}
+
+.dayun-ages {
+  font-size: 0.68rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.05em;
+}
+
+.dayun-ganzhi {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.dayun-ganzhi em {
+  font-style: normal;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.yun-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  padding: 0.06rem 0.4rem;
+  border-radius: 3px;
+  border: 1px solid currentColor;
+}
+
+.yun-label--ji { color: var(--jade); }
+.yun-label--xiong { color: var(--cinnabar); }
+.yun-label--ping { color: var(--gold); }
+
+.dayun-years {
+  font-size: 0.64rem;
+  color: var(--ink-muted);
+}
+
+.liunian-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  margin-top: 0.75rem;
+}
+
+.liunian-chip {
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  color: var(--ink-light);
+  background: rgba(255, 253, 249, 0.75);
+}
+
+.liunian-chip.yun-label--ji { color: var(--jade); border-color: currentColor; }
+.liunian-chip.yun-label--xiong { color: var(--cinnabar); border-color: currentColor; }
+
+/* ── 人生洞察表 ── */
+.insights-table {
+  width: 100%;
+  font-size: 0.88rem;
+  border-collapse: collapse;
+}
+
+.insights-table th {
+  text-align: left;
+  color: var(--ink-muted);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.insights-table td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px dashed var(--border-light);
+  vertical-align: top;
+  line-height: 1.55;
+}
+
+.insights-table tr:last-child td { border-bottom: none; }
+
 .report-section {
   padding: 0.85rem 0;
   border-bottom: 1px dashed var(--border-light);
