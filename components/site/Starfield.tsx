@@ -50,6 +50,11 @@ export function Starfield() {
     let running = true;
     let lastMeteorAt = 0;
     let nextMeteorDelay = 6000 + Math.random() * 9000;
+    // 鼠标视差：目标偏移与当前偏移（lerp 平滑）
+    let targetX = 0;
+    let targetY = 0;
+    let curX = 0;
+    let curY = 0;
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -94,12 +99,18 @@ export function Starfield() {
       if (!running) return;
       ctx!.clearRect(0, 0, width, height);
 
+      // 视差平滑逼近（最大偏移 ~26px，按星子深度分层）
+      curX += (targetX - curX) * 0.04;
+      curY += (targetY - curY) * 0.04;
+
       for (const s of stars) {
         const alpha = reduced.matches
           ? s.baseAlpha
           : Math.max(0.05, s.baseAlpha + Math.sin(now * s.twinkleSpeed + s.phase) * s.twinkleAmp);
+        const px = s.x + curX * s.drift;
+        const py = s.y + curY * s.drift;
         ctx!.beginPath();
-        ctx!.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx!.arc(px, py, s.r, 0, Math.PI * 2);
         ctx!.fillStyle = `rgba(227, 193, 134, ${alpha.toFixed(3)})`;
         ctx!.fill();
         if (!reduced.matches) {
@@ -114,11 +125,13 @@ export function Starfield() {
       // 亮星光晕（少量大星）
       for (const s of stars) {
         if (s.r > 1.45) {
-          const g = ctx!.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 6);
+          const px = s.x + curX * s.drift;
+          const py = s.y + curY * s.drift;
+          const g = ctx!.createRadialGradient(px, py, 0, px, py, s.r * 6);
           g.addColorStop(0, `rgba(227, 193, 134, ${(s.baseAlpha * 0.35).toFixed(3)})`);
           g.addColorStop(1, "rgba(227, 193, 134, 0)");
           ctx!.fillStyle = g;
-          ctx!.fillRect(s.x - s.r * 6, s.y - s.r * 6, s.r * 12, s.r * 12);
+          ctx!.fillRect(px - s.r * 6, py - s.r * 6, s.r * 12, s.r * 12);
         }
       }
 
@@ -147,6 +160,13 @@ export function Starfield() {
       raf = requestAnimationFrame(frame);
     }
 
+    function onMouseMove(e: MouseEvent) {
+      if (reduced.matches) return;
+      // 归一化到 [-1, 1]，再乘最大偏移
+      targetX = (e.clientX / window.innerWidth - 0.5) * -2 * 26;
+      targetY = (e.clientY / window.innerHeight - 0.5) * -2 * 18;
+    }
+
     function onVisibility() {
       if (document.hidden) {
         running = false;
@@ -160,12 +180,14 @@ export function Starfield() {
     seed();
     raf = requestAnimationFrame(frame);
     window.addEventListener("resize", seed);
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       running = false;
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", seed);
+      window.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [resolved]);

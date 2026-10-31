@@ -1,4 +1,5 @@
 import { InkWashBg } from "@/components/site/Decorations";
+import { MoonWidget } from "@/components/site/MoonWidget";
 import { MobileNav } from "@/components/site/MobileNav";
 import { PwaRegister, SplashMeta } from "@/components/site/PwaRegister";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -32,6 +33,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           <div className="site-shell">
             <InkWashBg />
             <Starfield />
+            <MoonWidget />
             <SiteHeader />
             <main className="site-main site-main--with-nav">{children}</main>
             <SiteFooter />
