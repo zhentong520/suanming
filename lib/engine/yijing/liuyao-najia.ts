@@ -298,9 +298,13 @@ export function buildLiuyaoNajia(input: {
     const gan = najia[0];
     const zhi = najia[1];
     const pos = i + 1;
+    // 爻名：初/上缀后（初九/上六），二三四五缀前（九四/六四）
+    const yinYang = input.lines[i] ? "九" : "六";
+    const posName =
+      i === 0 ? `初${yinYang}` : i === 5 ? `上${yinYang}` : `${yinYang}${["二", "三", "四", "五"][i - 1]}`;
     yao.push({
       position: pos,
-      name: ["初", "二", "三", "四", "五", "上"][i] + (input.lines[i] ? "九" : "六"),
+      name: posName,
       najia,
       gan,
       zhi,
