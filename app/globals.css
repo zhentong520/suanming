@@ -1225,6 +1225,61 @@ a { color: inherit; text-decoration: none; }
 
 .share-toast--error { color: var(--cinnabar-light); }
 
+/* ── 分享图弹层 ── */
+.share-card-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.share-card-dialog {
+  max-width: min(420px, 92vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--paper-warm);
+  border: 1px solid rgba(201, 168, 106, 0.35);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.share-card-dialog img {
+  width: 100%;
+  border-radius: 6px;
+  display: block;
+}
+
+.share-card-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 0.9rem;
+}
+
+.share-card-hint {
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+.share-btn--card {
+  background: rgba(201, 168, 106, 0.12);
+  border: 1px solid rgba(201, 168, 106, 0.4);
+  color: var(--gold-light);
+  width: 100%;
+}
+
+[data-theme="night"] .share-card-dialog {
+  background: #1e1a28;
+  border-color: rgba(201, 168, 106, 0.3);
+}
+
 .shared-page .scroll-card {
   max-width: 860px;
   margin: 0 auto;

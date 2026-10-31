@@ -130,7 +130,7 @@ export function ModulePageShell({
           )}
           <ReportPanel report={report} aiReport={aiReport} facts={facts} />
           {reportId && <ReportAskPanel reportId={reportId} />}
-          <SharePanel reportId={reportId} moduleTitle={title} />
+          <SharePanel reportId={reportId} report={report} moduleTitle={title} />
         </ScrollCard>
       )}
     </div>

@@ -4,24 +4,26 @@ import { useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { buildSharePayload } from "@/lib/seo/build-metadata";
 import { useShareActions } from "@/lib/wechat/share-client";
+import { drawShareCard, extractSummaryLines } from "@/lib/share-card";
 
 export function SharePanel({
   reportId,
+  report,
   moduleTitle,
 }: {
   reportId?: string;
+  report?: string;
   moduleTitle: string;
 }) {
   const pathname = usePathname();
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [cardDataUrl, setCardDataUrl] = useState<string | null>(null);
 
-  // 无 reportId 或无公开链接时，系统分享只能分享页面自身链接
   const shareData = useMemo(
-    () =>
-      buildSharePayload(pathname, shareUrl ? `${moduleTitle}测算结果` : `${moduleTitle}测算结果`),
-    [pathname, moduleTitle, shareUrl]
+    () => buildSharePayload(pathname, `${moduleTitle}测算结果`),
+    [pathname, moduleTitle]
   );
   const shareTarget = useMemo(
     () => (shareUrl ? { ...shareData, link: shareUrl } : shareData),
@@ -60,9 +62,36 @@ export function SharePanel({
     }
   }
 
+  function showCard() {
+    if (!report) return;
+    const url = drawShareCard({
+      moduleTitle,
+      lines: extractSummaryLines(report),
+      dateText: new Date().toLocaleDateString("zh-CN"),
+    });
+    if (url) setCardDataUrl(url);
+  }
+
+  function downloadCard() {
+    if (!cardDataUrl) return;
+    const a = document.createElement("a");
+    a.href = cardDataUrl;
+    a.download = `${moduleTitle}-测算结果.png`;
+    a.click();
+  }
+
   return (
     <div className="share-panel">
       <p className="share-panel-title">分享测算结果</p>
+
+      {report && (
+        <div className="share-panel-actions" style={{ marginBottom: "0.6rem" }}>
+          <button type="button" className="share-btn share-btn--card" onClick={showCard}>
+            🖼 保存分享图
+          </button>
+        </div>
+      )}
+
       {!reportId ? (
         <div className="share-panel-actions">
           <button type="button" className="share-btn" onClick={shareNative}>
@@ -81,7 +110,7 @@ export function SharePanel({
             <button type="button" className="share-btn" onClick={shareNative}>
               系统分享
             </button>
-            <button type="button" className="share-btn share-btn--ghost" onClick={() => void copyLink()}>
+            <button type="button" className="share-btn share-btn--ghost" onClick={copyLink}>
               复制链接
             </button>
             <button type="button" className="share-btn share-btn--revoke" disabled={busy} onClick={() => void revokeLink()}>
@@ -104,6 +133,23 @@ export function SharePanel({
       )}
       {error && <p className="share-toast share-toast--error">{error}</p>}
       {toast && <p className="share-toast">{toast}</p>}
+
+      {cardDataUrl && (
+        <div className="share-card-overlay" onClick={() => setCardDataUrl(null)}>
+          <div className="share-card-dialog" onClick={(e) => e.stopPropagation()}>
+            <img src={cardDataUrl} alt="分享图预览" />
+            <div className="share-card-actions">
+              <button type="button" className="btn-primary" onClick={downloadCard}>
+                下载图片
+              </button>
+              <button type="button" className="btn-ghost" onClick={() => setCardDataUrl(null)}>
+                关闭
+              </button>
+            </div>
+            <p className="share-card-hint">手机端也可长按图片保存到相册</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

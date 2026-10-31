@@ -204,7 +204,7 @@ export function ImageReadingPage({
               <Link href="/reports">全部历史</Link>
             </p>
           )}
-          <SharePanel reportId={reportId} moduleTitle={title} />
+          <SharePanel reportId={reportId} report={report} moduleTitle={title} />
           <ReportPanel report={report} aiReport={aiReport} />
         </ScrollCard>
       )}
