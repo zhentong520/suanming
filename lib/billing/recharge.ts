@@ -24,7 +24,7 @@ import { and, eq } from "drizzle-orm";
 import { getDb, getSqlite } from "@/lib/db/client";
 import { paymentOrders, users } from "@/lib/db/schema";
 import { grantPoints } from "./points";
-import { wxQueryXpayOrder, type WxOrderQueryResult } from "@/lib/wechat/mini-session";
+import { wxQueryXpayOrder, getXpayAppKey, type WxOrderQueryResult } from "@/lib/wechat/mini-session";
 
 export interface RechargePackage {
   id: string;
@@ -191,7 +191,18 @@ export async function fulfillRechargeOrderWithWxConfirm(opts: {
     if (paidRow) return { ok: true, alreadyPaid: true, userId: paidRow.user_id, points: paidRow.points };
   }
 
-  const outTradeNo = opts.outTradeNo;
+  let outTradeNo = opts.outTradeNo;
+
+  // 仅微信内部单号且本地无匹配（订单尚未回填外部单号）：
+  // 用 wx_order_id + openid 向微信反查，取响应中的商户单号（order_id）映射回本地订单
+  if (!outTradeNo && opts.wxOrderId && opts.openid && getXpayAppKey()) {
+    try {
+      const query = await wxQueryXpayOrder({ openid: opts.openid, wxOrderId: opts.wxOrderId });
+      if (query.merchantOrderId) outTradeNo = query.merchantOrderId;
+    } catch {
+      // 查询失败则走下方"missing order reference"，等待微信重试
+    }
+  }
   if (!outTradeNo) return { ok: false, reason: "missing order reference" };
 
   const order = sqlite

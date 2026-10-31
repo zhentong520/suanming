@@ -209,3 +209,60 @@ describe("wechat callback fulfill with query_order confirm", () => {
     expect(r.reason).toContain("mismatch");
   });
 });
+
+describe("wx_order_id-only callback resolution", () => {
+  afterAll(() => {
+    globalThis.fetch = realFetch;
+  });
+
+  it("resolves merchant order via reverse lookup and fulfills", async () => {
+    process.env.WX_MINI_APPID = "wx-test-appid";
+    process.env.WX_MINI_SECRET = "wx-test-secret";
+    process.env.WX_MINI_APPKEY = "test-appkey-0123456789abcdef";
+    const userId = await createWxUser("o-resolve-1");
+    const pkg = findPackage("points_60")!;
+    const order = await createRechargeOrder({ userId, pkg });
+    const before = (await getPointsStatus(userId)).balance;
+
+    // 回调只带 wx_order_id：第一次反查拿商户单号，第二次确认支付状态
+    mockWxFetch((url) => {
+      if (url.includes("/cgi-bin/stable_token")) {
+        return { data: { access_token: "test-token", expires_in: 7200 } };
+      }
+      if (url.includes("/xpay/query_order")) {
+        return {
+          data: {
+            errcode: 0,
+            order: { order_id: order.outTradeNo, order_status: 1, wx_order_id: "wx-x1", paid_fee: 600 },
+          },
+        };
+      }
+      return { status: 404, data: {} };
+    });
+
+    const r = await fulfillRechargeOrderWithWxConfirm({ wxOrderId: "wx-x1", openid: "o-resolve-1" });
+    expect(r.ok).toBe(true);
+    expect((await getPointsStatus(userId)).balance).toBe(before + 60);
+
+    const row = getSqlite()
+      .prepare("SELECT external_trade_no, status FROM payment_orders WHERE id = ?")
+      .get(order.outTradeNo) as { external_trade_no: string; status: string };
+    expect(row.external_trade_no).toBe("wx-x1");
+    expect(row.status).toBe("paid");
+  });
+
+  it("rejects wx_order_id-only callback when reverse lookup fails", async () => {
+    process.env.WX_MINI_APPID = "wx-test-appid";
+    process.env.WX_MINI_SECRET = "wx-test-secret";
+    process.env.WX_MINI_APPKEY = "test-appkey-0123456789abcdef";
+    mockWxFetch((url) => {
+      if (url.includes("/cgi-bin/stable_token")) {
+        return { data: { access_token: "test-token", expires_in: 7200 } };
+      }
+      return { data: { errcode: 268490004, errmsg: "order not exist" } };
+    });
+    const r = await fulfillRechargeOrderWithWxConfirm({ wxOrderId: "wx-none", openid: "o-ghost" });
+    expect(r.ok).toBe(false);
+    expect(r.reason).toContain("missing order reference");
+  });
+});

@@ -81,13 +81,6 @@ function hmacHex(key: string, message: string): string {
   return createHmac("sha256", key).update(message, "utf8").digest("hex");
 }
 
-/** 服务端 /xpay/* 接口的 pay_sig：hex(HMAC-SHA256(AppKey, uri + '&' + postBody)) */
-export function xpayPaySig(uri: string, postBody: string): string {
-  const appKey = getXpayAppKey();
-  if (!appKey) throw new Error("服务端未配置虚拟支付 AppKey（WX_MINI_APPKEY / WX_MINI_SANDBOX_APPKEY）");
-  return hmacHex(appKey, `${uri}&${postBody}`);
-}
-
 /* ---- access_token 稳定凭证（进程内缓存，到期前 300s 主动刷新） ---- */
 let cachedToken: { token: string; expiresAt: number } | null = null;
 let tokenPromise: Promise<string> | null = null;
@@ -128,6 +121,8 @@ export async function getStableAccessToken(): Promise<string> {
 export interface WxOrderQueryResult {
   /** 微信侧确认订单已支付成功 */
   paid: boolean;
+  /** 商户单号（即我们的 payment_orders.id，query_order 响应回带） */
+  merchantOrderId?: string;
   /** 微信内部单号（回填订单用） */
   wxOrderId?: string;
   /** 订单状态原文（0 创建 / 1 支付成功 / 2 已退款 / 3 已关闭，以微信文档为准） */
@@ -141,16 +136,21 @@ export interface WxOrderQueryResult {
 /**
  * 服务端实单查询：POST /xpay/query_order。
  * 发货前调用，确保只有微信侧真实支付成功的订单才会入账。
+ * 二选一：传商户单号 orderId，或传微信内部单号 wxOrderId（回调只带内部单号时反查）。
  */
 export async function wxQueryXpayOrder(opts: {
   openid: string;
-  orderId: string;
+  orderId?: string;
+  wxOrderId?: string;
 }): Promise<WxOrderQueryResult> {
   const appKey = getXpayAppKey();
   if (!appKey) throw new Error("服务端未配置虚拟支付 AppKey");
 
   // 字段顺序固定（签名基于原始串，不能二次序列化）
-  const body = JSON.stringify({ openid: opts.openid, env: xpayEnv(), order_id: opts.orderId });
+  const bodyObj: Record<string, string | number> = { openid: opts.openid, env: xpayEnv() };
+  if (opts.orderId) bodyObj.order_id = opts.orderId;
+  if (opts.wxOrderId) bodyObj.wx_order_id = opts.wxOrderId;
+  const body = JSON.stringify(bodyObj);
   const paySig = hmacHex(appKey, `/xpay/query_order&${body}`);
   const accessToken = await getStableAccessToken();
 
@@ -168,6 +168,7 @@ export async function wxQueryXpayOrder(opts: {
     errcode?: number;
     errmsg?: string;
     order?: {
+      order_id?: string;
       order_status?: number;
       wx_order_id?: string;
       paid_fee?: number;
@@ -181,6 +182,7 @@ export async function wxQueryXpayOrder(opts: {
   return {
     // 1 = 支付成功（0 创建 / 2 退款 / 3 关闭）
     paid: orderStatus === 1,
+    merchantOrderId: data.order?.order_id,
     wxOrderId: data.order?.wx_order_id,
     orderStatus,
     paidFee: data.order?.paid_fee,
