@@ -1,0 +1,40 @@
+<view class="page">
+  <view wx:if="{{!authed}}" class="card login-hint">
+    <text>登录后即可充值积分</text>
+    <button class="btn-primary" bindtap="goLogin">去登录</button>
+  </view>
+
+  <block wx:else>
+    <view class="card balance-card">
+      <text class="balance-label">当前积分</text>
+      <text class="balance-value">{{balance}}</text>
+    </view>
+
+    <view wx:if="{{notice}}" class="notice">{{notice}}</view>
+
+    <view class="pkg-list">
+      <view
+        wx:for="{{packages}}"
+        wx:key="id"
+        class="pkg-card {{buyingId===item.id?'buying':''}}"
+        data-id="{{item.id}}"
+        bindtap="buy"
+      >
+        <view class="pkg-main">
+          <text class="pkg-points">{{item.points}} 积分</text>
+          <text wx:if="{{item.bonusPoints}}" class="pkg-bonus">含赠送 {{item.bonusPoints}} 积分</text>
+        </view>
+        <button class="pkg-buy" loading="{{buyingId===item.id}}" disabled="{{!xpayConfigured}}">
+          ¥{{item.priceYuan}}
+        </button>
+      </view>
+    </view>
+
+    <view wx:if="{{error}}" class="error">{{error}}</view>
+    <view class="tips">
+      <text>· 积分用于 AI 深度解读与人生洞察解锁</text>
+      <text>· 支付由微信虚拟支付完成，到账如有延迟请稍候刷新</text>
+      <text>· 充值前请确认已通过「微信一键登录」登录</text>
+    </view>
+  </block>
+</view>

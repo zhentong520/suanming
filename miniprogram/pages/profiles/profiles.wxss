@@ -1,1 +1,17 @@
 /* profiles */
+
+.account-card {
+  margin-bottom: 16rpx;
+}
+
+.account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.account-balance {
+  font-size: 28rpx;
+  color: #1a1208;
+  font-weight: 600;
+}

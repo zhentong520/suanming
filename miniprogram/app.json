@@ -5,6 +5,7 @@
     "pages/modules/modules",
     "pages/calc/calc",
     "pages/profiles/profiles",
+    "pages/recharge/recharge",
     "pages/reports/reports",
     "pages/report-detail/report-detail"
   ],

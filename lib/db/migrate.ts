@@ -218,6 +218,8 @@ function runIndexMigrations(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_matches_profile_b ON matches(profile_id_b);
     CREATE INDEX IF NOT EXISTS idx_report_messages_report ON report_messages(report_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_report_messages_user ON report_messages(user_id, created_at);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_users_wx_open_id ON users(wx_open_id) WHERE wx_open_id IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS idx_payment_orders_status ON payment_orders(status, created_at);
   `);
 }
 
@@ -265,6 +267,12 @@ function runColumnMigrations(db: Database.Database) {
   const userCols2 = db.prepare("PRAGMA table_info(users)").all() as Array<{ name: string }>;
   if (!userCols2.some((c) => c.name === "allow_life_insights")) {
     db.exec("ALTER TABLE users ADD COLUMN allow_life_insights INTEGER NOT NULL DEFAULT 0");
+  }
+  if (!userCols2.some((c) => c.name === "wx_open_id")) {
+    db.exec("ALTER TABLE users ADD COLUMN wx_open_id TEXT");
+  }
+  if (!userCols2.some((c) => c.name === "wx_session_key")) {
+    db.exec("ALTER TABLE users ADD COLUMN wx_session_key TEXT");
   }
   const reportCols2 = db.prepare("PRAGMA table_info(reports)").all() as Array<{ name: string }>;
   if (!reportCols2.some((c) => c.name === "life_insights_unlocked")) {

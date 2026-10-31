@@ -9,6 +9,9 @@
   <button class="btn-primary" loading="{{loading}}" bindtap="submit">开始测算</button>
 </view>
 <view wx:if="{{error}}" class="error">{{error}}</view>
+<view wx:if="{{needRecharge}}" class="card recharge-hint">
+  <navigator url="/pages/recharge/recharge" class="btn-primary recharge-btn">去充值积分</navigator>
+</view>
 <view class="card" wx:if="{{report}}">
   <view style="font-weight:600;margin-bottom:12rpx;">测算结果</view>
   <view class="report">{{report}}</view>

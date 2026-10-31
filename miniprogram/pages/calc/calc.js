@@ -34,7 +34,7 @@ Page({
       wx.navigateTo({ url: "/pages/login/login" });
       return;
     }
-    this.setData({ loading: true, error: "", report: "", reportId: "" });
+    this.setData({ loading: true, error: "", report: "", reportId: "", needRecharge: false });
     try {
       const params = { ...form };
       if (params.surnameLen) params.surnameLen = Number(params.surnameLen) || 1;
@@ -48,7 +48,11 @@ Page({
         reportId: data.reportId || "",
       });
     } catch (err) {
-      this.setData({ error: err.message || "测算失败" });
+      const msg = err.message || "测算失败";
+      this.setData({
+        error: msg,
+        needRecharge: msg.includes("积分不足"),
+      });
     } finally {
       this.setData({ loading: false });
     }

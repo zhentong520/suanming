@@ -10,6 +10,7 @@ Page({
     ziSects: ["算当天（传统通行）", "算次日（换日派）"],
     ziSectIndex: 0,
     showDstHint: false,
+    balance: 0,
     form: {
       name: "",
       birthYear: "1990",
@@ -27,6 +28,9 @@ Page({
   },
   goLogin() {
     wx.navigateTo({ url: "/pages/login/login" });
+  },
+  goRecharge() {
+    wx.navigateTo({ url: "/pages/recharge/recharge" });
   },
   onForm(e) {
     const k = e.currentTarget.dataset.k;
@@ -49,6 +53,7 @@ Page({
       this.setData({
         profiles: me.profiles || [],
         activeId: me.user?.activeProfileId || "",
+        balance: me.points?.balance ?? me.user?.pointsBalance ?? 0,
       });
     } catch (err) {
       this.setData({ error: err.message, authed: !!api.getToken() });

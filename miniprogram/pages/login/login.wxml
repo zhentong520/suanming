@@ -13,5 +13,7 @@
     <input class="input" value="{{displayName}}" bindinput="onName" />
   </label>
   <button class="btn-primary" loading="{{loading}}" bindtap="submit">{{mode==='login'?'登录':'注册'}}</button>
+  <view class="divider"><text>或</text></view>
+  <button class="btn-wechat" loading="{{loading}}" bindtap="wechatLogin">微信一键登录</button>
 </view>
 <view wx:if="{{error}}" class="error">{{error}}</view>

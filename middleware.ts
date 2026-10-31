@@ -7,11 +7,14 @@ const AUTH_REQUIRED_PREFIXES = ["/profiles", "/reports", "/onboarding", "/rechar
 const PUBLIC_API = [
   "/api/auth/login",
   "/api/auth/register",
+  "/api/auth/wechat",
   "/api/auth/me",
   "/api/auth/logout",
   "/api/init",
   "/api/og",
   "/api/wechat/",
+  // 微信/Midas 服务端发货回调（无用户态，路由内自行校验）
+  "/api/pay/wechat/notify",
 ];
 
 const CRAWLER_UA =

@@ -11,6 +11,10 @@ export const users = sqliteTable("users", {
   status: text("status").notNull().default("active"),
   pointsBalance: integer("points_balance").notNull().default(0),
   aiQuotaUsed: integer("ai_quota_used").notNull().default(0),
+  /** 微信小程序 openid（微信登录） */
+  wxOpenId: text("wx_open_id"),
+  /** 微信 session_key（虚拟支付用户态签名用，仅服务端持有） */
+  wxSessionKey: text("wx_session_key"),
   /** 是否允许积分解锁「人生洞察」（流年/六亲等） */
   allowLifeInsights: integer("allow_life_insights", { mode: "boolean" }).notNull().default(false),
   createdAt: text("created_at").notNull(),

@@ -3,6 +3,12 @@
   <button class="btn-primary" bindtap="goLogin">去登录</button>
 </view>
 <block wx:else>
+  <view class="card account-card">
+    <view class="account-row">
+      <text class="account-balance">积分余额：{{balance}}</text>
+      <button class="btn-ghost" size="mini" bindtap="goRecharge">去充值</button>
+    </view>
+  </view>
   <view class="card">
     <view style="font-weight:600;">新建档案</view>
     <label class="label">名称<input class="input" value="{{form.name}}" data-k="name" bindinput="onForm" /></label>
