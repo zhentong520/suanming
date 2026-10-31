@@ -154,7 +154,7 @@ export default function ReportDetailPage() {
           </div>
           <ReportPanel report={report.templateReport} aiReport={report.aiReport} facts={report.facts ?? null} />
           <ReportAskPanel reportId={report.id} />
-          <SharePanel report={report.templateReport} moduleTitle={report.moduleName} />
+          <SharePanel reportId={report.id} moduleTitle={report.moduleName} />
         </ScrollCard>
       )}
 

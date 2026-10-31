@@ -170,6 +170,16 @@ export const moduleStats = sqliteTable("module_stats", {
   lastCalledAt: text("last_called_at"),
 });
 
+/** 报告公开分享 token（免登录只读，可撤销） */
+export const shareTokens = sqliteTable("share_tokens", {
+  id: text("id").primaryKey(),
+  token: text("token").notNull().unique(),
+  reportId: text("report_id").notNull(),
+  userId: text("user_id").notNull(),
+  revoked: integer("revoked", { mode: "boolean" }).notNull().default(false),
+  createdAt: text("created_at").notNull(),
+});
+
 export type Profile = typeof profiles.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type UserOperation = typeof userOperations.$inferSelect;

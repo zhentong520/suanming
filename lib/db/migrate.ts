@@ -295,5 +295,14 @@ function runColumnMigrations(db: Database.Database) {
       created_at TEXT NOT NULL,
       paid_at TEXT
     );
+    CREATE TABLE IF NOT EXISTS share_tokens (
+      id TEXT PRIMARY KEY,
+      token TEXT NOT NULL UNIQUE,
+      report_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      revoked INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_share_tokens_token ON share_tokens(token);
   `);
 }
