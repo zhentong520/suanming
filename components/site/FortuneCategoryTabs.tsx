@@ -66,7 +66,6 @@ export function FortuneCategoryTabs({ items }: { items: ModuleItem[] }) {
             )}
             onClick={() => handleTab(cat)}
           >
-            {cat === "全部" ? t("nav.all") : CATEGORY_META[cat]?.glyph ?? cat}
             <span className="fortune-tab-label">{labelFor(cat)}</span>
           </button>
         ))}

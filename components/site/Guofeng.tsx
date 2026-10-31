@@ -153,17 +153,71 @@ function FortuneItem({
   );
 }
 
+export interface PillarGridFacts {
+  ganZhiYear?: string;
+  ganZhiMonth?: string;
+  ganZhiDay?: string;
+  ganZhiTime?: string;
+  tenGods?: string[];
+  hiddenStems?: string[][];
+  wuXing?: string[];
+  diShi?: Array<{ pillar: string; diShi: string }>;
+  zodiacLichun?: string;
+  dayMaster?: string;
+}
+
+/** 四柱排盘卡：十神 / 天干 / 地支 / 藏干 / 纳音 / 十二长生 */
+export function PillarGrid({ facts }: { facts: PillarGridFacts }) {
+  const pillars = [
+    { label: "年柱", gz: facts.ganZhiYear, shiShen: facts.tenGods?.[0], hidden: facts.hiddenStems?.[0], naYin: facts.wuXing?.[0], diShi: facts.diShi?.find((d) => d.pillar === "年柱")?.diShi },
+    { label: "月柱", gz: facts.ganZhiMonth, shiShen: facts.tenGods?.[1], hidden: facts.hiddenStems?.[1], naYin: facts.wuXing?.[1], diShi: facts.diShi?.find((d) => d.pillar === "月柱")?.diShi },
+    { label: "日柱", gz: facts.ganZhiDay, shiShen: "日主", hidden: facts.hiddenStems?.[2], naYin: facts.wuXing?.[2], diShi: facts.diShi?.find((d) => d.pillar === "日柱")?.diShi, isDay: true },
+    { label: "时柱", gz: facts.ganZhiTime, shiShen: facts.tenGods?.[3], hidden: facts.hiddenStems?.[3], naYin: facts.wuXing?.[3], diShi: facts.diShi?.find((d) => d.pillar === "时柱")?.diShi },
+  ].filter((p) => p.gz && p.gz !== "未知");
+
+  if (pillars.length === 0) return null;
+
+  return (
+    <div className="pillar-grid" role="table" aria-label="四柱排盘">
+      {pillars.map((p) => (
+        <div key={p.label} className={clsx("pillar-col", p.isDay && "pillar-col--day")}>
+          <span className="pillar-label">{p.label}</span>
+          {p.shiShen && <span className="pillar-shishen">{p.shiShen}</span>}
+          <span className="pillar-gan">{p.gz?.[0]}</span>
+          <span className="pillar-zhi">{p.gz?.[1]}</span>
+          {p.hidden && p.hidden.length > 0 && <span className="pillar-hidden">{p.hidden.join("·")}</span>}
+          {p.naYin && <span className="pillar-nayin">{p.naYin}</span>}
+          {p.diShi && <span className="pillar-dishi">{p.diShi}</span>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function ReportPanel({
   report,
   aiReport,
+  facts,
 }: {
   report: string;
   aiReport?: string;
+  facts?: PillarGridFacts | null;
 }) {
   const sections = parseReportSections(report);
+  const hasPillars = Boolean(facts?.ganZhiYear && facts?.ganZhiDay);
 
   return (
     <div className="report-panel">
+      {hasPillars && (
+        <div className="report-section report-section--chart">
+          <PillarGrid facts={facts!} />
+          {facts?.zodiacLichun && facts?.dayMaster && (
+            <p className="pillar-meta">
+              日主 {facts.dayMaster} · 立春生肖 {facts.zodiacLichun}
+            </p>
+          )}
+        </div>
+      )}
       {sections.map((sec, i) => (
         <div key={i} className={clsx("report-section", sec.isHeader && "report-section--header")}>
           {sec.title ? (

@@ -48,7 +48,7 @@ export function GenericModulePage({
   const { profiles, activeProfile, loading: userLoading } = useUser();
   const { locale, t } = useLocale();
   const profileId = urlProfileId ?? activeProfile?.id ?? null;
-  const { loading, report, aiReport, reportId, error, submit } = useModuleCalc(moduleId, profileId);
+  const { loading, report, aiReport, reportId, facts, error, submit } = useModuleCalc(moduleId, profileId);
 
   const def = getModuleDefinition(moduleId);
   const localizedTitle = def ? getModuleName(moduleId, locale, def.name) : title;
@@ -72,6 +72,7 @@ export function GenericModulePage({
       report={report}
       aiReport={aiReport}
       reportId={reportId}
+      facts={facts}
       error={error || profileError || partnerSelectError}
       onSubmit={submit}
       activeProfileName={activeProfile?.name ?? undefined}

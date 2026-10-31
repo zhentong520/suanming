@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ReportPanel, ScrollCard } from "@/components/site/Guofeng";
+import { ReportPanel, ScrollCard, type PillarGridFacts } from "@/components/site/Guofeng";
 import { SharePanel } from "@/components/site/SharePanel";
 import { ReportAskPanel } from "@/components/site/ReportAskPanel";
 
@@ -46,6 +46,7 @@ interface ReportDetail {
   profileName: string | null;
   templateReport: string;
   aiReport?: string;
+  facts?: PillarGridFacts | null;
   createdAt: string;
   lifeInsights?: LifeInsights;
   lifeInsightsMeta?: LifeInsightsMeta;
@@ -151,9 +152,9 @@ export default function ReportDetailPage() {
               再次测算
             </Link>
           </div>
-          <SharePanel report={report.templateReport} moduleTitle={report.moduleName} />
-          <ReportPanel report={report.templateReport} aiReport={report.aiReport} />
+          <ReportPanel report={report.templateReport} aiReport={report.aiReport} facts={report.facts ?? null} />
           <ReportAskPanel reportId={report.id} />
+          <SharePanel report={report.templateReport} moduleTitle={report.moduleName} />
         </ScrollCard>
       )}
 

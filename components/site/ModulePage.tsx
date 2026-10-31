@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ScrollCard, ReportPanel } from "@/components/site/Guofeng";
+import { ScrollCard, ReportPanel, type PillarGridFacts } from "@/components/site/Guofeng";
 import { SharePanel } from "@/components/site/SharePanel";
 import { ReportAskPanel } from "@/components/site/ReportAskPanel";
 import { useOptionalUser } from "@/components/site/UserProvider";
@@ -20,6 +20,7 @@ interface ModulePageProps {
   report: string;
   aiReport?: string;
   reportId?: string;
+  facts?: PillarGridFacts | null;
   error: string;
 }
 
@@ -32,6 +33,7 @@ export function ModulePageShell({
   report,
   aiReport,
   reportId,
+  facts,
   error,
   activeProfileName,
   requireLogin,
@@ -119,9 +121,9 @@ export function ModulePageShell({
               <Link href="/reports">{t("common.allHistory")}</Link>
             </p>
           )}
-          <SharePanel report={report} moduleTitle={title} />
-          <ReportPanel report={report} aiReport={aiReport} />
+          <ReportPanel report={report} aiReport={aiReport} facts={facts} />
           {reportId && <ReportAskPanel reportId={reportId} />}
+          <SharePanel report={report} moduleTitle={title} />
         </ScrollCard>
       )}
     </div>
@@ -133,6 +135,7 @@ export function useModuleCalc(moduleId: string, profileId?: string | null) {
   const [report, setReport] = useState("");
   const [aiReport, setAiReport] = useState<string | undefined>();
   const [reportId, setReportId] = useState<string | undefined>();
+  const [facts, setFacts] = useState<PillarGridFacts | null>(null);
   const [error, setError] = useState("");
   const userCtx = useOptionalUser();
   const { locale, t } = useLocale();
@@ -159,6 +162,7 @@ export function useModuleCalc(moduleId: string, profileId?: string | null) {
       setReport(data.templateReport);
       setAiReport(data.aiReport);
       setReportId(data.reportId);
+      setFacts(data.facts ?? null);
       void userCtx?.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : t("common.calcFailed"));
@@ -167,5 +171,5 @@ export function useModuleCalc(moduleId: string, profileId?: string | null) {
     }
   }
 
-  return { loading, report, aiReport, reportId, error, submit };
+  return { loading, report, aiReport, reportId, facts, error, submit };
 }
