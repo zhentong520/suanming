@@ -220,6 +220,22 @@ a { color: inherit; text-decoration: none; }
   writing-mode: vertical-rl;
   user-select: none;
   line-height: 1;
+  animation: hero-ornament-float 26s ease-in-out infinite alternate;
+}
+
+.hero-ornament--right {
+  animation-delay: -13s;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes hero-ornament-float {
+  0% { transform: translateY(-12px) rotate(-1.2deg); opacity: 0.04; }
+  50% { opacity: 0.08; }
+  100% { transform: translateY(14px) rotate(1.2deg); opacity: 0.05; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-ornament { animation: none; }
 }
 
 .hero-content { text-align: center; max-width: 36rem; }
@@ -2745,4 +2761,82 @@ body.is-wechat .site-header {
 [data-theme="night"] .share-btn--ghost {
   background: rgba(30, 26, 22, 0.9);
   border-color: var(--border);
+}
+
+/* ── 打印样式：报告页可打印/导出 PDF ── */
+@media print {
+  .site-header,
+  .mobile-nav,
+  .site-footer,
+  .ink-wash-bg,
+  .moon-widget,
+  .share-panel,
+  .report-ask-panel,
+  .report-detail-actions,
+  .scroll-roller,
+  .page-eyebrow,
+  .hero-section,
+  .home-modules,
+  .page-header-line {
+    display: none !important;
+  }
+
+  html, body, .site-shell, .scroll-card, .report-panel {
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .page-container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .scroll-card {
+    border: none !important;
+    border-radius: 0 !important;
+    break-inside: avoid;
+  }
+
+  .report-section {
+    break-inside: avoid;
+    border-bottom: 1px solid #ddd !important;
+  }
+
+  .report-section-body {
+    color: #111 !important;
+    font-size: 11pt !important;
+    line-height: 1.8;
+  }
+
+  .report-ai-title { color: #333 !important; }
+  .report-ai-body {
+    background: #f7f7f7 !important;
+    border: 1px solid #ccc !important;
+    color: #111 !important;
+  }
+
+  .pillar-col, .pillar-col--day {
+    background: #fafafa !important;
+    border: 1px solid #bbb !important;
+    box-shadow: none !important;
+    animation: none !important;
+  }
+
+  .pillar-gan, .pillar-zhi, .pillar-hidden, .pillar-nayin, .pillar-dishi {
+    color: #111 !important;
+    text-shadow: none !important;
+  }
+
+  .dayun-cell, .dayun-cell--current {
+    background: #fafafa !important;
+    border: 1px solid #bbb !important;
+    box-shadow: none !important;
+  }
+
+  .a4-margins { margin: 0 !important; }
+
+  .life-insights table, .insights-table {
+    font-size: 9.5pt !important;
+  }
 }
