@@ -203,9 +203,9 @@ describe("almanac bazi link", () => {
 });
 
 describe("module registry", () => {
-  it("has 31 modules all implemented", async () => {
+  it("has 33 modules all implemented", async () => {
     const { MODULE_DEFINITIONS } = await import("@/lib/hub/module-registry");
-    expect(MODULE_DEFINITIONS.length).toBe(31);
+    expect(MODULE_DEFINITIONS.length).toBe(33);
     expect(MODULE_DEFINITIONS.every((m) => m.implemented)).toBe(true);
   });
 });

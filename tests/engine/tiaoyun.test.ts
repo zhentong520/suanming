@@ -6,7 +6,7 @@ describe('tiaoyun', () => {
     const r = computeTiaoyun({ concern: 'general' });
     expect(r.concern).toBe('general');
     expect(r.sections.some((s) => s.title.includes('象数'))).toBe(true);
-    expect(r.sections.some((s) => s.title.includes('改命'))).toBe(true);
+    expect(r.sections.some((s) => s.title.includes('调整的几个层面'))).toBe(true);
     expect(r.caveat).toContain('非医疗');
   });
 
