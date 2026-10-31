@@ -2,6 +2,7 @@ import { InkWashBg } from "@/components/site/Decorations";
 import { MobileNav } from "@/components/site/MobileNav";
 import { PwaRegister, SplashMeta } from "@/components/site/PwaRegister";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { Starfield } from "@/components/site/Starfield";
 import { ThemeProvider } from "@/components/site/ThemeProvider";
 import { UserProvider } from "@/components/site/UserProvider";
 import { LocaleProvider } from "@/components/site/LocaleProvider";
@@ -30,6 +31,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           <SplashMeta />
           <div className="site-shell">
             <InkWashBg />
+            <Starfield />
             <SiteHeader />
             <main className="site-main site-main--with-nav">{children}</main>
             <SiteFooter />
