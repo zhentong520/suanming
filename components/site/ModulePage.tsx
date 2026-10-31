@@ -61,12 +61,19 @@ export function ModulePageShell({
       </header>
       <ScrollCard title={t("common.submit")}>
         {requireLogin !== false && !loggedIn && !userCtx?.loading ? (
-          <p className="form-error" style={{ marginBottom: "0.75rem" }}>
-            {t("billing.loginRequired")}{" "}
-            <Link href="/login">{t("nav.login")}</Link>
-            {" · "}
-            <Link href="/register">{t("nav.register")}</Link>
-          </p>
+          <>
+            <div className="module-steps">
+              <span>① 登录 / 注册账号</span>
+              <span>② 填写信息提交测算</span>
+              <span>③ 生成报告 · AI 解读 · 追问</span>
+            </div>
+            <p className="form-error" style={{ marginBottom: "0.75rem" }}>
+              {t("billing.loginRequired")}{" "}
+              <Link href="/login">{t("nav.login")}</Link>
+              {" · "}
+              <Link href="/register">{t("nav.register")}</Link>
+            </p>
+          </>
         ) : null}
         <form
           onSubmit={(e) => {

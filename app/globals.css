@@ -1171,8 +1171,7 @@ a { color: inherit; text-decoration: none; }
 .liunian-chip.yun-label--ji { color: var(--jade); border-color: currentColor; }
 .liunian-chip.yun-label--xiong { color: var(--cinnabar); border-color: currentColor; }
 
-/* ── 人生洞察表 ── */
-.insights-table {
+/* ── 人生洞察表 ── */.insights-table {
   width: 100%;
   font-size: 0.88rem;
   border-collapse: collapse;
@@ -1197,6 +1196,32 @@ a { color: inherit; text-decoration: none; }
 }
 
 .insights-table tr:last-child td { border-bottom: none; }
+
+/* ── 未登录使用引导 ── */
+.module-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(154, 114, 41, 0.06);
+  border: 1px solid rgba(154, 114, 41, 0.25);
+  border-radius: 6px;
+  font-size: 0.86rem;
+  color: var(--ink-light);
+  letter-spacing: 0.04em;
+}
+
+.module-steps span { position: relative; }
+
+/* ── 报告节标题纹样 ── */
+.report-section-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+  margin-left: 0.25rem;
+}
 
 .report-section {
   padding: 0.85rem 0;
@@ -1228,6 +1253,8 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 0.5rem;
   padding-left: 0.75rem;
   border-left: 3px solid var(--cinnabar);
+  display: flex;
+  align-items: center;
 }
 
 .report-section-body {
