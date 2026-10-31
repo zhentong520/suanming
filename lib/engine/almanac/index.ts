@@ -3,6 +3,7 @@ import { getAlmanacForDate, BirthInput, computeCalendar } from "../calendar";
 import { computeBazi } from "../bazi";
 import { scoreGanZhiAgainstYongShen, type WuXing } from "../bazi/strength";
 import { dayJiuXing } from "./jiuxing";
+import { computeXieJi } from "./xieji";
 
 export interface AlmanacDayPick {
   date: string;
@@ -118,6 +119,8 @@ export function computeAlmanac(dateStr?: string, profile?: BirthInput) {
   return {
     ...almanac,
     ganZhiDay: ganZhi,
+    // 《协纪辨方书》打分择日（总纲：吉足胜凶从宜不从忌）
+    xieJi: computeXieJi(date),
     personalHint,
     profileZodiac: profileZodiac || undefined,
     usefulGods,

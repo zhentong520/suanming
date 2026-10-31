@@ -233,6 +233,25 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
 
   if (typeof facts.summary === "string") lines.push(`引擎摘要: ${truncate(facts.summary, 280)}`);
 
+  // 《协纪辨方书》择日打分（黄历模块）
+  const xj = facts.xieJi as {
+    dayGZ?: string;
+    jianChu?: { name?: string; yi?: string };
+    jiShen?: Array<{ name?: string; note?: string }>;
+    xiongSha?: Array<{ name?: string; note?: string }>;
+    verdict?: { level?: string; basis?: string };
+    perActivity?: Array<{ activity?: string; level?: string }>;
+  } | undefined;
+  if (xj?.verdict) {
+    if (xj.jianChu?.name) lines.push(`建除十二神: ${xj.jianChu.name}（宜${xj.jianChu.yi ?? ""}）`);
+    if (xj.jiShen?.length) lines.push(`吉神: ${xj.jiShen.map((x) => `${x.name}(${x.note ?? ""})`).join("；")}`);
+    if (xj.xiongSha?.length) lines.push(`凶煞: ${xj.xiongSha.map((x) => `${x.name}(${x.note ?? ""})`).join("；")}`);
+    lines.push(`择日裁定【${xj.verdict.level}】: ${xj.verdict.basis}`);
+    if (xj.perActivity?.length) {
+      lines.push(`分用事: ${xj.perActivity.map((a) => `${a.activity}=${a.level}`).join("、")}`);
+    }
+  }
+
   // 控制长度
   let text = lines.join("\n");
   if (text.length > 2600) text = `${text.slice(0, 2600)}\n…(已截断)`;
