@@ -18,6 +18,8 @@ ARG NEXT_PUBLIC_SITE_URL=http://localhost:9111
 ARG NEXT_PUBLIC_SITE_NAME=易道命理
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SITE_NAME=$NEXT_PUBLIC_SITE_NAME
+# 小内存服务器（2G）构建防护：限制 Node 堆，防止 OOM
+ENV NODE_OPTIONS=--max-old-space-size=1280
 RUN npm run build
 
 FROM node:20-bookworm-slim AS runner
