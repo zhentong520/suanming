@@ -59,28 +59,45 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
     lines.push(`缺五行: ${(facts.missingElements as string[]).join("、")}`);
   }
 
-  // 子平经典要素：格局成败 + 干支关系网 + 十二长生
+  // 子平经典要素：格局成败 + 干支关系网 + 十二长生 + 调候
   const gj = facts.geJu as {
     name?: string;
     monthZhi?: string;
     monthQi?: string;
     tenGod?: string;
+    takenFrom?: string;
+    shanE?: string;
+    usage?: string;
+    xiangShen?: string;
     broken?: boolean;
     brokenReason?: string;
     summary?: string;
     successFactors?: string[];
     breakFactors?: string[];
+    rescue?: string[];
     useGodHint?: string;
   } | undefined;
   if (gj?.name) {
+    const src = gj.takenFrom === "透干" ? "透干取格" : "本气取格";
     lines.push(
-      `格局: ${gj.name}（月令${gj.monthZhi ?? "?"}·月气${gj.monthQi ?? "?"}·${gj.tenGod ?? "?"}）${gj.broken ? "【破格】" : "【成格】"}`
+      `格局: ${gj.name}（月令${gj.monthZhi ?? "?"}·${src}·${gj.monthQi ?? "?"}·${gj.tenGod ?? "?"}·${gj.shanE ?? ""}神${gj.usage ?? ""}）${gj.broken ? "【破格】" : "【成格】"}`
     );
     if (gj.summary) lines.push(`格局总论: ${gj.summary}`);
     if (gj.successFactors?.length) lines.push(`成格要点: ${gj.successFactors.join("；")}`);
     if (gj.breakFactors?.length) lines.push(`破格风险: ${gj.breakFactors.join("；")}`);
+    if (gj.rescue?.length) lines.push(`救应: ${gj.rescue.join("；")}`);
     if (gj.brokenReason) lines.push(`破格原因: ${gj.brokenReason}`);
     if (gj.useGodHint) lines.push(`格局用神: ${gj.useGodHint}`);
+    if (gj.xiangShen) lines.push(`相神: ${gj.xiangShen}`);
+  }
+
+  const th = facts.tiaoHou as
+    | { primary?: string; secondary?: string[]; monthZhi?: string; note?: string }
+    | undefined;
+  if (th?.primary) {
+    lines.push(
+      `调候用神(穷通宝鉴): ${th.primary}${th.secondary?.length ? `（辅:${th.secondary.join("")}）` : ""}——${th.note ?? ""}`
+    );
   }
 
   const gx = facts.ganZhiGuanXi as
@@ -208,11 +225,11 @@ interface PromptStyle {
 
 const STYLE_BAZI: PromptStyle = {
   structure: "格局成败 → 性格气质 → 事业 → 财官 → 大运流年趋势 → 行动建议",
-  tone: "以子平命理师的口吻论断，论据必须挂钩格局成败、喜忌冲合、十二长生等具体要素，而非泛谈运势",
-  focus: "把清单中的「格局/成格要点/破格风险/干支关系/十二长生/喜用忌神」喂进论述：每谈一个领域，先引用对应硬事实再作推断，格局有破时应指出风险方向",
+  tone: "以子平命理师的口吻论断，论据必须挂钩格局成败、喜忌冲合、调候、十二长生等具体要素，而非泛谈运势",
+  focus: "把清单中的「格局/成格要点/破格风险/救应/相神/干支关系/十二长生/调候用神/喜用忌神」喂进论述：每谈一个领域，先引用对应硬事实再作推断；格局有破应指出风险与救应方向，调候与扶抑冲突时说明取舍",
   structureEn: "structure success/failure → temperament → career → wealth & authority → luck-cycle trends → actionable advice",
-  toneEn: "reason like a classical Zi Ping master: every claim must hook onto specific hard facts (ge-ju success/break factors, clashes and combinations, life stages), never generic fortune talk",
-  focusEn: "weave the ge-ju (structure) success/break factors, branch relations, and life-stage cycle into each domain: cite the hard fact first, then infer",
+  toneEn: "reason like a classical Zi Ping master: every claim must hook onto specific hard facts (ge-ju success/break factors, rescue gods, clashes and combinations, climate adjustment, life stages), never generic fortune talk",
+  focusEn: "weave the ge-ju success/break/rescue factors, branch relations, climate-adjustment gods, and life-stage cycle into each domain: cite the hard fact first, then infer",
 };
 
 const STYLE_ZIWEI: PromptStyle = {

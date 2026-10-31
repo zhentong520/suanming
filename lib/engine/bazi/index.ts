@@ -12,6 +12,7 @@ import {
 import { computeShenSha, type ShenShaItem } from "./shensha";
 import { computeDiShi, computeGanZhiRelations } from "./guanxi";
 import { computeGeJu, type GeJuResult } from "./geju";
+import { computeTiaoHou } from "./tiaohou";
 import { Solar } from "lunar-typescript";
 
 export interface BaziResult extends CalendarResult {
@@ -26,6 +27,7 @@ export interface BaziResult extends CalendarResult {
   yongShen?: YongShenResult;
   shenSha?: ShenShaItem[];
   geJu?: GeJuResult;
+  tiaoHou?: ReturnType<typeof computeTiaoHou>;
   ganZhiGuanXi?: ReturnType<typeof computeGanZhiRelations>;
   diShi?: Array<{ pillar: string; diShi: string; note: string }>;
   tongGen?: ReturnType<typeof analyzeTongGenTouGan>;
@@ -102,6 +104,8 @@ export function computeBazi(input: BirthInput): BaziResult {
   // 子平经典要素：干支合冲刑害关系网 + 日主十二长生
   const ganZhiGuanXi = computeGanZhiRelations(eightChar, calendar.timeKnown);
   const diShi = computeDiShi(eightChar, calendar.timeKnown);
+  // 《穷通宝鉴》调候用神（按日主 + 月令寒暖燥湿）
+  const tiaoHou = computeTiaoHou(dayMaster, m.zhi);
 
   return {
     ...calendar,
@@ -126,6 +130,7 @@ export function computeBazi(input: BirthInput): BaziResult {
     yongShen,
     shenSha,
     geJu,
+    tiaoHou,
     tongGen,
     ganZhiGuanXi,
     diShi,
@@ -214,6 +219,7 @@ export function computeBaziDayun(input: BirthInput) {
     strengthScore: bazi.strengthScore,
     yongShen: bazi.yongShen,
     geJu: bazi.geJu,
+    tiaoHou: bazi.tiaoHou,
     tongGen: bazi.tongGen,
     trueSolarNote: bazi.trueSolarNote,
     daYun: daYunScored,

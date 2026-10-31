@@ -1,5 +1,7 @@
 /** 月令取格 + 成格/破格细则 */
 
+import { MONTH_HIDDEN_STEMS } from "./hidden-stems";
+
 export type GeJuName =
   | "正官格"
   | "七杀格"
@@ -18,8 +20,17 @@ export interface GeJuResult {
   monthZhi: string;
   monthQi: string;
   tenGod: string;
+  /** 取格依据：透干（《子平真诠》透干优先）或月令本气 */
+  takenFrom: "透干" | "本气";
+  /** 善神顺用 / 恶神逆用（《子平真诠》顺逆法则） */
+  shanE: "善" | "恶" | "中";
+  usage: "顺用" | "逆用" | "顺势";
+  /** 相神提示：格之成立所赖之神，相神受损甚于伤用 */
+  xiangShen: string;
   broken: boolean;
   brokenReason?: string;
+  /** 败中有成，全凭救应（《子平真诠·论用神成败救应》） */
+  rescue?: string[];
   successFactors: string[];
   breakFactors: string[];
   useGodHint: string;
@@ -98,6 +109,36 @@ const USE_HINT: Record<GeJuName, string> = {
   杂气格: "宜透干取清，忌混杂无用。",
 };
 
+/** 善神顺用、恶神逆用（《子平真诠》：财官印食为善，杀伤枭刃为恶） */
+const GE_NATURE: Record<GeJuName, { shanE: "善" | "恶" | "中"; usage: "顺用" | "逆用" | "顺势" }> = {
+  正官格: { shanE: "善", usage: "顺用" },
+  正印格: { shanE: "善", usage: "顺用" },
+  正财格: { shanE: "善", usage: "顺用" },
+  偏财格: { shanE: "善", usage: "顺用" },
+  食神格: { shanE: "善", usage: "顺用" },
+  七杀格: { shanE: "恶", usage: "逆用" },
+  伤官格: { shanE: "恶", usage: "逆用" },
+  偏印格: { shanE: "恶", usage: "逆用" },
+  羊刃格: { shanE: "恶", usage: "逆用" },
+  建禄格: { shanE: "中", usage: "顺势" },
+  杂气格: { shanE: "中", usage: "顺势" },
+};
+
+/** 相神提示（《子平真诠》：格之成败系于相神，伤相甚于伤用） */
+const XIANG_SHEN: Record<GeJuName, string> = {
+  正官格: "以印为相（官印相生），财星生官亦可",
+  七杀格: "以食神制杀或印化杀为相",
+  正印格: "以官杀生印为相",
+  偏印格: "以食伤泄秀或财星制枭为相",
+  正财格: "以官星护财为相",
+  偏财格: "以官星护财为相，食伤生财亦可",
+  食神格: "以财星为相（食神生财）",
+  伤官格: "以印制伤或财星引化为相",
+  建禄格: "以官杀制禄、财官流通为相",
+  羊刃格: "以官杀制刃为相",
+  杂气格: "以透干取清为相",
+};
+
 export function computeGeJu(input: {
   dayGan: string;
   monthZhi: string;
@@ -106,18 +147,40 @@ export function computeGeJu(input: {
   timeGan?: string;
   strength?: string;
 }): GeJuResult {
-  const monthQi = BRANCH_MAIN_STEM[input.monthZhi] ?? "戊";
+  const stems = [input.yearGan, input.monthGan, input.timeGan].filter(Boolean) as string[];
+
+  // 《子平真诠》「八字用神，专求月令」+ 《渊海子平·宝法》透干取用：
+  // 月令藏干透出年/月/时干者优先取格（透干为比劫者不取，顺延其他透干；
+  // 皆不透则取月令本气）。多透依藏干表顺序（本气→中气→余气）取本气最强。
+  const hidden = MONTH_HIDDEN_STEMS[input.monthZhi] ?? [];
+  const transparent = hidden.filter((h) => stems.includes(h));
+  let monthQi = BRANCH_MAIN_STEM[input.monthZhi] ?? "戊";
+  let takenFrom: "透干" | "本气" = "本气";
+  const isBiJie = (s: string) => tenGodOf(input.dayGan, s) === "比肩" || tenGodOf(input.dayGan, s) === "劫财";
+  const transNonBiJie = transparent.find((h) => !isBiJie(h));
+  if (transNonBiJie) {
+    monthQi = transNonBiJie;
+    takenFrom = "透干";
+  } else if (transparent.length && isBiJie(monthQi)) {
+    // 只透比劫且本气即比劫：仍取本气（建禄/羊刃格）
+    monthQi = BRANCH_MAIN_STEM[input.monthZhi] ?? "戊";
+    takenFrom = "本气";
+  }
+
   const tenGod = tenGodOf(input.dayGan, monthQi);
   let name: GeJuName = TEN_TO_GE[tenGod] ?? "杂气格";
   if (["辰", "戌", "丑", "未"].includes(input.monthZhi) && !TEN_TO_GE[tenGod]) name = "杂气格";
 
-  const stems = [input.yearGan, input.monthGan, input.timeGan].filter(Boolean) as string[];
   const gods = stems.map((g) => tenGodOf(input.dayGan, g));
   const has = (g: string) => gods.includes(g);
   const count = (g: string) => gods.filter((x) => x === g).length;
 
+  const nature = GE_NATURE[name];
+  const xiangShen = XIANG_SHEN[name];
+
   const successFactors: string[] = [];
   const breakFactors: string[] = [];
+  const rescue: string[] = [];
 
   // 成格
   if (name === "正官格" && has("正印")) successFactors.push("官印相生，官格较清。");
@@ -153,21 +216,48 @@ export function computeGeJu(input: {
     breakFactors.push("羊刃无制，刚猛易惹事端。");
   }
 
-  const broken = breakFactors.length > 0 && breakFactors.length >= successFactors.filter((s) => !s.includes("顺势")).length;
+  // 救应（《子平真诠·论用神成败救应》：「败中有成，全凭救应」）
+  if (name === "正官格" && has("伤官") && (has("正印") || has("偏印"))) {
+    rescue.push("伤官有印制伏，败中有成，官星得护。");
+  }
+  if (name === "伤官格" && has("正官") && (has("正印") || has("偏印"))) {
+    rescue.push("印能制伤护官，伤官见官有救。");
+  }
+  if (name === "食神格" && has("偏印") && (has("偏财") || has("正财"))) {
+    rescue.push("财能制枭护食，枭神夺食有救。");
+  }
+  if ((name === "正财格" || name === "偏财格") && count("比肩") + count("劫财") >= 2 && (has("食神") || has("伤官"))) {
+    rescue.push("食伤通关化劫生财，比劫争夺有救。");
+  }
+  if ((name === "正财格" || name === "偏财格") && input.strength === "偏弱" && (has("正印") || has("偏印"))) {
+    rescue.push("印星扶身，身弱任财有望。");
+  }
+
+  const broken = breakFactors.length > 0 && rescue.length === 0;
   const brokenReason = breakFactors[0];
   const useGodHint = USE_HINT[name];
 
+  const takenDesc =
+    takenFrom === "透干"
+      ? `月支${input.monthZhi}藏干透出${monthQi}为${tenGod}，透干取格`
+      : `月支${input.monthZhi}本气${monthQi}为${tenGod}，本气取格`;
+  const rescueDesc = rescue.length ? ` 带忌有救：${rescue.join("；")}` : "";
   const summary = broken
-    ? `月令取${name}（月支${input.monthZhi}本气${monthQi}为${tenGod}）。破格：${breakFactors.join("；")} 用神提示：${useGodHint}`
-    : `月令取${name}（月支${input.monthZhi}本气${monthQi}为${tenGod}）。成格：${successFactors.join("；")} 用神提示：${useGodHint}`;
+    ? `${takenDesc}取${name}（${nature.shanE}神${nature.usage}）。破格：${breakFactors.join("；")}${rescueDesc} 相神宜${xiangShen}。用神提示：${useGodHint}`
+    : `${takenDesc}取${name}（${nature.shanE}神${nature.usage}）。成格：${successFactors.join("；")}${rescueDesc} 相神宜${xiangShen}。用神提示：${useGodHint}`;
 
   return {
     name,
     monthZhi: input.monthZhi,
     monthQi,
     tenGod,
+    takenFrom,
+    shanE: nature.shanE,
+    usage: nature.usage,
+    xiangShen,
     broken,
     brokenReason,
+    rescue: rescue.length ? rescue : undefined,
     successFactors,
     breakFactors,
     useGodHint,
