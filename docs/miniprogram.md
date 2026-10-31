@@ -51,3 +51,12 @@
 ### 质量抽查
 
 - `npx tsx --tsconfig tsconfig.json scripts/ai-spotcheck.mts [bazi|liuyao|ziwei|name|almanac]`：用真实 Key 跑解读并自动质检「去套话铁律」，供 prompt 迭代复查
+
+## 支付宝网页支付（Web 端充值，2026-11 新增）
+
+- 通道：支付宝「电脑网站支付」（`alipay.trade.page.pay`），档位与小程序充值共用（`RECHARGE_PACKAGES`）
+- 流程：Web 充值页选档 → `POST /api/pay/alipay/prepare`（建单+RSA2 签名，返回收银台 URL）→ 跳转支付宝付款 → 异步通知 `/api/pay/alipay/notify` 验签+金额校验+幂等发货 → 同步回跳 `/api/pay/alipay/return` 到充值页
+- **资质要求**：电脑网站支付需企业/个体工商户签约（个人身份无法签约）；境外用户用支付宝钱包可付（人民币结算），境外本地币收单需另签蚂蚁国际 Antom/Alipay+
+- 服务端 `.env`：`ALIPAY_APP_ID` / `ALIPAY_PRIVATE_KEY`（PKCS8 应用私钥）/ `ALIPAY_ALIPAY_PUBLIC_KEY`（支付宝公钥）；沙箱再加 `ALIPAY_GATEWAY_URL=https://openapi-sandbox.dl.alipaydev.com/gateway.do`
+- 安全设计：通知 RSA2 验签（支付宝公钥）+ `app_id` 比对 + `total_amount` 与订单金额比对 + 订单状态机幂等（pending→paid 单向），验签失败一律 400 拒绝
+- 测试：`tests/billing/alipay.test.ts`（6 用例：签名串构造/RSA 往返/收银台 URL/幂等发货/金额篡改拒绝/等待态忽略）

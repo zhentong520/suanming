@@ -15,6 +15,9 @@ const PUBLIC_API = [
   "/api/wechat/",
   // 微信/Midas 服务端发货回调（无用户态，路由内自行校验）
   "/api/pay/wechat/notify",
+  // 支付宝服务端异步通知与同步回跳（无用户态，路由内自行验签）
+  "/api/pay/alipay/notify",
+  "/api/pay/alipay/return",
 ];
 
 const CRAWLER_UA =

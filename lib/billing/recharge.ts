@@ -164,20 +164,28 @@ export async function buildVirtualPaymentPayload(opts: {
 /**
  * 发货：把订单标记为已支付并发放积分（幂等）。
  * 只有 status=pending 的订单会被受理；重复回调直接返回已处理。
+ * expectedAmountYuan 提供时校验订单金额（支付宝渠道用），不符则拒绝发货。
  */
 export async function fulfillRechargeOrder(opts: {
   outTradeNo: string;
   externalTradeNo?: string;
+  expectedAmountYuan?: number;
 }): Promise<{ ok: boolean; alreadyPaid?: boolean; points?: number; userId?: string }> {
   const sqlite = getSqlite();
   const now = new Date().toISOString();
 
   const row = sqlite
-    .prepare("SELECT id, user_id, points, status, meta_json FROM payment_orders WHERE id = ?")
+    .prepare("SELECT id, user_id, points, status, meta_json, amount_yuan FROM payment_orders WHERE id = ?")
     .get(opts.outTradeNo) as
-    | { id: string; user_id: string; points: number; status: string; meta_json: string | null }
+    | { id: string; user_id: string; points: number; status: string; meta_json: string | null; amount_yuan: number }
     | undefined;
   if (!row) return { ok: false };
+  if (
+    typeof opts.expectedAmountYuan === "number" &&
+    Math.abs(opts.expectedAmountYuan - row.amount_yuan) > 0.001
+  ) {
+    return { ok: false };
+  }
   if (row.status === "paid") return { ok: true, alreadyPaid: true, userId: row.user_id, points: row.points };
   if (row.status !== "pending") return { ok: false };
 
