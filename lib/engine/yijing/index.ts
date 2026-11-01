@@ -1,6 +1,6 @@
 import {
   buildHexagramReading,
-  hexagramIndexToName,
+  hexagramNameFromTrigrams,
   HEXAGRAM_NAMES,
 } from "../hexagram-lib";
 import {
@@ -178,6 +178,25 @@ export function computeLiuyao(question?: string, date?: Date, manualLines?: YaoL
 
 const BAGUA = ["", "乾", "兑", "离", "震", "巽", "坎", "艮", "坤"];
 
+/** 卦名 → 三爻位（初→上，1阳0阴） */
+const TRIGRAM_BITS: Record<string, number[]> = {
+  乾: [1, 1, 1], 兑: [1, 1, 0], 离: [1, 0, 1], 震: [1, 0, 0],
+  巽: [0, 1, 1], 坎: [0, 1, 0], 艮: [0, 0, 1], 坤: [0, 0, 0],
+};
+const BITS_TO_GUA: Record<string, string> = {
+  "111": "乾", "110": "兑", "101": "离", "100": "震",
+  "011": "巽", "010": "坎", "001": "艮", "000": "坤",
+};
+const TRIGRAM_WX_MAP: Record<string, string> = {
+  乾: "金", 兑: "金", 离: "火", 震: "木", 巽: "木", 坎: "水", 艮: "土", 坤: "土",
+};
+const ZHI_WX_MAP: Record<string, string> = {
+  子: "水", 丑: "土", 寅: "木", 卯: "木", 辰: "土", 巳: "火",
+  午: "火", 未: "土", 申: "金", 酉: "金", 戌: "土", 亥: "水",
+};
+const SHENG: Record<string, string> = { 木: "火", 火: "土", 土: "金", 金: "水", 水: "木" };
+const KE: Record<string, string> = { 木: "土", 土: "水", 水: "火", 火: "金", 金: "木" };
+
 export function computeMeihua(question?: string, numbers?: number[], date?: Date) {
   const d = date ?? new Date();
   const lunar = lunarFromDate(d);
@@ -191,11 +210,43 @@ export function computeMeihua(question?: string, numbers?: number[], date?: Date
   const tiGua = BAGUA[upper];
   const yongGua = BAGUA[lower];
 
-  const reading = buildHexagramReading(hexagramIndexToName(idx), {
+  const benName = hexagramNameFromTrigrams(BAGUA[upper], BAGUA[lower]);
+  const reading = buildHexagramReading(benName, {
     question,
     method: "梅花易数（时数起卦）",
     changingYao: changing,
   });
+
+  // 互卦（234爻为下互、345爻为上互，表中间过程，互卦不论体用）+ 变卦 + 错卦综卦
+  // 六爻自下而上：下卦三爻在前、上卦三爻在后
+  const benBits = [...TRIGRAM_BITS[yongGua], ...TRIGRAM_BITS[tiGua]];
+  const huLowerBits = [benBits[1], benBits[2], benBits[3]];
+  const huUpperBits = [benBits[2], benBits[3], benBits[4]];
+  const bitsToGuaNum = (bits: number[]) => BAGUA.indexOf(BITS_TO_GUA[bits.join("")]);
+  const huLower = bitsToGuaNum(huLowerBits);
+  const huUpper = bitsToGuaNum(huUpperBits);
+  const huGuaName = hexagramNameFromTrigrams(BITS_TO_GUA[huUpperBits.join("")], BITS_TO_GUA[huLowerBits.join("")]);
+  const bianBits = benBits.map((b, i) => (i === changing - 1 ? (b ? 0 : 1) : b));
+  const bianGuaName = hexagramNameFromTrigrams(BITS_TO_GUA[bianBits.slice(3).join("")], BITS_TO_GUA[bianBits.slice(0, 3).join("")]);
+  const cuoGuaName = hexagramNameFromTrigrams(
+    BITS_TO_GUA[benBits.slice(3).map((b) => (b ? 0 : 1)).join("")],
+    BITS_TO_GUA[benBits.slice(0, 3).map((b) => (b ? 0 : 1)).join("")]
+  );
+  // 综卦：上下颠倒（本卦上下卦互换即综的简化——严格综卦是整卦翻转）
+  const zongGuaName = hexagramNameFromTrigrams(BAGUA[lower], BAGUA[upper]);
+
+  // 卦气旺衰（体卦五行对月令：旺衰是吉凶的放大镜）
+  const monthZhi = lunar.getEightChar().getMonthZhi();
+  const tiWx = TRIGRAM_WX_MAP[tiGua];
+  const monthWx = ZHI_WX_MAP[monthZhi];
+  let guaQi = "";
+  if (tiWx && monthWx) {
+    if (tiWx === monthWx) guaQi = `体卦${tiGua}（${tiWx}）与月令${monthZhi}（${monthWx}）同气——体卦当令旺相，吉者愈吉。`;
+    else if (SHENG[monthWx] === tiWx) guaQi = `月令生体卦，体卦得生旺——事有生机，吉力放大。`;
+    else if (KE[monthWx] === tiWx) guaQi = `月令克体卦，体卦受囚——事多阻抑，凶者愈凶，宜缓图。`;
+    else if (SHENG[tiWx] === monthWx) guaQi = `体卦生月令，泄气于时——事费力而少功，宜借人力。`;
+    else guaQi = `体卦克月令，体旺可用——主动权在我，蛮干耗力。`;
+  }
 
   const tiYongAnalysis = `体卦${tiGua}，用卦${yongGua}。体为主、用为事，${
     upper === lower
@@ -217,10 +268,24 @@ export function computeMeihua(question?: string, numbers?: number[], date?: Date
     lowerName: yongGua,
     changingYao: changing,
     tiYong: tiYongAnalysis,
+    huGua: huGuaName,
+    bianGuaName,
+    cuoGua: cuoGuaName,
+    zongGua: zongGuaName,
+    guaQi,
     waiYingGuide,
     sections: [
       ...(reading.sections ?? []),
       { title: "体用分析", content: tiYongAnalysis },
+      {
+        title: "互卦与变卦",
+        content: [
+          `互卦${huGuaName}（二三四爻为下互、三四五爻为上互）——表中间过程，互卦不论体用，只取卦象。`,
+          `变卦${bianGuaName}——表最终趋势。`,
+          `错卦${cuoGuaName}（阴阳互换，反面对照）、综卦${zongGuaName}（上下颠倒）——事不明时可参其对反。`,
+        ].join("\n"),
+      },
+      { title: "卦气旺衰", content: `${guaQi}\n旺衰是吉凶的放大镜：体宜旺、用宜衰；卦气不足，宜借月建生扶之方与时。` },
       { title: "起卦数", content: `上卦数${n1}，下卦数${n2}，动爻数${n3}（农历${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}）。` },
       { title: "外应心法", content: waiYingGuide },
     ],

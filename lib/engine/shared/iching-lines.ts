@@ -1,7 +1,7 @@
 /**
  * 易经六爻起卦：三钱法 + 卦象推导
  */
-import { HEXAGRAM_NAMES, hexagramIndexToName } from "../hexagram-lib";
+import { HEXAGRAM_NAMES, hexagramIndexToName, hexagramNameFromTrigrams, TRIGRAM_BITS_BY_VALUE } from "../hexagram-lib";
 
 export type LineType = "老阴" | "少阳" | "少阴" | "老阳";
 
@@ -90,7 +90,11 @@ export function buildLinesFromSeed(seed: number): YaoLine[] {
 export function deriveHexagramsFromLines(lines: YaoLine[]) {
   const lower = linesToTrigram(lines, 0);
   const upper = linesToTrigram(lines, 3);
-  const benIdx = trigramsToHexIndex(lower, upper);
+  const benName = hexagramNameFromTrigrams(
+    TRIGRAM_BITS_BY_VALUE[upper] ?? "乾",
+    TRIGRAM_BITS_BY_VALUE[lower] ?? "乾"
+  );
+  const benIdx = HEXAGRAM_NAMES.indexOf(benName as never);
 
   const changedLines = lines.map((l) => ({
     ...l,
@@ -102,7 +106,11 @@ export function deriveHexagramsFromLines(lines: YaoLine[]) {
   })) as YaoLine[];
   const bianLower = linesToTrigram(changedLines, 0);
   const bianUpper = linesToTrigram(changedLines, 3);
-  const bianIdx = trigramsToHexIndex(bianLower, bianUpper);
+  const bianName = hexagramNameFromTrigrams(
+    TRIGRAM_BITS_BY_VALUE[bianUpper] ?? "乾",
+    TRIGRAM_BITS_BY_VALUE[bianLower] ?? "乾"
+  );
+  const bianIdx = HEXAGRAM_NAMES.indexOf(bianName as never);
 
   const changing = lines.filter((l) => l.changing);
   const changingYao =

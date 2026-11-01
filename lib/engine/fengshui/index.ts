@@ -1,5 +1,6 @@
 import { BirthInput, computeCalendar } from "../calendar";
 import { computeFeixingChart, STAR_NATURE } from "./feixing";
+import { computeBazhai } from "./bazhai";
 
 const GUA_INFO: Record<number, { name: string; element: string; group: string; lucky: string[]; unlucky: string[] }> = {
   1: { name: "坎", element: "水", group: "东四命", lucky: ["北", "东", "东南", "南"], unlucky: ["西南", "西北", "西", "东北"] },
@@ -54,6 +55,8 @@ export function computeFengshui(
     mingGua: `${info.name}卦（${guaNum}）`,
     element: info.element,
     group: info.group,
+    // 八宅大游年（以命卦代宅卦布九星）
+    bazhai: computeBazhai(info.name),
     shengXiao: cal.shengXiao,
     luckyDirections: info.lucky,
     unluckyDirections: info.unlucky,
