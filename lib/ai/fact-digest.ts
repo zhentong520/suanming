@@ -100,6 +100,13 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
     );
   }
 
+  const sl = facts.siLing as
+    | { gan?: string; dayOffset?: number; jie?: string; note?: string }
+    | undefined;
+  if (sl?.gan) {
+    lines.push(`司令分野(滴天髓): ${sl.jie}后第${sl.dayOffset}日，${sl.gan}司令用事——${sl.note ?? ""}`);
+  }
+
   const gx = facts.ganZhiGuanXi as
     | {
         ganHe?: Array<{ detail?: string }>;
@@ -239,6 +246,18 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
     lines.push(`评分: ${JSON.stringify(facts.scores)}`);
   }
   if (typeof facts.totalScore === "number") lines.push(`总分: ${facts.totalScore}`);
+
+  // 数字命理：Lo Shu / 业债数
+  const ls = facts.loShu as
+    | { missing?: number[]; repeated?: number[]; note?: string }
+    | undefined;
+  if (ls?.note) {
+    lines.push(`洛书九宫: ${ls.note}`);
+    if (facts.karmicDebt) {
+      const kd = facts.karmicDebt as { number?: number; note?: string };
+      if (kd.note) lines.push(`业债数: ${kd.note}`);
+    }
+  }
 
   if (facts.grids && typeof facts.grids === "object") {
     const g = facts.grids as Record<string, { value?: number; luck?: string; element?: string }>;

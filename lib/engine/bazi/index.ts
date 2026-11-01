@@ -13,6 +13,7 @@ import { computeShenSha, type ShenShaItem } from "./shensha";
 import { computeDiShi, computeGanZhiRelations } from "./guanxi";
 import { computeGeJu, type GeJuResult } from "./geju";
 import { computeTiaoHou } from "./tiaohou";
+import { computeSiLing } from "./siling";
 import { Solar } from "lunar-typescript";
 
 export interface BaziResult extends CalendarResult {
@@ -28,6 +29,7 @@ export interface BaziResult extends CalendarResult {
   shenSha?: ShenShaItem[];
   geJu?: GeJuResult;
   tiaoHou?: ReturnType<typeof computeTiaoHou>;
+  siLing?: ReturnType<typeof computeSiLing>;
   ganZhiGuanXi?: ReturnType<typeof computeGanZhiRelations>;
   diShi?: Array<{ pillar: string; diShi: string; note: string }>;
   tongGen?: ReturnType<typeof analyzeTongGenTouGan>;
@@ -106,6 +108,8 @@ export function computeBazi(input: BirthInput): BaziResult {
   const diShi = computeDiShi(eightChar, calendar.timeKnown);
   // 《穷通宝鉴》调候用神（按日主 + 月令寒暖燥湿）
   const tiaoHou = computeTiaoHou(dayMaster, m.zhi);
+  // 《滴天髓》月令人元司令分野（按入节日数查用事之神）
+  const siLing = computeSiLing(new Date(`${chart.solar.toYmd()}T12:00:00+08:00`), m.zhi);
 
   return {
     ...calendar,
@@ -131,6 +135,7 @@ export function computeBazi(input: BirthInput): BaziResult {
     shenSha,
     geJu,
     tiaoHou,
+    siLing,
     tongGen,
     ganZhiGuanXi,
     diShi,
