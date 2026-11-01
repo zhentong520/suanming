@@ -1,6 +1,8 @@
 import { qimenFromLunar, taiyiFromLunar, daliurenKe } from "../shared/lunar-advanced";
 import { computeQimenSanYuan } from "../shared/qimen-sanyuan";
 import { seedFromDate } from "../shared/iching-lines";
+import { Solar } from "lunar-typescript";
+import { analyzeQiMenGeJu } from "./geju";
 
 const GATE_DETAIL: Record<string, { meaning: string; career: string; direction: string; advice: string }> = {
   休: { meaning: "休门主休息、和解、退让", career: "宜谈判调解，不宜强攻", direction: "北方", advice: "以柔克刚，蓄势待发" },
@@ -78,6 +80,19 @@ export function computeQimen(question?: string, date?: Date) {
   const d = date ?? new Date();
   const q = qimenFromLunar(d);
   const plate = computeQimenSanYuan(d);
+  // 十干克应格局引擎（《烟波钓叟歌》）
+  const monthZhi = Solar.fromDate(d).getLunar().getEightChar().getMonthZhi();
+  const qiMenGeJu = analyzeQiMenGeJu(
+    plate.plate.map((p) => ({
+      palace: p.palace,
+      tianGan: p.tianGan,
+      diGan: p.diGan,
+      gate: normalizeGate(p.gate),
+      god: p.god,
+      star: normalizeStar(p.star),
+    })),
+    { timeGan: plate.timeGan, monthZhi }
+  );
   const qText = question ?? "";
   // 按所问映射用神门：财→生，官→开，病→死/芮，婚→休/合，争→伤…
   let focusIdx = 0;
@@ -134,6 +149,7 @@ export function computeQimen(question?: string, date?: Date) {
     godMeaning: GOD_DETAIL[focus.god] ?? `${q.yinYang}，${q.luck}`,
     plate: plate.plate,
     yongShenRule: gatePrefer ? `按所问取${gatePrefer}门为用` : "按时辰落宫为用",
+    qiMenGeJu,
     sections: [
       {
         title: "局式",
@@ -149,6 +165,23 @@ export function computeQimen(question?: string, date?: Date) {
           .join("\n"),
       },
       { title: "用神宫", content: `${focus.palace}（${focus.position}） — ${gate}门配${star}，${focus.god}当值。${GOD_DETAIL[focus.god] ?? ""}` },
+      {
+        title: "十干克应（《烟波钓叟歌》）",
+        content: [
+          qiMenGeJu.geJuList.length
+            ? qiMenGeJu.geJuList
+                .map((g) => `${g.palace}宫 天盘${g.tianGan}加地盘${g.diGan}＝【${g.kind}】${g.name}（${g.verse}）——${g.note}`)
+                .join("\n")
+            : "本局无十干克应成格。",
+          qiMenGeJu.ganGe.join("\n"),
+          qiMenGeJu.sanDun.join("\n"),
+          qiMenGeJu.menPoDetail.join("\n"),
+          qiMenGeJu.xingWang.slice(0, 9).join("\n"),
+          qiMenGeJu.summary,
+        ]
+          .filter((x) => x && x.length > 0)
+          .join("\n"),
+      },
       { title: "八神", content: Object.entries(GOD_DETAIL).map(([k, v]) => `${k}：${v}`).join("\n") },
       { title: "八门", content: `${gate}门 — ${gateInfo.meaning}。${gateInfo.advice}` },
       { title: "九星", content: `${star} — ${starText}` },

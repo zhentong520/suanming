@@ -203,6 +203,29 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
     lines.push(`卦断【${dg.conclusion.level}】: ${dg.conclusion.text}（依据：${dg.conclusion.basis}）`);
   }
 
+  // 奇门十干克应格局（烟波钓叟歌）
+  const qg = facts.qiMenGeJu as {
+    geJuList?: Array<{ palace?: string; tianGan?: string; diGan?: string; name?: string; kind?: string; note?: string }>;
+    sanDun?: string[];
+    ganGe?: string[];
+    xingWang?: string[];
+    summary?: string;
+  } | undefined;
+  if (qg?.summary) {
+    if (qg.geJuList?.length) {
+      lines.push(
+        `十干克应: ${qg.geJuList.map((g) => `${g.palace}宫${g.tianGan}加${g.diGan}【${g.kind}】${g.name}`).join("；")}`
+      );
+      for (const g of qg.geJuList) {
+        if (g.note) lines.push(`格局注: ${g.name}——${g.note}`);
+      }
+    }
+    if (qg.sanDun?.length) lines.push(`三遁: ${qg.sanDun.join("；")}`);
+    if (qg.ganGe?.length) lines.push(`干格: ${qg.ganGe.join("；")}`);
+    if (qg.xingWang?.length) lines.push(`九星旺衰: ${qg.xingWang.join("；")}`);
+    lines.push(`格局总论: ${qg.summary}`);
+  }
+
   if (typeof facts.scores === "object" && facts.scores) {
     lines.push(`评分: ${JSON.stringify(facts.scores)}`);
   }
