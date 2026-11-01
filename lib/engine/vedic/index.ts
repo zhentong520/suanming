@@ -15,6 +15,7 @@ import {
   NODE_NOTE,
   planetIsRetrograde,
 } from "./astro";
+import { computeVimshottari } from "./vimshottari";
 
 const NAKSHATRAS = [
   "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
@@ -136,6 +137,8 @@ export function computeVedic(input: BirthInput) {
     currentDasha: dashaLord,
     dashaYears,
     dashaRemainingYears: dashaRemaining,
+    // Vimshottari 全表（《BPHS》Ch.46-49）：九大运时间线 + 当前 Antardasha
+    vimshottari: computeVimshottari(input, dashaLord, dashaYears, dashaRemaining),
     moonSign: rashi,
     moonDegree: moonSidereal.toFixed(2),
     sunDegree: sunSidereal.toFixed(2),

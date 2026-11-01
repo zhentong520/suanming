@@ -1,4 +1,5 @@
 import { BirthInput, computeCalendar } from "../calendar";
+import { computeWesternChart } from "./western-chart";
 
 const HOROSCOPES = [
   { name: "白羊座", range: "3.21-4.19", element: "火", traits: "热情直率" },
@@ -28,6 +29,15 @@ export function computeHoroscope(input: BirthInput) {
   const sign = HOROSCOPES.find((h) => h.name.includes(cal.constellation.replace("座", ""))) ??
     HOROSCOPES.find((h) => cal.constellation.includes(h.name.replace("座", ""))) ?? HOROSCOPES[0];
 
+  // 西洋古典占星：Lilly 五级尊贵计分（有出生时刻才可定昼/夜盘）
+  const westernChart =
+    input.hour != null
+      ? computeWesternChart(
+          new Date(`${input.year}-${String(input.month).padStart(2, "0")}-${String(input.day).padStart(2, "0")}T${String(input.hour).padStart(2, "0")}:30:00`),
+          input.hour
+        )
+      : null;
+
   const dayIndex = new Date().getDate() % FORTUNES.length;
   return {
     constellation: cal.constellation,
@@ -35,6 +45,7 @@ export function computeHoroscope(input: BirthInput) {
     element: sign.element,
     traits: sign.traits,
     range: sign.range,
+    westernChart,
     dailyFortune: FORTUNES[dayIndex],
     luckyColor: ["红", "蓝", "绿", "黄", "白"][dayIndex % 5],
     luckyNumber: (dayIndex + 1) * 3,

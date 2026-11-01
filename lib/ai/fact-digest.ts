@@ -247,6 +247,30 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
   }
   if (typeof facts.totalScore === "number") lines.push(`总分: ${facts.totalScore}`);
 
+  // 西洋古典占星：Lilly 五级尊贵计分
+  const wc = facts.westernChart as {
+    isDayChart?: boolean;
+    planets?: Array<{ body?: string; sign?: string; degreeInSign?: number; score?: number; dignities?: string[]; condition?: string }>;
+    summary?: string;
+  } | undefined;
+  if (wc?.planets?.length) {
+    lines.push(
+      `西洋占星(昼夜盘·Lilly计分): ${wc.planets.map((p) => `${p.body}${p.sign}${p.degreeInSign}°(${p.score}分${p.dignities?.[0] ?? ""})`).join("；")}`
+    );
+    lines.push(`星象总论: ${wc.summary ?? ""}`);
+  }
+
+  // 吠陀 Vimshottari 大运
+  const vim = facts.vimshottari as {
+    mahadashas?: Array<{ lord?: string; lordCn?: string; startAge?: number; endAge?: number }>;
+    current?: { mahadasha?: string; antardasha?: string; antardashaCn?: string; startAge?: number; endAge?: number };
+  } | undefined;
+  if (vim?.current?.mahadasha) {
+    lines.push(
+      `吠陀大运: 当前${vim.current.mahadasha}大运·${vim.current.antardasha}（${vim.current.antardashaCn}）子运 ${vim.current.startAge}-${vim.current.endAge} 岁；${(vim.mahadashas ?? []).map((m) => `${m.lordCn ?? m.lord}${m.startAge}-${m.endAge}`).join("、")}`
+    );
+  }
+
   // 数字命理：Lo Shu / 业债数
   const ls = facts.loShu as
     | { missing?: number[]; repeated?: number[]; note?: string }
