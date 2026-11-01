@@ -1,5 +1,6 @@
 import { Solar, Lunar } from "lunar-typescript";
 import { placeShenJiang, tianDiPan, isDayTime } from "./daliuren-shenjiang";
+import { liuRenSanChuan } from "./liuren-jiuzongmen";
 
 /** 当前或指定时刻的农历对象 */
 export function lunarFromDate(date?: Date): Lunar {
@@ -68,10 +69,10 @@ export function taiyiFromLunar(date?: Date) {
   };
 }
 
-const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"] as const;
+export const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"] as const;
 
 /** 天干寄宫 */
-const STEM_PALACE: Record<string, number> = {
+export const STEM_PALACE: Record<string, number> = {
   甲: 2,
   乙: 4,
   丙: 5,
@@ -85,7 +86,7 @@ const STEM_PALACE: Record<string, number> = {
 };
 
 /** 农历月 → 月将地支索引（亥将起正月） */
-const MONTH_JIANG: Record<number, number> = {
+export const MONTH_JIANG: Record<number, number> = {
   1: 11,
   2: 10,
   3: 9,
@@ -100,7 +101,7 @@ const MONTH_JIANG: Record<number, number> = {
   12: 0,
 };
 
-const WX: Record<string, string> = {
+export const WX: Record<string, string> = {
   子: "水",
   丑: "土",
   寅: "木",
@@ -117,12 +118,12 @@ const WX: Record<string, string> = {
 
 const KE: Record<string, string> = { 木: "土", 土: "水", 水: "火", 火: "金", 金: "木" };
 
-function controls(a: string, b: string) {
+export function controls(a: string, b: string) {
   return KE[a] === b;
 }
 
 /** 月将加时：返回地盘索引 → 天盘地支索引 */
-function buildTianPan(monthJiangIdx: number, hourZhiIdx: number): number[] {
+export function buildTianPan(monthJiangIdx: number, hourZhiIdx: number): number[] {
   const pan = Array.from({ length: 12 }, (_, di) => 0);
   for (let i = 0; i < 12; i++) {
     pan[(hourZhiIdx + i) % 12] = (monthJiangIdx + i) % 12;
@@ -130,7 +131,7 @@ function buildTianPan(monthJiangIdx: number, hourZhiIdx: number): number[] {
   return pan;
 }
 
-function yinShen(tianPan: number[], tianZhiIdx: number): number {
+export function yinShen(tianPan: number[], tianZhiIdx: number): number {
   // 天盘神所临之地盘，再取该地盘上之天盘神
   const di = tianPan.indexOf(tianZhiIdx);
   if (di < 0) return (tianZhiIdx + 6) % 12;
@@ -171,105 +172,22 @@ export function daliurenKe(date?: Date) {
     desc: `${k.desc}（上${k.shang}临下${k.xia}）`,
   }));
 
-  // 取传：贼克 → 比用 → 涉害 → 遥克 → 昴星/别责 → 干上发用
-  type Hit = { shangIdx: number; kind: string; travel?: number; keName?: string };
-  const zeiHits: Hit[] = [];
-  const keHits: Hit[] = [];
-  for (const k of siKeRaw) {
-    const sWx = WX[k.shang];
-    const xWx = WX[k.xia];
-    const sIdx = BRANCHES.indexOf(k.shang as (typeof BRANCHES)[number]);
-    const xIdx = BRANCHES.indexOf(k.xia as (typeof BRANCHES)[number]);
-    const travel = (sIdx - xIdx + 12) % 12;
-    if (controls(xWx, sWx)) zeiHits.push({ shangIdx: sIdx, kind: "贼", travel, keName: k.name });
-    else if (controls(sWx, xWx)) keHits.push({ shangIdx: sIdx, kind: "克", travel, keName: k.name });
-  }
+  // 取传：九宗门引擎（贼克→比用→涉害→遥克→昴星→别责→八专→伏吟→返吟，分课体定中末）
+  const jzm = liuRenSanChuan({
+    dayGan,
+    dayZhi,
+    timeZhi,
+    monthJiangIdx,
+    timeZhiIdx: timeZhiIdx >= 0 ? timeZhiIdx : 0,
+    siKeRaw: siKeRaw.map((k) => ({ name: k.name, shang: k.shang, xia: k.xia })),
+    tianPan,
+    ganPalace,
+  });
 
-  let preferred: Hit | undefined;
-  let method = "";
-
-  const tryOne = (list: Hit[], label: string) => {
-    if (list.length === 1) {
-      preferred = list[0];
-      method = `${label}取传`;
-      return true;
-    }
-    return false;
-  };
-
-  if (!tryOne(zeiHits, "贼") && !tryOne(keHits, "克")) {
-    const pool = zeiHits.length ? zeiHits : keHits;
-    if (pool.length > 1) {
-      // 比用：上下五行比和者优先
-      const biYong = pool.find((h) => {
-        const k = siKeRaw.find(
-          (x) => BRANCHES.indexOf(x.shang as (typeof BRANCHES)[number]) === h.shangIdx
-        );
-        return k && WX[k.shang] === WX[k.xia];
-      });
-      if (biYong) {
-        preferred = biYong;
-        method = "比用取传";
-      } else {
-        const sheHai = [...pool].sort((a, b) => (b.travel ?? 0) - (a.travel ?? 0));
-        preferred = sheHai[0];
-        method = `涉害（行${sheHai[0].travel ?? 0}位）`;
-      }
-    }
-  }
-
-  if (!preferred) {
-    const sheHai = siKeRaw
-      .map((k) => {
-        const sIdx = BRANCHES.indexOf(k.shang as (typeof BRANCHES)[number]);
-        const xIdx = BRANCHES.indexOf(k.xia as (typeof BRANCHES)[number]);
-        return { shangIdx: sIdx, travel: (sIdx - xIdx + 12) % 12, kind: "涉害" };
-      })
-      .sort((a, b) => b.travel - a.travel);
-    if (sheHai[0] && sheHai[0].travel >= 3) {
-      preferred = sheHai[0];
-      method = `涉害（行${sheHai[0].travel}位）`;
-    }
-  }
-
-  if (!preferred) {
-    const pairs: Array<[number, number]> = [
-      [0, 2],
-      [1, 3],
-    ];
-    for (const [a, b] of pairs) {
-      const ka = siKeRaw[a];
-      const kb = siKeRaw[b];
-      const aWx = WX[ka.shang];
-      const bWx = WX[kb.shang];
-      if (controls(aWx, bWx) || controls(bWx, aWx)) {
-        const winner = controls(aWx, bWx) ? ka : kb;
-        preferred = {
-          shangIdx: BRANCHES.indexOf(winner.shang as (typeof BRANCHES)[number]),
-          kind: "遥克",
-        };
-        method = "遥克取传";
-        break;
-      }
-    }
-  }
-
-  if (!preferred) {
-    // 昴星/别责简化：阳日取酉上神，阴日取酉下神对应；别责取干上前一位
-    const yangDay = ["甲", "丙", "戊", "庚", "壬"].includes(dayGan);
-    if (yangDay) {
-      preferred = { shangIdx: tianPan[9] ?? ke1Tian, kind: "昴星" }; // 酉=9
-      method = "昴星取传";
-    } else {
-      preferred = { shangIdx: (ke1Tian + 11) % 12, kind: "别责" };
-      method = "别责取传";
-    }
-  }
-
-  const chu = preferred.shangIdx;
-  if (!method) method = "干上发用";
-  const zhong = yinShen(tianPan, chu);
-  const mo = yinShen(tianPan, zhong);
+  const chu = jzm.chuan[0];
+  const zhong = jzm.chuan[1];
+  const mo = jzm.chuan[2];
+  const method = `${jzm.keTi}：${jzm.method}`;
 
   const sanChuan = [
     {
@@ -277,8 +195,8 @@ export function daliurenKe(date?: Date) {
       zhi: BRANCHES[chu],
       meaning: method,
     },
-    { name: "中传", zhi: BRANCHES[zhong], meaning: "初传阴神" },
-    { name: "末传", zhi: BRANCHES[mo], meaning: "中传阴神" },
+    { name: "中传", zhi: BRANCHES[zhong], meaning: "中传" },
+    { name: "末传", zhi: BRANCHES[mo], meaning: "末传" },
   ];
 
   const shenJiang = placeShenJiang(dayGan, hour);
@@ -295,6 +213,9 @@ export function daliurenKe(date?: Date) {
     siKe,
     sanChuan,
     takeMethod: method,
+    keTi: jzm.keTi,
+    keTiNature: jzm.keTiNature,
+    jzmNotes: jzm.notes,
     tianPan: BRANCHES[(dayZhiIdx + 6) % 12],
     diPan: dayZhi,
     xun: ec.getDayXun(),
