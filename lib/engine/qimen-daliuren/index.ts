@@ -249,6 +249,10 @@ export function computeDaliuren(question?: string, date?: Date) {
     diPan: ke.diPan,
     xun: ke.xun,
     xunKong: ke.xunKong,
+    keTi: ke.keTi,
+    keTiNature: ke.keTiNature,
+    jzmNotes: ke.jzmNotes,
+    biFa: ke.biFa,
     shenJiang: ke.shenJiang,
     timeDunGan: ke.timeDunGan,
     isDayKe: ke.isDayKe,
@@ -257,7 +261,13 @@ export function computeDaliuren(question?: string, date?: Date) {
       { title: "四课", content: ke.siKe.map((k) => `${k.name}：${k.zhi}（${k.desc}）`).join("\n") },
       {
         title: "三传",
-        content: `月将${ke.monthJiang}加时起课。取传法：${ke.takeMethod}\n${ke.sanChuan.map((s) => `${s.name}${s.zhi}（${s.meaning}）`).join("\n")}`,
+        content: `月将${ke.monthJiang}加时起课。课体：${ke.keTi}（${ke.keTiNature}）\n取传法：${ke.takeMethod}\n${ke.sanChuan.map((s) => `${s.name}${s.zhi}（${s.meaning}）`).join("\n")}\n${(ke.jzmNotes ?? []).join("\n")}`,
+      },
+      {
+        title: "毕法断语（凌福之《毕法赋》节选）",
+        content: (ke.biFa ?? [])
+          .map((b: { fa: string; source: string; text: string }) => `【${b.fa}·${b.source}】${b.text}`)
+          .join("\n") || "本课无可触发之毕法条目。",
       },
       {
         title: "神将",

@@ -203,6 +203,15 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
     lines.push(`卦断【${dg.conclusion.level}】: ${dg.conclusion.text}（依据：${dg.conclusion.basis}）`);
   }
 
+  // 大六壬课体与毕法断语
+  if (facts.keTi) {
+    lines.push(`六壬课体: ${facts.keTi}（${(facts as { keTiNature?: string }).keTiNature ?? ""}）`);
+  }
+  const bf = facts.biFa as Array<{ fa?: string; source?: string; text?: string }> | undefined;
+  if (bf?.length) {
+    lines.push(`毕法断语(凌福之·节选): ${bf.map((b) => `【${b.fa}】${b.text}`).join("；")}`);
+  }
+
   // 奇门十干克应格局（烟波钓叟歌）
   const qg = facts.qiMenGeJu as {
     geJuList?: Array<{ palace?: string; tianGan?: string; diGan?: string; name?: string; kind?: string; note?: string }>;

@@ -1,6 +1,7 @@
 import { Solar, Lunar } from "lunar-typescript";
 import { placeShenJiang, tianDiPan, isDayTime } from "./daliuren-shenjiang";
 import { liuRenSanChuan } from "./liuren-jiuzongmen";
+import { evaluateBiFa } from "./bifa";
 
 /** 当前或指定时刻的农历对象 */
 export function lunarFromDate(date?: Date): Lunar {
@@ -200,6 +201,13 @@ export function daliurenKe(date?: Date) {
   ];
 
   const shenJiang = placeShenJiang(dayGan, hour);
+  const biFa = evaluateBiFa({
+    keTi: jzm.keTi,
+    sanChuanZhi: [BRANCHES[chu], BRANCHES[zhong], BRANCHES[mo]],
+    xunKong: ec.getDayXunKong(),
+    shenJiang,
+    isDayKe: isDayTime(hour),
+    dayGanZhi: `${dayGan}${dayZhi}`,  });
   const { tianPan: tianDi, diPan, timeDunGan } = tianDiPan(
     dayGan,
     dayZhiIdx >= 0 ? dayZhiIdx : 0,
@@ -216,6 +224,7 @@ export function daliurenKe(date?: Date) {
     keTi: jzm.keTi,
     keTiNature: jzm.keTiNature,
     jzmNotes: jzm.notes,
+    biFa,
     tianPan: BRANCHES[(dayZhiIdx + 6) % 12],
     diPan: dayZhi,
     xun: ec.getDayXun(),

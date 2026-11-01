@@ -246,6 +246,8 @@ export async function runModule(input: ModuleInput): Promise<ModuleOutput> {
     case "chenggu": {
       if (!profileInput) throw new Error("称骨算命需要档案");
       facts = computeChenggu(profileInput) as unknown as Record<string, unknown>;
+      (facts as Record<string, unknown>).caveat =
+        "称骨算命托名唐·袁天罡，唐代无此术流行的史料证据，一般认为是后人托名之作；歌诀为民间流传版本，男女版有别，仅供文化娱乐参考。";
       break;
     }
     case "zodiac": {
@@ -259,6 +261,8 @@ export async function runModule(input: ModuleInput): Promise<ModuleOutput> {
         birth: profileInput,
       }) as unknown as Record<string, unknown>;
       scores = { total: (facts as { totalScore: number }).totalScore };
+      (facts as Record<string, unknown>).caveat =
+        "五格剖象法系 1930 年代日本人熊崎健翁所创，并非中国古籍算法；传统命名依据为《康熙字典》笔画、音韵与义理。本模块数理仅供文化娱乐参考。";
       break;
     }
     case "naming": {
