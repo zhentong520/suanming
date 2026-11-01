@@ -125,6 +125,7 @@ a { color: inherit; text-decoration: none; }
   font-size: 1.65rem;
   color: var(--ink);
   letter-spacing: 0.15em;
+  white-space: nowrap;
 }
 
 .seal-stamp {
@@ -2010,20 +2011,25 @@ a { color: inherit; text-decoration: none; }
   .admin-sidebar { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
   .site-header-inner {
-    padding: 0.65rem 1rem;
-    gap: 0.5rem;
+    padding: 0.6rem 0.85rem;
+    gap: 0.4rem;
     flex-wrap: nowrap;
   }
 
+  .site-logo {
+    gap: 0.45rem;
+    flex-shrink: 0;
+  }
+
   .site-logo-text {
-    font-size: 1.35rem;
-    letter-spacing: 0.12em;
+    font-size: 1.02rem;
+    letter-spacing: 0.1em;
   }
 
   .seal-stamp {
-    width: 1.9rem;
-    height: 1.9rem;
-    font-size: 0.95rem;
+    width: 1.7rem;
+    height: 1.7rem;
+    font-size: 0.85rem;
   }
 
   .site-nav--desktop {
@@ -2037,6 +2043,11 @@ a { color: inherit; text-decoration: none; }
 
   .site-main--with-nav {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* 仅模块表单页：为 fixed 提交栏预留空间（提交栏+页尾链接行+免责行），防遮挡 */
+  .page-container.page-container--module-form {
+    padding-bottom: 11.5rem;
   }
 
   .mobile-nav {
@@ -2206,12 +2217,20 @@ a { color: inherit; text-decoration: none; }
   }
 
   .form-sticky-actions {
-    position: sticky;
+    position: fixed;
+    left: 0;
+    right: 0;
     bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
-    z-index: 10;
-    margin: 0 -1.1rem -1.15rem;
+    z-index: 40;
+    margin: 0;
     padding: 0.85rem 1.1rem 1rem;
-    background: linear-gradient(180deg, transparent, rgba(250, 246, 238, 0.95) 25%);
+    background: linear-gradient(180deg, transparent, rgba(250, 246, 238, 0.96) 55%);
+    border-top: 1px solid var(--border-light);
+  }
+
+  /* fixed 脱流后为主内容预留按钮高度，防长表单尾部被遮 */
+  .form-grid {
+    padding-bottom: 5.5rem;
   }
 
   .form-sticky-actions .btn-primary {
@@ -2551,6 +2570,12 @@ body.is-wechat .site-header {
 
 [data-theme="night"] .mobile-nav {
   background: rgba(20, 18, 16, 0.96);
+  border-top-color: var(--border);
+}
+
+/* 夜观主题：H5 吸底操作栏用深色卷底，避免亮色纸面刺眼 */
+[data-theme="night"] .form-sticky-actions {
+  background: linear-gradient(180deg, transparent, rgba(20, 18, 16, 0.97) 55%);
   border-top-color: var(--border);
 }
 
@@ -2903,19 +2928,39 @@ body.is-wechat .site-header {
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-  gap: 0.4rem 1.2rem;
+  gap: 0.55rem;
 }
 
 .kb-item-link {
-  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
   text-decoration: none;
-  font-size: 0.92rem;
-  line-height: 1.9;
+  transition: all 0.2s;
+}
+
+.kb-item-link::after {
+  content: "›";
+  color: var(--gold);
+  opacity: 0.55;
+  font-size: 1.05rem;
+  flex-shrink: 0;
 }
 
 .kb-item-link:hover {
   color: var(--cinnabar);
-  text-decoration: underline;
+  border-color: color-mix(in srgb, var(--cinnabar) 45%, transparent);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px var(--shadow-ink);
+  text-decoration: none;
 }
 
 .kb-article {

@@ -46,7 +46,7 @@ export function ModulePageShell({
   const loggedIn = Boolean(userCtx?.user);
 
   return (
-    <div className="page-container">
+    <div className="page-container page-container--module-form">
       <header className="page-header">
         <p className="page-eyebrow">{t("nav.modules")}</p>
         <h1>{title}</h1>
