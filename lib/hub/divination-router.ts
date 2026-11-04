@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb } from "../db/client";
 import { profiles, reports } from "../db/schema";
 import { getModuleDefinition } from "./module-registry";
@@ -187,9 +187,13 @@ export interface ModuleOutput {
   };
 }
 
-async function getProfileBirthInput(profileId: string): Promise<BirthInput> {
+async function getProfileBirthInput(profileId: string, userId?: string): Promise<BirthInput> {
   const db = getDb();
-  const [profile] = await db.select().from(profiles).where(eq(profiles.id, profileId)).limit(1);
+  // 纵深防御：登录态下强制校验档案归属，防越权读取他人出生数据
+  const ownerFilter = userId
+    ? and(eq(profiles.id, profileId), eq(profiles.userId, userId))
+    : eq(profiles.id, profileId);
+  const [profile] = await db.select().from(profiles).where(ownerFilter).limit(1);
   if (!profile) throw new Error("档案不存在");
   return {
     calendarType: profile.calendarType as "solar" | "lunar",
@@ -225,7 +229,7 @@ export async function runModule(input: ModuleInput): Promise<ModuleOutput> {
   ];
 
   const profileInput = input.profileId
-    ? await getProfileBirthInput(input.profileId)
+    ? await getProfileBirthInput(input.profileId, input.userId)
     : input.birth;
 
   switch (input.module) {
