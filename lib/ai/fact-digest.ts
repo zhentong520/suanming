@@ -139,6 +139,48 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
   const ds = facts.diShi as Array<{ pillar: string; diShi: string }> | undefined;
   if (ds?.length) lines.push(`十二长生: ${ds.map((d) => `${d.pillar}${d.diShi}`).join("、")}`);
 
+  // 子平三柱一空：胎元/命宫/身宫/旬空亡
+  const sj = facts.sanJia as
+    | {
+        taiYuan?: string;
+        mingGong?: string;
+        shenGong?: string;
+        xunKong?: Array<{ pillar?: string; kong?: string }>;
+        notes?: string[];
+      }
+    | undefined;
+  if (sj?.taiYuan) {
+    lines.push(
+      `胎元: ${sj.taiYuan} · 命宫: ${sj.mingGong} · 身宫: ${sj.shenGong}`
+    );
+    if (sj.xunKong?.length) {
+      lines.push(`四柱旬空: ${sj.xunKong.map((x) => `${x.pillar ?? ""}${x.kong ?? ""}`).join("、")}`);
+    }
+    if (sj.notes?.length) lines.push(`三柱空亡义理: ${truncate(sj.notes.join("；"), 260)}`);
+  }
+
+  // 神煞清单（名+落柱，取前 14 条防超长）
+  if (Array.isArray(facts.shenSha) && (facts.shenSha as Array<{ name: string; pillar: string }>).length) {
+    const ss = (facts.shenSha as Array<{ name: string; pillar: string }>).slice(0, 14);
+    lines.push(`神煞: ${ss.map((s) => `${s.name}(${s.pillar})`).join("、")}`);
+  }
+
+  // 黄历择日（协纪辨方书三档裁定）
+  const xjz = facts.xieJi as
+    | {
+        dayGZ?: string;
+        jianChu?: { name?: string };
+        jiShen?: Array<{ name?: string }>;
+        xiongSha?: Array<{ name?: string }>;
+        verdict?: { level?: string; basis?: string };
+      }
+    | undefined;
+  if (xjz?.verdict?.level) {
+    lines.push(
+      `协纪择日: ${xjz.dayGZ ?? ""}日，建除${xjz.jianChu?.name ?? "—"}，裁定【${xjz.verdict.level}】；吉神:${(xjz.jiShen ?? []).map((s) => s.name).join("、") || "无"}；凶煞:${(xjz.xiongSha ?? []).map((s) => s.name).join("、") || "无"}`
+    );
+  }
+
   if (Array.isArray(facts.daYun)) {
     const cur = (facts.daYun as Array<Record<string, unknown>>).find((d) => d.isCurrent);
     if (cur) {
@@ -174,6 +216,56 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
       `四化: ${(facts.siHua as Array<{ star: string; hua: string; palace?: string }>)
         .map((s) => `${s.star}化${s.hua}${s.palace ? `@${s.palace}` : ""}`)
         .join("、")}`
+    );
+  }
+
+  // 紫微全量星曜（iztro 桥接，乙级星+杂耀+亮度+生年化）
+  if (Array.isArray(facts.palaces)) {
+    const fullLines = (facts.palaces as Array<{ palace: string; starsFull?: string[] }>)
+      .filter((p) => (p.starsFull ?? []).length > 0)
+      .map((p) => `${p.palace}：${(p.starsFull ?? []).join("、")}`);
+    if (fullLines.length) lines.push(`十二宫全量星曜:\n${fullLines.join("\n")}`);
+  }
+  if (typeof facts.mingZhu === "string") {
+    lines.push(`命主星: ${facts.mingZhu} · 身主星: ${facts.shenZhu ?? "—"} · 五行局: ${facts.wuXingJu ?? "—"}`);
+  }
+
+  // 紫微四组十二神（长生/博士/岁前/将前）
+  const godGroups: Array<[string, unknown]> = [
+    ["长生十二神", facts.changSheng12Zw],
+    ["博士十二神", facts.boShi12Zw],
+    ["岁前十二星", facts.suiQian12],
+    ["将前十二星", facts.jiangQian12],
+  ];
+  for (const [label, arr] of godGroups) {
+    if (Array.isArray(arr) && arr.length) {
+      lines.push(
+        `${label}: ${(arr as Array<{ star: string; branch: string }>).map((x) => `${x.star}${x.branch}`).join("、")}`
+      );
+    }
+  }
+
+  // 紫微三层流曜（年/月/日）+ 各层四化（iztro horoscope）
+  const lyx = facts.liuYaoXing as
+    | {
+        liuNianGanZhi?: string;
+        liuNianMutagen?: string[];
+        liuNianStars?: Array<{ branch: string; stars: string[] }>;
+        liuYueGanZhi?: string;
+        liuYueMutagen?: string[];
+        liuYueStars?: Array<{ branch: string; stars: string[] }>;
+        liuRiGanZhi?: string;
+        liuRiMutagen?: string[];
+        liuRiStars?: Array<{ branch: string; stars: string[] }>;
+      }
+    | undefined;
+  if (lyx?.liuNianGanZhi) {
+    const layer = (label: string, gz?: string, mu?: string[], stars?: Array<{ branch: string; stars: string[] }>) =>
+      `${label}:${gz}，四化${(mu ?? []).join("/")}，流曜${(stars ?? [])
+        .map((x) => `${x.branch}${x.stars.join("")}`)
+        .join(" ")}`;
+    lines.push(
+      `三层流曜: ${layer("流年", lyx.liuNianGanZhi, lyx.liuNianMutagen, lyx.liuNianStars)}\n${layer("流月", lyx.liuYueGanZhi, lyx.liuYueMutagen, lyx.liuYueStars)}\n${layer("流日", lyx.liuRiGanZhi, lyx.liuRiMutagen, lyx.liuRiStars)}`
     );
   }
 
