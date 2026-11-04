@@ -429,7 +429,7 @@ describe("deepened algorithms", () => {
   it("qizheng lists seven luminaries", async () => {
     const { computeQizheng } = await import("@/lib/engine/heluo-qizheng");
     const r = computeQizheng({ calendarType: "solar", year: 1990, month: 5, day: 15, hour: 15 });
-    expect((r.planetPositions as unknown[]).length).toBe(9);
+    expect((r.planetPositions as unknown[]).length).toBe(10); // 七政四余含月孛
   });
 
   it("bazi reverse lookup returns candidates", async () => {
