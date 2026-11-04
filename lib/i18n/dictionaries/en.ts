@@ -27,7 +27,7 @@ export const en: Dictionary = {
   "home.cta.profiles": "My profiles",
   "home.cta.almanac": "Today's almanac",
   "home.modulesTitle": "Destiny · Divination · Physiognomy · Arts",
-  "home.modulesSubtitle": "Filter by category · Tap to calculate",
+  "home.modulesSubtitle": "Spin the compass, or pick from the board",
   "common.loading": "Loading…",
   "common.submit": "Calculate",
   "common.submitting": "Calculating…",

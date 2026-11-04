@@ -11,6 +11,7 @@ export default function HomePage() {
     category: m.category,
     description: m.description,
     implemented: m.implemented,
+    sortOrder: m.sortOrder,
   }));
   const moduleCount = MODULE_DEFINITIONS.filter((m) => m.implemented).length;
 
@@ -25,6 +26,7 @@ export default function HomePage() {
         yi: almanac.yi,
         ji: almanac.ji,
         chong: almanac.chong,
+        pillars: almanac.pillars,
       }}
     />
   );

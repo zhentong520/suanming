@@ -3043,3 +3043,861 @@ body.is-wechat .site-header {
     align-items: stretch;
   }
 }
+
+/* ============================================================
+   Magic UI 移植组件（https://magicui.design, MIT）+ 主页重设计
+   ============================================================ */
+
+@property --beam-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* ── BorderBeam：流光描边 ── */
+.magicui-beamed {
+  position: relative;
+  border-radius: 14px;
+}
+
+.magicui-beam {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0 55%,
+    color-mix(in srgb, var(--gold-light) 90%, transparent) 68%,
+    transparent 82%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  animation: magicui-beam-sweep var(--beam-duration, 7s) linear infinite;
+  opacity: 0.9;
+}
+
+.magicui-beam--reverse {
+  animation-direction: reverse;
+  opacity: 0.45;
+}
+
+@keyframes magicui-beam-sweep {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+
+/* ── OrbitingCircles：轨道环绕 ── */
+.hero-orbits {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 640px;
+  height: 640px;
+  max-width: 130vw;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0.7;
+  -webkit-mask-image: radial-gradient(circle, #000 52%, transparent 74%);
+  mask-image: radial-gradient(circle, #000 52%, transparent 74%);
+}
+
+.magicui-orbit {
+  position: absolute;
+  inset: 0;
+  animation: magicui-orbit-rot var(--orbit-duration, 40s) linear infinite;
+}
+
+.magicui-orbit--reverse {
+  animation-name: magicui-orbit-rot-rev;
+}
+
+.orbit-node {
+  --orbit-count: 6;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: -1.25rem;
+  transform: rotate(calc(var(--orbit-i) * 360deg / var(--orbit-count)))
+    translateY(calc(-1 * var(--orbit-radius, 200px)))
+    rotate(calc(-1 * var(--orbit-i) * 360deg / var(--orbit-count)));
+}
+
+.orbit-node--inner {
+  --orbit-count: 4;
+}
+
+.orbit-node__inner {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  font-size: 0.95rem;
+  color: var(--gold-light);
+  border: 1px solid color-mix(in srgb, var(--gold) 38%, transparent);
+  background: color-mix(in srgb, var(--paper-warm) 78%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--gold) 18%, transparent);
+  animation: magicui-orbit-rot-rev var(--orbit-duration, 40s) linear infinite;
+}
+
+.magicui-orbit--reverse .orbit-node__inner {
+  animation-name: magicui-orbit-rot;
+}
+
+@keyframes magicui-orbit-rot {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes magicui-orbit-rot-rev {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+/* ── NumberTicker / BlurFade ── */
+.magicui-blurfade {
+  animation: magicui-blurfade-in 0.8s cubic-bezier(0.2, 0.65, 0.3, 1) both;
+  animation-delay: var(--blur-delay, 0ms);
+}
+
+@keyframes magicui-blurfade-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+/* ── ShimmerButton：扫光主按钮 ── */
+.shimmer-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 2.1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  color: #221b0e;
+  background: linear-gradient(135deg, #e3c186 0%, #c9a86a 55%, #9a7229 100%);
+  border: 1px solid rgba(58, 42, 12, 0.45);
+  box-shadow:
+    0 10px 32px color-mix(in srgb, var(--gold) 28%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.shimmer-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 14px 40px color-mix(in srgb, var(--gold) 38%, transparent);
+}
+
+.shimmer-btn--lg {
+  padding: 0.95rem 2.5rem;
+  font-size: 1.02rem;
+}
+
+.shimmer-btn__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 58%
+  );
+  transform: translateX(-130%);
+  animation: magicui-shimmer-sweep 3.4s ease-in-out infinite;
+}
+
+@keyframes magicui-shimmer-sweep {
+  0%,
+  55% {
+    transform: translateX(-130%);
+  }
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+/* ── Hero 居中重设计 ── */
+.hero-section--center {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 430px;
+  padding: 4rem 1rem 3rem;
+  overflow: hidden;
+}
+
+.hero-section--center .hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-section--center .hero-title {
+  background: linear-gradient(
+    115deg,
+    var(--ink) 25%,
+    var(--gold-light) 60%,
+    var(--cinnabar-light) 95%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-stats {
+  display: flex;
+  align-items: baseline;
+  gap: 1.1rem;
+  margin: 0.4rem 0 1.7rem;
+  color: var(--ink-light);
+}
+
+.hero-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.hero-stat__num {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-accent);
+}
+
+.hero-stat__label {
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  color: var(--ink-muted);
+}
+
+.hero-stat-sep {
+  color: var(--gold);
+  opacity: 0.55;
+  font-size: 0.65rem;
+  align-self: center;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ── 门类卡（替代 feature-pill） ── */
+.feature-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(160deg, var(--paper-warm), var(--paper-deep));
+  box-shadow: 0 6px 22px var(--shadow-ink);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--gold) 55%, transparent);
+  box-shadow:
+    0 12px 34px var(--shadow-ink),
+    0 0 22px color-mix(in srgb, var(--gold) 14%, transparent);
+}
+
+.feature-card__icon {
+  flex: none;
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+  font-family: var(--font-accent);
+  color: var(--gold-light);
+  background: radial-gradient(
+    circle at 30% 25%,
+    color-mix(in srgb, var(--gold) 26%, transparent),
+    color-mix(in srgb, var(--gold) 6%, transparent)
+  );
+  border: 1px solid color-mix(in srgb, var(--gold) 32%, transparent);
+}
+
+.feature-card strong {
+  font-size: 1rem;
+  color: var(--ink);
+  letter-spacing: 0.08em;
+}
+
+.feature-card p {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+}
+
+.feature-card__arrow {
+  margin-left: auto;
+  color: var(--gold);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.feature-card:hover .feature-card__arrow {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── 降级与可访问性 ── */
+@media (max-width: 720px) {
+  .hero-orbits {
+    opacity: 0.35;
+  }
+
+  .hero-stats {
+    gap: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .magicui-blurfade,
+  .magicui-orbit,
+  .orbit-node__inner,
+  .magicui-beam,
+  .shimmer-btn__glow {
+    animation: none !important;
+  }
+
+  .shimmer-btn__glow {
+    display: none;
+  }
+}
+
+/* ============================================================
+   布局 V2：罗盘首屏 + Bento 看板（A+B 混合方案）
+   ============================================================ */
+
+@keyframes compass-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes compass-spin-rev {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+/* ── 首屏分栏 ── */
+.hero-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2.5rem;
+  align-items: center;
+  padding: 3.5rem 0 2.5rem;
+  min-height: 540px;
+}
+
+.hero-split__copy {
+  max-width: 30rem;
+}
+
+.hero-title--compact {
+  font-size: clamp(2.4rem, 6vw, 3.4rem);
+  letter-spacing: 0.18em;
+  background: linear-gradient(
+    115deg,
+    var(--ink) 25%,
+    var(--gold-light) 60%,
+    var(--cinnabar-light) 95%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-split__wheel {
+  display: flex;
+  justify-content: center;
+}
+
+/* ── 罗盘 ── */
+.compass {
+  position: relative;
+  width: 460px;
+  height: 460px;
+  flex: none;
+}
+
+.compass__ticks {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, var(--gold) 35%, transparent);
+}
+
+.compass__ticks::before {
+  content: "";
+  position: absolute;
+  inset: 14.5%;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--gold) 22%, transparent);
+}
+
+.compass__trigrams,
+.compass__ring {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.compass__trigrams {
+  animation: compass-spin 90s linear infinite;
+}
+
+.compass__trigram {
+  --compass-count: 8;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.7rem;
+  height: 1.7rem;
+  margin: -0.85rem;
+  transform: rotate(calc(var(--compass-i) * 360deg / var(--compass-count)))
+    translateY(-168px)
+    rotate(calc(-1 * var(--compass-i) * 360deg / var(--compass-count)));
+}
+
+.compass__trigram-inner {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--gold) 55%, transparent);
+  animation: compass-spin-rev 90s linear infinite;
+}
+
+.compass__ring--outer {
+  animation: compass-spin 150s linear infinite;
+}
+
+.compass__ring--inner {
+  animation: compass-spin-rev 105s linear infinite;
+}
+
+.compass__node {
+  pointer-events: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4.5rem;
+  height: 1.95rem;
+  margin: -0.975rem 0 0 -2.25rem;
+  transform: rotate(calc(var(--compass-i) * 360deg / var(--compass-n)))
+    translateY(-198px)
+    rotate(calc(-1 * var(--compass-i) * 360deg / var(--compass-n)));
+}
+
+.compass__node--inner {
+  width: 4.1rem;
+  margin-left: -2.05rem;
+  transform: rotate(calc(var(--compass-i) * 360deg / var(--compass-n)))
+    translateY(-122px)
+    rotate(calc(-1 * var(--compass-i) * 360deg / var(--compass-n)));
+}
+
+.compass__node-inner {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  letter-spacing: 0.12em;
+  color: var(--gold-light);
+  border: 1px solid color-mix(in srgb, var(--gold) 42%, transparent);
+  background: color-mix(in srgb, var(--paper-warm) 86%, transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--gold) 14%, transparent);
+  transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.compass__ring--outer .compass__node-inner {
+  animation: compass-spin-rev 150s linear infinite;
+}
+
+.compass__ring--inner .compass__node-inner {
+  animation: compass-spin 105s linear infinite;
+}
+
+.compass__node:hover .compass__node-inner,
+.compass__node:focus-visible .compass__node-inner {
+  color: var(--paper);
+  background: var(--gold-light);
+  border-color: var(--gold-light);
+}
+
+.compass__center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 172px;
+  height: 172px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  text-align: center;
+  background:
+    radial-gradient(circle at 35% 28%, color-mix(in srgb, var(--gold) 20%, transparent), transparent 60%),
+    var(--paper-deep);
+  border: 1px solid color-mix(in srgb, var(--gold) 48%, transparent);
+  box-shadow:
+    0 0 34px color-mix(in srgb, var(--gold) 16%, transparent),
+    inset 0 0 26px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.compass__center:hover {
+  border-color: var(--gold-light);
+  box-shadow:
+    0 0 44px color-mix(in srgb, var(--gold) 26%, transparent),
+    inset 0 0 26px rgba(0, 0, 0, 0.35);
+}
+
+.compass__taiji {
+  font-size: 2rem;
+  line-height: 1.1;
+  color: var(--gold-light);
+}
+
+.compass__date {
+  font-size: 0.86rem;
+  color: var(--ink);
+  font-family: var(--font-accent);
+}
+
+.compass__sx {
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
+  color: var(--ink-muted);
+}
+
+.compass:hover .compass__ring,
+.compass:hover .compass__trigrams {
+  animation-play-state: paused;
+}
+
+.compass:hover .compass__node-inner,
+.compass:hover .compass__trigram-inner {
+  animation-play-state: paused;
+}
+
+/* ── Bento 看板 ── */
+.home-bento {
+  margin-top: 1.5rem;
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.bento-item {
+  min-width: 0;
+}
+
+.bento-item--wide {
+  grid-column: span 2;
+}
+
+.bento-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  height: 100%;
+  min-height: 7.2rem;
+  padding: 1.15rem 1.25rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: linear-gradient(165deg, var(--paper-warm), var(--paper-deep));
+  box-shadow: 0 6px 22px var(--shadow-ink);
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.bento-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--gold) 55%, transparent);
+  box-shadow:
+    0 14px 36px var(--shadow-ink),
+    0 0 24px color-mix(in srgb, var(--gold) 14%, transparent);
+}
+
+.bento-badge {
+  align-self: flex-start;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  padding: 0.14rem 0.6rem;
+  border-radius: 999px;
+  color: var(--gold-light);
+  border: 1px solid color-mix(in srgb, var(--gold) 36%, transparent);
+  background: color-mix(in srgb, var(--gold) 9%, transparent);
+}
+
+.bento-badge--gold {
+  color: var(--paper);
+  background: var(--gold-light);
+  border-color: var(--gold-light);
+}
+
+.bento-card__name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+}
+
+.bento-card__desc {
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+.bento-card__arrow {
+  position: absolute;
+  right: 1.1rem;
+  bottom: 0.95rem;
+  color: var(--gold);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.bento-card:hover .bento-card__arrow {
+  opacity: 1;
+  transform: none;
+}
+
+.bento-card--all {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-style: dashed;
+  background: transparent;
+  box-shadow: none;
+}
+
+.bento-card--almanac {
+  min-height: 0;
+}
+
+.bento-almanac__date {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: 0.1em;
+  color: var(--gold-light);
+}
+
+.bento-almanac__ganzhi {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  margin-bottom: 0.55rem;
+}
+
+.bento-almanac__row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--ink-light);
+}
+
+.bento-almanac__row--yi .almanac-label {
+  color: var(--jade-light);
+}
+
+.bento-almanac__row--ji .almanac-label {
+  color: var(--cinnabar-light);
+}
+
+.bento-almanac__chong {
+  margin-top: auto;
+  padding-top: 0.55rem;
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+}
+
+/* ── 响应式 ── */
+@media (max-width: 1080px) {
+  .compass {
+    transform: scale(0.85);
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-split {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    min-height: 0;
+    padding-top: 2.5rem;
+  }
+
+  .hero-split__copy {
+    max-width: 36rem;
+  }
+
+  .hero-split .hero-actions {
+    justify-content: center;
+  }
+
+  .bento-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-split {
+    overflow-x: clip;
+  }
+
+  .compass {
+    transform: scale(0.66);
+    margin: -3.6rem 0;
+  }
+
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bento-item--wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 400px) {
+  .compass {
+    transform: scale(0.58);
+    margin: -4.4rem 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compass__ring,
+  .compass__trigrams,
+  .compass__trigram-inner,
+  .compass__node-inner {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   全站统一质感覆盖层（内页与首页风格统一）
+   ============================================================ */
+
+/* ── 全站统一质感（覆盖层，内页自动生效） ── */
+
+/* scroll-card 古籍双线金框 */
+.scroll-card::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid color-mix(in srgb, var(--gold) 20%, transparent);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+/* 主按钮统一为金 */
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
+  color: #221b0e;
+  border: 1px solid rgba(58, 42, 12, 0.4);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--gold) 22%, transparent);
+  font-weight: 600;
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+
+/* 区块标题加金色菱饰 */
+.section-heading-title::before,
+.section-heading-title::after {
+  content: "◆";
+  font-size: 0.5em;
+  color: color-mix(in srgb, var(--gold) 70%, transparent);
+  vertical-align: middle;
+  margin: 0 0.9em;
+}
+
+/* 内页标题区加金饰线 */
+.page-header::after {
+  content: "";
+  display: block;
+  width: 72px;
+  height: 2px;
+  margin: 1.1rem auto 0;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* 表单焦点统一金 */
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus {
+  border-color: color-mix(in srgb, var(--gold) 60%, transparent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 14%, transparent);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-btn__glow,
+  .bento-card,
+  .bento-card__arrow {
+    transition: none;
+  }
+}

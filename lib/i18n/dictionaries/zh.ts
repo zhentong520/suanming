@@ -27,7 +27,7 @@ export const zh: Dictionary = {
   "home.cta.profiles": "我的档案",
   "home.cta.almanac": "今日黄历",
   "home.modulesTitle": "命·卜·相·术，四门齐备",
-  "home.modulesSubtitle": "点选分类筛选 · 进入即可测算",
+  "home.modulesSubtitle": "转罗盘择术 · 或自看板进入",
   "common.loading": "加载中…",
   "common.submit": "开始测算",
   "common.submitting": "测算中…",
