@@ -118,6 +118,11 @@ export function computeZiwei(input: BirthInput) {
     hourZhiIdx: hourZhiIdx >= 0 ? hourZhiIdx : 0,
     gender,
   });
+  // 亮度口径统一：自研表与 iztro（业界主流）有分歧（如紫微在巳宫），以 iztro 为准修正主星亮度
+  for (const m of mainStars) {
+    const iz = iztro.brightness[m.star];
+    if (iz && iz !== m.brightness) m.brightness = iz;
+  }
   // 流曜十星 + 流年四化（iztro horoscope，与本项目自算流年四化互为交叉验证）
   const liuYaoXing = computeLiuYaoXing({
     solarYmd: solar.toYmd(),

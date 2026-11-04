@@ -539,6 +539,60 @@ function enrichZiwei(f: Facts): Facts {
         : stars.map((s) => `${s.palace}${s.star}(${s.brightness})`).join(" · "),
     },
     {
+      title: "全量星曜（乙级星·杂曜·亮度）",
+      content: Array.isArray(f.palaces)
+        ? (f.palaces as Array<{ palace: string; starsFull?: string[] }>)
+            .filter((p) => (p.starsFull ?? []).length > 0)
+            .map((p) => `${p.palace}：${(p.starsFull ?? []).join("、")}`)
+            .join("\n") || "全量星曜待排。"
+        : "全量星曜待排。",
+    },
+    {
+      title: "神煞十二神（长生/博士/岁前/将前）",
+      content: (() => {
+        const fmt = (label: string, arr: unknown) =>
+          Array.isArray(arr) && arr.length
+            ? `${label}：${(arr as Array<{ star: string; branch: string }>).map((x) => `${x.star}${x.branch}`).join("、")}`
+            : `${label}待排`;
+        return [
+          fmt("长生十二", f.changSheng12Zw),
+          fmt("博士十二", f.boShi12Zw),
+          fmt("岁前十二", f.suiQian12),
+          fmt("将前十二", f.jiangQian12),
+        ].join("\n");
+      })(),
+    },
+    {
+      title: "流曜与三层四化（年/月/日）",
+      content: (() => {
+        const l = f.liuYaoXing as
+          | {
+              liuNianGanZhi?: string;
+              liuNianMutagen?: string[];
+              liuNianStars?: Array<{ branch: string; stars: string[] }>;
+              liuYueGanZhi?: string;
+              liuYueMutagen?: string[];
+              liuYueStars?: Array<{ branch: string; stars: string[] }>;
+              liuRiGanZhi?: string;
+              liuRiMutagen?: string[];
+              liuRiStars?: Array<{ branch: string; stars: string[] }>;
+            }
+          | undefined;
+        if (!l) return "流曜待排。";
+        const fmt = (label: string, gz?: string, mu?: string[], stars?: Array<{ branch: string; stars: string[] }>) =>
+          [
+            `${label}：${gz ?? "?"}（${(mu ?? []).join("/")}）`,
+            ...(stars ?? []).map((x) => `  ${x.branch}${x.stars.join("、")}`),
+          ].join("\n");
+        return [
+          "流年四化与流曜（禄权科忌）：",
+          fmt("流年", l.liuNianGanZhi, l.liuNianMutagen, l.liuNianStars),
+          fmt("流月", l.liuYueGanZhi, l.liuYueMutagen, l.liuYueStars),
+          fmt("流日", l.liuRiGanZhi, l.liuRiMutagen, l.liuRiStars),
+        ].join("\n");
+      })(),
+    },
+    {
       title: "四化飞星详断",
       content: sihuaReading,
     },

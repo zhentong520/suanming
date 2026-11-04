@@ -10,6 +10,10 @@ import { BRANCHES } from "./placement";
 export interface IztroBridgeResult {
   /** 十二宫全量星曜串（主星带亮度 + 辅星 + 杂耀），按宫名索引 */
   palaceFullStars: Record<string, string[]>;
+  /** 主星亮度表（star → brightness），口径统一用 iztro（业界主流） */
+  brightness: Record<string, string>;
+  /** 主星落宫（star → palace），供亮度核对 */
+  starPalace: Record<string, string>;
   /** 命主星（真·命主，来自 iztro） */
   soulStar: string;
   /** 身主星 */
@@ -46,7 +50,13 @@ export function computeIztroAstrolabe(params: {
   );
 
   const palaceFullStars: Record<string, string[]> = {};
+  const brightness: Record<string, string> = {};
+  const starPalace: Record<string, string> = {};
   for (const p of ast.palaces) {
+    for (const s of p.majorStars) {
+      brightness[s.name] = s.brightness ?? "";
+      starPalace[s.name] = p.name;
+    }
     const fmt = (s: { name: string; brightness?: string; mutagen?: string }) =>
       `${s.name}${s.brightness ? `(${s.brightness})` : ""}${s.mutagen ? `[生年化${s.mutagen}]` : ""}`;
     palaceFullStars[p.name] = [
@@ -68,6 +78,8 @@ export function computeIztroAstrolabe(params: {
 
   return {
     palaceFullStars,
+    brightness,
+    starPalace,
     soulStar: ast.soul,
     bodyStar: ast.body,
     fiveElementsClass: ast.fiveElementsClass,
