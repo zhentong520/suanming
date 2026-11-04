@@ -14,7 +14,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 # 构建期公开变量可从构建参数注入；运行期仍读 env_file
-ARG NEXT_PUBLIC_SITE_URL=http://localhost:9111
+# 默认值必须为生产域名：sitemap/robots/OG 在 build 时静态生成，
+# 若缺省会内联 localhost（2026-11-04 事故：robots Sitemap 指向 localhost）
+ARG NEXT_PUBLIC_SITE_URL=https://suanming.zikao-star.top
 ARG NEXT_PUBLIC_SITE_NAME=易道命理
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SITE_NAME=$NEXT_PUBLIC_SITE_NAME
