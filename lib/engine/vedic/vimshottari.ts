@@ -101,6 +101,26 @@ export function vimshottariTimeline(opts: {
     subCursor += len;
   }
 
+  // 第三层 Pratyantardasha（当前 Antardasha 内再分 9 段，同构比例）
+  const adYears = antardasha.endAge - antardasha.startAge;
+  const startIdxAd = VIM_ORDER.indexOf(antardasha.lord as (typeof VIM_ORDER)[number]);
+  let pCursor = antardasha.startAge;
+  let pratyantardasha: Antardasha = {
+    lord: antardasha.lord,
+    lordCn: antardasha.lordCn,
+    startAge: antardasha.startAge,
+    endAge: antardasha.endAge,
+  };
+  for (let i = 0; i < 9; i++) {
+    const p = VIM_ORDER[(startIdxAd + i) % 9];
+    const len = (adYears * VIM_YEARS[p]) / 120;
+    if (age < pCursor + len || i === 8) {
+      pratyantardasha = { lord: p, lordCn: VIM_CN[p], startAge: Number(pCursor.toFixed(2)), endAge: Number((pCursor + len).toFixed(2)) };
+      break;
+    }
+    pCursor += len;
+  }
+
   return {
     mahadashas,
     current: {
@@ -110,6 +130,7 @@ export function vimshottariTimeline(opts: {
       startAge: antardasha.startAge,
       endAge: antardasha.endAge,
     },
+    pratyantardasha,
   };
 }
 

@@ -13,48 +13,81 @@ import {
   EPHEMERIS_NOTE,
   NODE_NOTE,
 } from "../vedic/astro";
+import { hexagramNameFromTrigrams } from "../hexagram-lib";
 
 const GUA_NAMES = ["", "坎", "坤", "震", "巽", "中", "乾", "兑", "艮", "离"];
 const GUA_WUXING = ["", "水", "土", "木", "木", "土", "金", "金", "土", "火"];
 
-/** 河洛理数：先天命卦 + 后天运卦 */
+/**
+ * 河洛理数 · 真法起卦（陈希夷一脉通行法）：
+ * 四柱干支化数（甲己子午九、乙庚丑未八、丙辛寅申七、丁壬卯酉六、戊癸辰戌五、巳亥四），
+ * 天干数和为天局、地支数和为地局；
+ * 天局定上卦、地局定下卦（先天序 乾一兑二离三震四巽五坎六艮七坤八，余八者为八卦）；
+ * 天地总数模六定动爻，动爻阴阳反转为变卦。
+ */
+const HELUO_NUM: Record<string, number> = {
+  甲: 9, 己: 9, 子: 9, 午: 9,
+  乙: 8, 庚: 8, 丑: 8, 未: 8,
+  丙: 7, 辛: 7, 寅: 7, 申: 7,
+  丁: 6, 壬: 6, 卯: 6, 酉: 6,
+  戊: 5, 癸: 5, 辰: 5, 戌: 5,
+  巳: 4, 亥: 4,
+};
+const XIAN_TIAN = ["乾", "兑", "离", "震", "巽", "坎", "艮", "坤"];
+/** 三爻 bits（bit0=初爻，1=阳）→ 卦名，与 hexagram-lib 约定一致 */
+const BITS_TO_TRIGRAM = ["坤", "艮", "坎", "巽", "震", "离", "兑", "乾"];
+const TRIGRAM_TO_BITS: Record<string, number> = { 坤: 0, 艮: 1, 坎: 2, 巽: 3, 震: 4, 离: 5, 兑: 6, 乾: 7 };
+
+/** 河洛理数：真法定先天命卦（含动爻与变卦） */
 export function computeHeluo(input: BirthInput) {
   const cal = computeCalendar(input);
   const { lunar } = buildLunarFromBirth(input);
   const eightChar = eightCharFromBirth(lunar, input);
 
-  const mingGong = eightChar.getMingGong();
-  const taiYuan = eightChar.getTaiYuan();
-  const mingZhi = mingGong.slice(-1);
-  const taiZhi = taiYuan.slice(-1);
-  const yearZhi = eightChar.getYearZhi();
-  const branches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
-  const upper = (branches.indexOf(mingZhi) % 8) + 1;
-  const lower = (branches.indexOf(taiZhi) % 8) + 1;
-  const guaIndex = ((upper + lower - 1) % 9) + 1;
+  const pillarGz = [eightChar.getYear(), eightChar.getMonth(), eightChar.getDay(), eightChar.getTime()];
+  const ganNums = pillarGz.map((gz) => HELUO_NUM[gz[0] ?? ""] ?? 0);
+  const zhiNums = pillarGz.map((gz) => HELUO_NUM[gz[1] ?? ""] ?? 0);
+  const tianJu = ganNums.reduce((a, b) => a + b, 0);
+  const diJu = zhiNums.reduce((a, b) => a + b, 0);
+  const total = tianJu + diJu;
 
-  const yearZhiIdx = branches.indexOf(yearZhi);
-  const houUpper = ((upper + yearZhiIdx) % 8) + 1;
-  const houLower = ((lower + lunar.getMonth()) % 8) + 1;
-  const houGuaIndex = ((houUpper + houLower - 1) % 9) + 1;
+  const upper = XIAN_TIAN[(tianJu % 8 || 8) - 1];
+  const lower = XIAN_TIAN[(diJu % 8 || 8) - 1];
+  const benGua = hexagramNameFromTrigrams(upper, lower);
+
+  const changingYao = (total % 6 || 6);
+  // 动爻反转 → 变卦（库约定 bit0=上爻、bit2=初爻；六爻自下而上：初=下卦初爻）
+  const upperBits = TRIGRAM_TO_BITS[upper];
+  const lowerBits = TRIGRAM_TO_BITS[lower];
+  const lines = [
+    (lowerBits >> 2) & 1, (lowerBits >> 1) & 1, lowerBits & 1,
+    (upperBits >> 2) & 1, (upperBits >> 1) & 1, upperBits & 1,
+  ];
+  const flipped = lines.map((v, i) => (i + 1 === changingYao ? 1 - v : v));
+  const bianLower = (flipped[2] | (flipped[1] << 1) | (flipped[0] << 2)) as number;
+  const bianUpper = (flipped[5] | (flipped[4] << 1) | (flipped[3] << 2)) as number;
+  const bianGua = hexagramNameFromTrigrams(BITS_TO_TRIGRAM[bianUpper], BITS_TO_TRIGRAM[bianLower]);
+
+  const pillarDetail = pillarGz
+    .map((gz, i) => `${gz}(干${ganNums[i]}支${zhiNums[i]})`)
+    .join(" ");
 
   return {
-    pillars: `${eightChar.getYear()} ${eightChar.getMonth()} ${eightChar.getDay()} ${eightChar.getTime()}`,
-    mingGong,
-    taiYuan,
-    mingGongNaYin: eightChar.getMingGongNaYin(),
-    taiYuanNaYin: eightChar.getTaiYuanNaYin(),
-    upperGua: GUA_NAMES[upper],
-    lowerGua: GUA_NAMES[lower],
-    mingGua: GUA_NAMES[guaIndex],
-    wuxing: GUA_WUXING[guaIndex],
-    houTianGua: GUA_NAMES[houGuaIndex],
-    houTianWuXing: GUA_WUXING[houGuaIndex],
-    houUpperGua: GUA_NAMES[houUpper],
-    houLowerGua: GUA_NAMES[houLower],
-    shengXiao: cal.shengXiao,
-    summary: `先天${GUA_NAMES[guaIndex]}（${GUA_WUXING[guaIndex]}），后天${GUA_NAMES[houGuaIndex]}（${GUA_WUXING[houGuaIndex]}）。命宫${mingGong}、胎元${taiYuan}。`,
-    caveat: "已含先天命卦与后天运卦，流年卦变可结合当前干支进一步推演。",
+    solarDate: cal.solarDate,
+    lunarDate: cal.lunarDate,
+    pillars: pillarGz.join(" "),
+    pillarDetail,
+    tianJu,
+    diJu,
+    total,
+    upperGua: upper,
+    lowerGua: lower,
+    benGua,
+    changingYao,
+    bianGua,
+    benYao: `${changingYao}爻动`,
+    summary: `四柱化数：${pillarDetail}。天局${tianJu}定上卦${upper}，地局${diJu}定下卦${lower}，得${benGua}（${changingYao}爻动），变${bianGua}。`,
+    caveat: "河洛理数化数取通行定数表（甲己子午九等），上卦天局、下卦地局、总数动爻为通行起法；卦义断辞可结合变卦参看。仅供文化参考。",
   };
 }
 

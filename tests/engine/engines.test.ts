@@ -305,7 +305,7 @@ describe("P2/P3 engines", () => {
 
   it("heluo", async () => {
     const { computeHeluo } = await import("@/lib/engine/heluo-qizheng");
-    expect(computeHeluo(profile).mingGua).toBeTruthy();
+    expect(computeHeluo(profile).benGua).toBeTruthy(); // 真法河洛：先天卦名改 benGua
   });
 
   it("qimen", async () => {
