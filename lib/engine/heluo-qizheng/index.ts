@@ -6,10 +6,12 @@ import {
   moonLongitude,
   planetTrueLongitude,
   lunarNodeLongitude,
+  moonApogeeLongitude,
   tropicalToSidereal,
   longitudeToRashi,
   longitudeToTimeOffset,
   EPHEMERIS_NOTE,
+  NODE_NOTE,
 } from "../vedic/astro";
 
 const GUA_NAMES = ["", "坎", "坤", "震", "巽", "中", "乾", "兑", "艮", "离"];
@@ -66,9 +68,17 @@ const PLANET_MEANINGS: Record<string, string> = {
   土: "土星主责任、限制、耐力与守成。",
   罗睺: "罗睺主欲望、非传统、突变。",
   计都: "计都主解脱、隐忧、业力课题。",
+  月孛: "月孛主暗昧、隐疾、纠缠之事（远地点之象）。",
 };
 
 const RASHI_CN = ["白羊", "金牛", "双子", "巨蟹", "狮子", "处女", "天秤", "天蝎", "射手", "摩羯", "水瓶", "双鱼"];
+
+/** 七政十二宫（从命宫起顺布） */
+const QIZHENG_HOUSES = [
+  "命宫", "财帛", "兄弟", "父母", "子女", "奴仆",
+  "配偶", "疾厄", "迁移", "官禄", "福德", "相貌",
+];
+const BRANCH_ORDER = "子丑寅卯辰巳午未申酉戌亥";
 
 /** 七政四余：接天文经度 + 八字宫位 */
 export function computeQizheng(input: BirthInput) {
@@ -94,50 +104,61 @@ export function computeQizheng(input: BirthInput) {
   const saturn = tropicalToSidereal(planetTrueLongitude(jd, "saturn"), ayanamsa);
   const rahu = tropicalToSidereal(lunarNodeLongitude(jd), ayanamsa);
   const ketu = (rahu + 180) % 360;
+  const yuebei = tropicalToSidereal(moonApogeeLongitude(jd), ayanamsa);
+
+  // 安命：沿用卯起法命宫（lunar-typescript 安命，与子平/七政通行一致），整宫顺布十二宫
+  const mingGongGz = eightChar.getMingGong();
+  const mingBranch = mingGongGz.slice(-1);
+  const mingIdx = BRANCH_ORDER.indexOf(mingBranch);
+  const palaceOf = (rashi: number): string => {
+    const rashiBranch = BRANCH_ORDER[(rashi - mingIdx + 12) % 12];
+    const offset = BRANCH_ORDER.indexOf(rashiBranch);
+    return QIZHENG_HOUSES[offset] ?? "?";
+  };
 
   const sunRashi = longitudeToRashi(sunSidereal);
   const moonRashi = longitudeToRashi(moonSidereal);
 
   const planetPositions = [
-    { name: "日", rashi: RASHI_CN[sunRashi], degree: sunSidereal.toFixed(1) },
-    { name: "月", rashi: RASHI_CN[moonRashi], degree: moonSidereal.toFixed(1) },
-    { name: "水", rashi: RASHI_CN[longitudeToRashi(mercury)], degree: mercury.toFixed(1) },
-    { name: "金", rashi: RASHI_CN[longitudeToRashi(venus)], degree: venus.toFixed(1) },
-    { name: "火", rashi: RASHI_CN[longitudeToRashi(mars)], degree: mars.toFixed(1) },
-    { name: "木", rashi: RASHI_CN[longitudeToRashi(jupiter)], degree: jupiter.toFixed(1) },
-    { name: "土", rashi: RASHI_CN[longitudeToRashi(saturn)], degree: saturn.toFixed(1) },
-    { name: "罗睺", rashi: RASHI_CN[longitudeToRashi(rahu)], degree: rahu.toFixed(1) },
-    { name: "计都", rashi: RASHI_CN[longitudeToRashi(ketu)], degree: ketu.toFixed(1) },
+    { name: "日", rashi: RASHI_CN[sunRashi], house: palaceOf(sunRashi), degree: sunSidereal.toFixed(1) },
+    { name: "月", rashi: RASHI_CN[moonRashi], house: palaceOf(moonRashi), degree: moonSidereal.toFixed(1) },
+    { name: "水", rashi: RASHI_CN[longitudeToRashi(mercury)], house: palaceOf(longitudeToRashi(mercury)), degree: mercury.toFixed(1) },
+    { name: "金", rashi: RASHI_CN[longitudeToRashi(venus)], house: palaceOf(longitudeToRashi(venus)), degree: venus.toFixed(1) },
+    { name: "火", rashi: RASHI_CN[longitudeToRashi(mars)], house: palaceOf(longitudeToRashi(mars)), degree: mars.toFixed(1) },
+    { name: "木", rashi: RASHI_CN[longitudeToRashi(jupiter)], house: palaceOf(longitudeToRashi(jupiter)), degree: jupiter.toFixed(1) },
+    { name: "土", rashi: RASHI_CN[longitudeToRashi(saturn)], house: palaceOf(longitudeToRashi(saturn)), degree: saturn.toFixed(1) },
+    { name: "罗睺", rashi: RASHI_CN[longitudeToRashi(rahu)], house: palaceOf(longitudeToRashi(rahu)), degree: rahu.toFixed(1) },
+    { name: "计都", rashi: RASHI_CN[longitudeToRashi(ketu)], house: palaceOf(longitudeToRashi(ketu)), degree: ketu.toFixed(1) },
+    { name: "月孛", rashi: RASHI_CN[longitudeToRashi(yuebei)], house: palaceOf(longitudeToRashi(yuebei)), degree: yuebei.toFixed(1) },
   ];
 
-  const mainStar = "日";
-  const secondary = "月";
-
-  const monthZhiIdx = "子丑寅卯辰巳午未申酉戌亥".indexOf(eightChar.getMonthZhi());
-  const houses = ["命宫", "财帛", "官禄", "迁移", "夫妻", "疾厄", "福德", "田宅"];
-  const house = houses[monthZhiIdx % houses.length];
   const element = eightChar.getDayWuXing().replace(/[^金木水火土]/g, "") || "土";
 
   return {
     solarDate: cal.solarDate,
     lunarDate: cal.lunarDate,
     location: input.location ?? (lon !== 116.4 ? `经${lon.toFixed(1)}°纬${lat.toFixed(1)}°` : "默认东经116°（北京）"),
-    mingGong: house,
-    mainStar,
-    secondaryStar: secondary,
+    mingGong: `${mingGongGz}（安命卯起法）`,
     element,
     dayGanZhi: eightChar.getDay(),
     monthGanZhi: eightChar.getMonth(),
     sunRashi: RASHI_CN[sunRashi],
+    sunHouse: palaceOf(sunRashi),
     moonRashi: RASHI_CN[moonRashi],
-    rahuHouse: RASHI_CN[longitudeToRashi(rahu)],
-    ketuHouse: RASHI_CN[longitudeToRashi(ketu)],
+    moonHouse: palaceOf(moonRashi),
+    rahuHouse: palaceOf(longitudeToRashi(rahu)),
+    ketuHouse: palaceOf(longitudeToRashi(ketu)),
+    yuebeiHouse: palaceOf(longitudeToRashi(yuebei)),
     ayanamsa: ayanamsa.toFixed(2),
     planetPositions,
-    mainMeaning: PLANET_MEANINGS[mainStar],
-    secondaryMeaning: PLANET_MEANINGS[secondary],
-    ephemeris: "meeus-approx",
-    summary: `七政：${house}；日${RASHI_CN[sunRashi]}月${RASHI_CN[moonRashi]}，木${RASHI_CN[longitudeToRashi(jupiter)]}土${RASHI_CN[longitudeToRashi(saturn)]}，罗睺${RASHI_CN[longitudeToRashi(rahu)]}。`,
-    caveat: `${EPHEMERIS_NOTE}命宫暂以月支宫位体系辅助，非完整分宫制。`,
+    // 身命二曜通行简化口径：日为命之曜、月为身之曜（完整宫主制依《果老》各派不一，暂不列）
+    mainStar: "日",
+    secondaryStar: "月",
+    mainStarNote: "身命二曜取通行简化口径（日命月身）；七政庙旺限度表流派分歧较大，暂不列。",
+    mainMeaning: PLANET_MEANINGS["日"],
+    secondaryMeaning: PLANET_MEANINGS["月"],
+    ephemeris: "astronomy-engine",
+    summary: `命宫${mingGongGz}；日${RASHI_CN[sunRashi]}（${palaceOf(sunRashi)}）月${RASHI_CN[moonRashi]}（${palaceOf(moonRashi)}），木${RASHI_CN[longitudeToRashi(jupiter)]}土${RASHI_CN[longitudeToRashi(saturn)]}，罗睺${RASHI_CN[longitudeToRashi(rahu)]}计都${RASHI_CN[longitudeToRashi(ketu)]}月孛${RASHI_CN[longitudeToRashi(yuebei)]}。`,
+    caveat: `${EPHEMERIS_NOTE} ${NODE_NOTE} 安命沿用卯起法，整宫顺布十二宫。`,
   };
 }

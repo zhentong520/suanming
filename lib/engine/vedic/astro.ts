@@ -96,10 +96,17 @@ export function planetMeanLongitude(jd: number, planet: PlanetKey): number {
   return planetTrueLongitude(jd, planet);
 }
 
-/** 升交点（罗睺）— 仍用解析近似 */
+/** 升交点（罗睺）— MEEUS 47.7 均值节点（平位置口径；与真节点差 ≤1.5°，事件插值因升降交替不可用，弃） */
 export function lunarNodeLongitude(jd: number): number {
   const n = jd - 2451545.0;
   return norm360(125.0445479 - 0.05295376 * n);
+}
+
+/** 月孛（月亮远地点）：MEEUS 47.A 近地点平黄经级数 + 180°，平位置口径（与罗睺均值同级） */
+export function moonApogeeLongitude(jd: number): number {
+  const T = (jd - 2451545.0) / 36525;
+  const perigee = 83.3532465 + 4069.0137287 * T - 0.01032 * T * T;
+  return norm360(perigee + 180);
 }
 
 export function wholeSignHouses(lagnaRashi: number): string[] {
@@ -145,6 +152,7 @@ export function longitudeToTimeOffset(longitude: number, standardMeridian = 120)
 export const EPHEMERIS_NOTE =
   "星历使用 astronomy-engine 地心黄经 + Lahiri 岁差（整宫制）；上升黄经按恒星时公式计算，非 Placidus。文化排盘可用。";
 
-export const NODE_NOTE = "罗睺/计都仍用解析近似升交点，非瑞士星历节点。";
+export const NODE_NOTE =
+  "罗睺/计都用 MEEUS 均值节点（平位置口径，与真节点差 ≤1.5°）；月孛用 MEEUS 近地点平黄经级数；紫炁无天文实体、历元各派不一，暂不列。";
 
 export { NAKSHATRA_ARC, RASHI_ARC };
