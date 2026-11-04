@@ -100,6 +100,14 @@ export interface LiuYaoXingResult {
   daXianPalace: string;
   /** 流年落宫 */
   liuNianPalace: string;
+  /** 流月干支 + 四化 + 月曜落宫（月禄/月羊/月陀/月昌/月曲/月魁/月钺/月鸾/月喜/月马） */
+  liuYueGanZhi: string;
+  liuYueMutagen: string[];
+  liuYueStars: Array<{ branch: string; stars: string[] }>;
+  /** 流日干支 + 四化 + 日曜落宫（日禄/日羊/日陀/日昌/日曲/日魁/日钺/日鸾/日喜/日马） */
+  liuRiGanZhi: string;
+  liuRiMutagen: string[];
+  liuRiStars: Array<{ branch: string; stars: string[] }>;
 }
 
 /** 流年/大限流曜（iztro horoscope）：流禄流羊流陀流昌流曲流魁流钺流鸾流喜流马十曜 + 流年四化 */
@@ -130,5 +138,11 @@ export function computeLiuYaoXing(params: {
     daXianStars: mapStars(hz.decadal.stars).filter((x) => x.stars.length > 0),
     daXianPalace: hz.decadal.name ?? "",
     liuNianPalace: hz.yearly.name ?? "",
+    liuYueGanZhi: `${hz.monthly.heavenlyStem}${hz.monthly.earthlyBranch}`,
+    liuYueMutagen: hz.monthly.mutagen ?? [],
+    liuYueStars: mapStars(hz.monthly.stars).filter((x) => x.stars.length > 0),
+    liuRiGanZhi: `${hz.daily.heavenlyStem}${hz.daily.earthlyBranch}`,
+    liuRiMutagen: hz.daily.mutagen ?? [],
+    liuRiStars: mapStars(hz.daily.stars).filter((x) => x.stars.length > 0),
   };
 }
