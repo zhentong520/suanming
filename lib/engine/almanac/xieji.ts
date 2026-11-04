@@ -12,6 +12,10 @@
  *         四离四绝（二分二至/四立之前一日）、建除十二神之破危闭；
  *   吉神：月德/月德合、天德/天德合、天赦（春戊寅夏甲午秋戊申冬甲子）、建除吉星（成开定收满）。
  *
+ * v2 扩容（+20，对标《协纪辨方书》月表与黄历通行软件）：
+ *   吉神：三合、六合、岁德/岁德合、母仓、天医、五富、黄道六神（青龙明堂金匮宝光玉堂司命）；
+ *   凶煞：劫煞/灾煞/月煞（月支三合局）、五墓、受死、血忌、重日、复日、黑道六神（天刑朱雀白虎天牢玄武勾陈）。
+ *
  * 仅供文化参考。
  */
 
@@ -202,6 +206,70 @@ export function computeXieJi(date: Date): XieJiResult {
     jiShen.push({ name: "天赦", kind: "吉", weight: 4, scope: "*", note: `${season}季天赦日（${tianShe[season]}），百煞潜藏，最吉` });
   }
 
+  // ---- 三合 / 六合（日支与月支） ----
+  const SAN_HE_SET: Record<string, string> = {
+    申: "水", 子: "水", 辰: "水",
+    寅: "火", 午: "火", 戌: "火",
+    巳: "金", 酉: "金", 丑: "金",
+    亥: "木", 卯: "木", 未: "木",
+  };
+  if (dayZhi !== monthZhi && SAN_HE_SET[dayZhi] === SAN_HE_SET[monthZhi]) {
+    jiShen.push({ name: "三合", kind: "吉", weight: 2, scope: "*", note: "日支与月支三合，和合之星，诸事皆宜" });
+  }
+  const LIU_HE: Record<string, string> = {
+    子: "丑", 丑: "子", 寅: "亥", 亥: "寅", 卯: "戌", 戌: "卯",
+    辰: "酉", 酉: "辰", 巳: "申", 申: "巳", 午: "未", 未: "午",
+  };
+  if (LIU_HE[monthZhi] === dayZhi) {
+    jiShen.push({ name: "六合", kind: "吉", weight: 2, scope: "*", note: "日支与月支六合，阴阳和合，宜嫁娶会友" });
+  }
+
+  // ---- 岁德 / 岁德合（按年干） ----
+  const yearGan = ec.getYearGan();
+  const isYangYearGan = "甲丙戊庚壬".includes(yearGan);
+  const suiDe = isYangYearGan ? yearGan : GAN_HE[yearGan];
+  const suiDeHe = isYangYearGan ? GAN_HE[yearGan] : yearGan;
+  if (dayGan === suiDe) {
+    jiShen.push({ name: "岁德", kind: "吉", weight: 3, scope: "*", note: "岁德临日，一年之德神，能御众煞" });
+  } else if (dayGan === suiDeHe) {
+    jiShen.push({ name: "岁德合", kind: "吉", weight: 2, scope: "*", note: "岁德合临日，吉力稍逊岁德" });
+  }
+
+  // ---- 母仓（按季节查日支：春亥子、夏寅卯、秋辰戌丑未、冬申酉） ----
+  const MU_CANG: Record<string, string[]> = {
+    春: ["亥", "子"], 夏: ["寅", "卯"], 秋: ["辰", "戌", "丑", "未"], 冬: ["申", "酉"],
+  };
+  if ((MU_CANG[season] ?? []).includes(dayZhi)) {
+    jiShen.push({ name: "母仓", kind: "吉", weight: 1, scope: "*", note: "母仓临日，宜种植纳畜安葬祭祀" });
+  }
+
+  // ---- 天医（月支顺一位） ----
+  if (dayZhi === ZHIS[(zhiIdx(monthZhi) + 1) % 12]) {
+    jiShen.push({ name: "天医", kind: "吉", weight: 2, scope: "求医", note: "天医临日，宜求医治病服药" });
+  }
+
+  // ---- 五富（月支逆三位） ----
+  if (dayZhi === ZHIS[(zhiIdx(monthZhi) - 3 + 12) % 12]) {
+    jiShen.push({ name: "五富", kind: "吉", weight: 1, scope: "*", note: "五富临日，宜开市纳财交易" });
+  }
+
+  // ---- 黄道六神（青龙起法口诀按月支定起点，顺排十二道） ----
+  const QI_LONG_START: Record<string, string> = {
+    子: "申", 午: "申", 卯: "寅", 酉: "寅",
+    寅: "子", 申: "子", 巳: "午", 亥: "午",
+    辰: "辰", 戌: "辰", 丑: "戌", 未: "戌",
+  };
+  const DAO_SHEN = ["青龙", "明堂", "天刑", "朱雀", "金匮", "宝光", "白虎", "玉堂", "天牢", "玄武", "司命", "勾陈"];
+  const HUANG_DAO = new Set(["青龙", "明堂", "金匮", "宝光", "玉堂", "司命"]);
+  const daoStart = zhiIdx(QI_LONG_START[monthZhi] ?? "申");
+  const daoOffset = ((zhiIdx(dayZhi) - daoStart) % 12 + 12) % 12;
+  const daoName = DAO_SHEN[daoOffset];
+  if (HUANG_DAO.has(daoName)) {
+    jiShen.push({ name: `黄道·${daoName}`, kind: "吉", weight: 2, scope: "*", note: `${daoName}黄道吉日，出入吉庆` });
+  } else {
+    xiongSha.push({ name: `黑道·${daoName}`, kind: "凶", weight: 1, scope: "*", note: `${daoName}黑道临日，大事宜择黄道` });
+  }
+
   // ---- 月破 ----
   const chongMonthZhi = ZHIS[(zhiIdx(monthZhi) + 6) % 12];
   if (dayZhi === chongMonthZhi) {
@@ -239,6 +307,63 @@ export function computeXieJi(date: Date): XieJiResult {
     xiongSha.push({ name: liJue, kind: "凶", weight: 4, scope: "*", note: `${liJue}日（节气前一 日），阴阳交替，忌出军征伐、出门远行` });
   }
 
+  // ---- 劫煞 / 灾煞 / 月煞（按月支三合局，协纪月表） ----
+  const YUE_Shape: Record<string, [string, string, string]> = {
+    申: ["巳", "午", "丑"], 子: ["巳", "午", "丑"], 辰: ["巳", "午", "丑"],
+    寅: ["亥", "子", "戌"], 午: ["亥", "子", "戌"], 戌: ["亥", "子", "戌"],
+    巳: ["寅", "卯", "未"], 酉: ["寅", "卯", "未"], 丑: ["寅", "卯", "未"],
+    亥: ["申", "酉", "辰"], 卯: ["申", "酉", "辰"], 未: ["申", "酉", "辰"],
+  };
+  const [jieZhi, zaiZhi, yueShaZhi] = YUE_Shape[monthZhi] ?? ["", "", ""];
+  if (dayZhi === jieZhi) {
+    xiongSha.push({ name: "劫煞", kind: "凶", weight: 2, scope: "*", note: "劫煞临日，防劫夺破财" });
+  }
+  if (dayZhi === zaiZhi) {
+    xiongSha.push({ name: "灾煞", kind: "凶", weight: 2, scope: "*", note: "灾煞临日，防灾伤疾厄" });
+  }
+  if (dayZhi === yueShaZhi) {
+    xiongSha.push({ name: "月煞", kind: "凶", weight: 1, scope: "*", note: "月煞临日，防六亲刑伤" });
+  }
+
+  // ---- 五墓（按季节日干支） ----
+  const WU_MU: Record<string, string> = { 春: "乙未", 夏: "丙戌", 秋: "辛丑", 冬: "壬辰" };
+  if (dayGZ === WU_MU[season]) {
+    xiongSha.push({ name: "五墓", kind: "凶", weight: 2, scope: "*", note: `${season}季五墓日（${dayGZ}），营建出征皆不利` });
+  }
+
+  // ---- 受死（按月支查日支） ----
+  const SHOU_SI: Record<string, string> = {
+    寅: "戌", 卯: "辰", 辰: "亥", 巳: "巳", 午: "子", 未: "午",
+    申: "丑", 酉: "未", 戌: "寅", 亥: "申", 子: "卯", 丑: "酉",
+  };
+  if (dayZhi === SHOU_SI[monthZhi]) {
+    xiongSha.push({ name: "受死", kind: "凶", weight: 3, scope: "*", note: "受死临日，忌祭祀求医纳采" });
+  }
+
+  // ---- 血忌（按月支查日支，忌针灸出血） ----
+  const XUE_JI: Record<string, string> = {
+    寅: "丑", 卯: "未", 辰: "寅", 巳: "申", 午: "卯", 未: "酉",
+    申: "辰", 酉: "戌", 戌: "巳", 亥: "亥", 子: "午", 丑: "子",
+  };
+  if (dayZhi === XUE_JI[monthZhi]) {
+    xiongSha.push({ name: "血忌", kind: "凶", weight: 2, scope: "求医", note: "血忌临日，忌针灸针刺出血" });
+  }
+
+  // ---- 重日（巳亥日） ----
+  if (dayZhi === "巳" || dayZhi === "亥") {
+    xiongSha.push({ name: "重日", kind: "凶", weight: 1, scope: "*", note: "重日临日，吉事再吉、凶事再凶，大事宜避重复之弊" });
+  }
+
+  // ---- 复日（按月支查日干） ----
+  const FU_RI: Record<string, string[]> = {
+    寅: ["甲", "庚"], 卯: ["乙", "辛"], 辰: ["戊", "己"], 巳: ["丙", "壬"],
+    午: ["丁", "癸"], 未: ["戊", "己"], 申: ["甲", "庚"], 酉: ["乙", "辛"],
+    戌: ["戊", "己"], 亥: ["丙", "壬"], 子: ["丁", "癸"], 丑: ["戊", "己"],
+  };
+  if ((FU_RI[monthZhi] ?? []).includes(dayGan)) {
+    xiongSha.push({ name: "复日", kind: "凶", weight: 1, scope: "*", note: "复日临日，事有重复之象，吉则再吉、凶则重凶" });
+  }
+
   // ---- 打分与总纲裁定 ----
   const jiScore = jiShen.reduce((s, x) => s + x.weight, 0);
   const xiongScore = xiongSha.reduce((s, x) => s + Math.abs(x.weight), 0);
@@ -251,7 +376,8 @@ export function computeXieJi(date: Date): XieJiResult {
     basis = hardVeto
       ? `大凶之日（${xiongSha.map((x) => x.name).join("、")}），诸事皆忌——「凶又逢凶，遇德仍诸事皆忌」。${ZONG_GANG}`
       : `吉不足胜凶，从忌不从宜。${ZONG_GANG}`;
-  } else if (xiongScore > 0 && Math.abs(jiScore - xiongScore) <= 3) {
+  } else if (xiongScore > 0 && xiongScore >= 2 && Math.abs(jiScore - xiongScore) <= 3) {
+    // 总纲权变：小煞（weight<2）遇吉星照临即可用，不入相抵档
     level = "平";
     basis = `吉凶相抵，德喜之事仍忌——遇德（${jiShen.map((x) => x.name).join("、") || "无"})则从宜，不遇则大事仍避。${ZONG_GANG}`;
   } else {
@@ -271,7 +397,7 @@ export function computeXieJi(date: Date): XieJiResult {
     if (veto || scopedXiong > globalJi + 3) {
       return { activity, level: "忌", note: `凶煞当值（${scoped.map((x) => x.name).join("、")}），${activity}从忌` };
     }
-    if (scopedXiong > 0 && Math.abs(globalJi - scopedXiong) <= 3) {
+    if (scopedXiong > 0 && scopedXiong >= 2 && Math.abs(globalJi - scopedXiong) <= 3) {
       return { activity, level: "平", note: `${activity}吉凶相抵，遇德可从宜，大事仍慎` };
     }
     return { activity, level: "宜", note: `${activity}吉足胜凶，可行` };
