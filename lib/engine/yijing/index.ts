@@ -73,6 +73,7 @@ export function computeLiuyao(question?: string, date?: Date, manualLines?: YaoL
     lines: binaryLines,
     dayGan,
     dayZhi,
+    monthZhi,
     changingYao: movingPositions,
   });
 
@@ -82,7 +83,7 @@ export function computeLiuyao(question?: string, date?: Date, manualLines?: YaoL
   );
   const changedNajia =
     movingPositions.length > 0
-      ? buildLiuyaoNajia({ lines: changedBinary, dayGan, dayZhi }).yao
+      ? buildLiuyaoNajia({ lines: changedBinary, dayGan, dayZhi, monthZhi }).yao
       : [];
   const duanGua = analyzeLiuyao({
     question: question ?? "",

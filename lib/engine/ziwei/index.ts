@@ -18,6 +18,8 @@ import {
   formatFeiXingSummary,
   interpretFeiXingClash,
 } from "./feixing";
+import { computeBoShiShiErShen, formatBoShiSummary } from "./boshi";
+import { computeIztroAstrolabe, computeLiuYaoXing } from "./iztro-bridge";
 
 export function computeZiwei(input: BirthInput) {
   const chart = buildBirthChartCore(input);
@@ -108,6 +110,20 @@ export function computeZiwei(input: BirthInput) {
     const bIdx = BRANCHES.indexOf(s.branch as (typeof BRANCHES)[number]);
     return bIdx === mingIdx;
   });
+  // 博士十二神：禄存起博士，阳男阴女顺、阴男阳女逆（《全书》通行安法）
+  const boShiShiErShen = computeBoShiShiErShen(yearGan, gender, mingIdx);
+  // iztro（MIT 开源）全量星曜桥接：乙级星/截空旬空/长生·博士·岁前·将前十二神，覆盖 100+ 颗
+  const iztro = computeIztroAstrolabe({
+    solarYmd: solar.toYmd(),
+    hourZhiIdx: hourZhiIdx >= 0 ? hourZhiIdx : 0,
+    gender,
+  });
+  // 流曜十星 + 流年四化（iztro horoscope，与本项目自算流年四化互为交叉验证）
+  const liuYaoXing = computeLiuYaoXing({
+    solarYmd: solar.toYmd(),
+    hourZhiIdx: hourZhiIdx >= 0 ? hourZhiIdx : 0,
+    gender,
+  });
   const mainInMing = mingStars.map((s) => `${s.star}(${s.brightness})`).join("、");
 
   const palaceOrder = ["命宫", "兄弟", "夫妻", "子女", "财帛", "疾厄", "迁移", "仆役", "官禄", "田宅", "福德", "父母"];
@@ -116,12 +132,14 @@ export function computeZiwei(input: BirthInput) {
     const aux = auxStars.filter((a) => a.palace === name).map((a) => a.star);
     const hua = sihua.filter((s) => s.palace === name).map((s) => `${s.star}化${s.hua}`);
     const stem = palaceStems.find((p) => p.palace === name);
+    const starsFull = iztro.palaceFullStars[name] ?? [];
     return {
       palace: name,
       ganZhi: stem?.ganZhi,
       mainStars: main,
       auxStars: aux,
       siHua: hua,
+      starsFull,
       text: [...main, ...aux, ...hua].join("、") || "空宫",
     };
   });
@@ -135,17 +153,32 @@ export function computeZiwei(input: BirthInput) {
     ziweiPos: ziweiBranch,
     tianfuPos: tianfuBranch,
     lunarDay,
-    mingZhu: mingStars[0]?.star ?? "无主星",
-    shenZhu: auxStars.find((a) => a.star === "天马")?.star ?? mainStars[6]?.star ?? "天府",
+    mingZhu: iztro.soulStar,
+    shenZhu: iztro.bodyStar,
     stars: mainStars,
     auxiliaryStars: auxStars,
     palaces,
     palaceStems,
     siHua: sihua,
+    siHuaNote:
+      yearGan === "戊" || yearGan === "壬"
+        ? "戊/壬干之右弼/左辅化科为通行本取法；中州派主张左右辅弼不参与四化（流派分歧，此处按《全书》通行本）"
+        : undefined,
     daXianSiHua: fei.daXianSiHua,
     liuNianSiHua: fei.liuNianSiHua,
     liuYueSiHua: fei.liuYueSiHua,
     liuRiSiHua: fei.liuRiSiHua,
+    boShiShiErShen,
+    boShiSummary: formatBoShiSummary(boShiShiErShen),
+    // iztro 全量扩展
+    mingZhuStar: iztro.soulStar,
+    shenZhuStar: iztro.bodyStar,
+    changSheng12Zw: iztro.changSheng12,
+    boShi12Zw: iztro.boShi12,
+    suiQian12: iztro.suiQian12,
+    jiangQian12: iztro.jiangQian12,
+    liuYaoXing,
+    fullStarCount: new Set(Object.values(iztro.palaceFullStars).flat().map((s) => s.replace(/\(.*\)|\[.*\]/g, ""))).size,
     feiXing: fei.feiXing,
     feiXingSummary: formatFeiXingSummary(fei.feiXing),
     feiXingClash: interpretFeiXingClash(fei.feiXing),

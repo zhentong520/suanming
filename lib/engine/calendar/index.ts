@@ -299,6 +299,7 @@ export function getAlmanacForDate(date?: Date) {
   const d = date ?? new Date();
   const solar = Solar.fromDate(d);
   const lunar = solar.getLunar();
+  const eightChar = lunar.getEightChar();
   return {
     date: solar.toYmd(),
     lunarDate: `${lunar.getYearInChinese()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`,
@@ -311,5 +312,20 @@ export function getAlmanacForDate(date?: Date) {
     wuXing: lunar.getDayNaYin(),
     pengZu: `${lunar.getPengZuGan()} ${lunar.getPengZuZhi()}`,
     shengXiao: lunar.getDayShengXiao(),
+    /** 当日四柱干支（以当前时辰为时柱），供首页大字展示 */
+    pillars: {
+      year: eightChar.getYear(),
+      month: eightChar.getMonth(),
+      day: eightChar.getDay(),
+      time: eightChar.getTime(),
+    },
+    /** 二十八宿：宿 / 七政 / 禽兽 / 宫位 / 吉凶（黄历传统标注） */
+    xiu: {
+      xiu: lunar.getXiu(),
+      zheng: lunar.getZheng(),
+      animal: lunar.getAnimal(),
+      gong: lunar.getGong(),
+      luck: lunar.getXiuLuck(),
+    },
   };
 }

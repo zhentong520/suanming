@@ -190,6 +190,10 @@ export interface YaoDetail {
   isShi: boolean;
   isYing: boolean;
   fuShen?: FuShen;
+  /** 爻支落于日旬空 */
+  xunKong?: boolean;
+  /** 爻支被月建冲破（月破） */
+  yuePo?: boolean;
 }
 
 export function detectLiuChongHe(upper: string, lower: string): { chong: boolean; he: boolean; note: string } {
@@ -273,6 +277,7 @@ export function buildLiuyaoNajia(input: {
   lines: number[];
   dayGan: string;
   dayZhi?: string;
+  monthZhi?: string;
   changingYao?: number[];
 }): {
   yao: YaoDetail[];
@@ -285,6 +290,8 @@ export function buildLiuyaoNajia(input: {
   fuShen: FuShen[];
   liuChongHe: { chong: boolean; he: boolean; note: string };
   dayChen: string;
+  xunKongZhi: string[];
+  yuePoZhi: string;
 } {
   const { upper, lower } = linesToTrigrams(input.lines);
   const { shi, ying, palace, role } = shiYingPositions(upper, lower, input.lines);
@@ -329,7 +336,49 @@ export function buildLiuyaoNajia(input: {
     y.liuQin = liuQinOf(palaceWx, ZHI_WX[y.zhi] ?? "土");
   }
 
-  return { yao, upper, lower, shi, ying, palace, role, fuShen, liuChongHe, dayChen };
+  // 旬空 / 月破（《增删卜易》核心旺衰要素）
+  const ZHI_ALL = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+  const GAN_ALL = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+  const XUN_KONG: Record<string, string[]> = {
+    "甲子": ["戌", "亥"], "甲戌": ["申", "酉"], "甲申": ["午", "未"],
+    "甲午": ["辰", "巳"], "甲辰": ["寅", "卯"], "甲寅": ["子", "丑"],
+  };
+  let xunKongZhi: string[] = [];
+  const dayZhiV = input.dayZhi ?? "";
+  const gi = GAN_ALL.indexOf(input.dayGan);
+  const zi = ZHI_ALL.indexOf(dayZhiV);
+  if (gi >= 0 && zi >= 0) {
+    // 旬首：日支退 (干支差) 位
+    const xunStart = (zi - gi + 12) % 12;
+    const xunName = `甲${ZHI_ALL[xunStart]}`;
+    xunKongZhi = XUN_KONG[xunName] ?? [];
+  }
+  const CHONG: Record<string, string> = {
+    子: "午", 午: "子", 丑: "未", 未: "丑", 寅: "申", 申: "寅",
+    卯: "酉", 酉: "卯", 辰: "戌", 戌: "辰", 巳: "亥", 亥: "巳",
+  };
+  const yuePoZhi = input.monthZhi ? (CHONG[input.monthZhi] ?? "") : "";
+  if (xunKongZhi.length || yuePoZhi) {
+    for (const y of yao) {
+      if (xunKongZhi.includes(y.zhi)) y.xunKong = true;
+      if (yuePoZhi && y.zhi === yuePoZhi) y.yuePo = true;
+    }
+  }
+
+  return {
+    yao,
+    upper,
+    lower,
+    shi,
+    ying,
+    palace,
+    role,
+    fuShen,
+    liuChongHe,
+    dayChen,
+    xunKongZhi,
+    yuePoZhi,
+  };
 }
 
 export function liuQinSummary(yao: YaoDetail[], extra?: { fuShen?: FuShen[]; liuChongHe?: string; dayChen?: string }): string {
@@ -351,6 +400,18 @@ export function liuQinSummary(yao: YaoDetail[], extra?: { fuShen?: FuShen[]; liu
   }
   if (extra?.liuChongHe) parts.push(extra.liuChongHe);
   if (extra?.dayChen) parts.push(extra.dayChen);
+  const kongYao = yao.filter((y) => y.xunKong);
+  const poYao = yao.filter((y) => y.yuePo);
+  if (kongYao.length) {
+    parts.push(
+      `旬空：${kongYao.map((y) => `${y.name}${y.liuQin}${y.najia}`).join("、")}落旬空，空则气散，用神逢空须待出空填实方应。`,
+    );
+  }
+  if (poYao.length) {
+    parts.push(
+      `月破：${poYao.map((y) => `${y.name}${y.liuQin}${y.najia}`).join("、")}被月建冲破，破则无力，近事凶险、出月逢合可解。`,
+    );
+  }
   return parts.join("");
 }
 

@@ -318,6 +318,14 @@ export function buildBaziInterpretation(bazi: BaziResult, gender?: string) {
           },
         ]
       : []),
+    ...(bazi.sanJia
+      ? [
+          {
+            title: "胎元命宫身宫与空亡",
+            content: bazi.sanJia.notes.join("\n"),
+          },
+        ]
+      : []),
     ...(bazi.ganZhiGuanXi && bazi.ganZhiGuanXi.summary !== "四柱干支未见明显合冲刑害，以旺衰喜用为断。"
       ? [
           {

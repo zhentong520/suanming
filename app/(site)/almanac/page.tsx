@@ -22,6 +22,7 @@ function formatAlmanacFacts(facts: ReturnType<typeof computeAlmanac>) {
     avoid: facts.avoid,
     personalHint: facts.personalHint,
     jiuXing: facts.jiuXing,
+    xiu: facts.xiu,
   };
 }
 
@@ -69,6 +70,15 @@ function AlmanacDisplay({
               <strong>日九星</strong>
               <p>
                 {facts.jiuXing.name} · {facts.jiuXing.nature} · {facts.jiuXing.tip}
+              </p>
+            </div>
+          )}
+          {facts.xiu && (
+            <div>
+              <strong>二十八宿</strong>
+              <p>
+                {facts.xiu.xiu}宿属{facts.xiu.zheng} · 禽{facts.xiu.animal} · 居
+                {facts.xiu.gong}方 · {facts.xiu.luck}
               </p>
             </div>
           )}

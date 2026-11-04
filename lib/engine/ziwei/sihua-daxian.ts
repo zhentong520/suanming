@@ -7,7 +7,7 @@ export interface SiHua {
   palace?: string;
 }
 
-const SI_HUA_TABLE: Record<string, SiHua[]> = {
+export const SI_HUA_TABLE: Record<string, SiHua[]> = {
   甲: [
     { star: "廉贞", hua: "禄" },
     { star: "破军", hua: "权" },
