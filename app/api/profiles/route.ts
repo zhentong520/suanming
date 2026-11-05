@@ -61,6 +61,20 @@ export async function POST(request: Request) {
       body.ziweiBrightnessSchool === "xiandai2"
         ? String(body.ziweiBrightnessSchool)
         : null,
+    ziweiGengSihua:
+      body.ziweiGengSihua === "GYWTY" ||
+      body.ziweiGengSihua === "GYWFT" ||
+      body.ziweiGengSihua === "GYWFX" ||
+      body.ziweiGengSihua === "GYWTX"
+        ? String(body.ziweiGengSihua)
+        : null,
+    ziweiTianmaSchool: body.ziweiTianmaSchool === "month-branch" ? "month-branch" : null,
+    ziweiKuiyueSchool:
+      body.ziweiKuiyueSchool === "qs2" || body.ziweiKuiyueSchool === "qs3" || body.ziweiKuiyueSchool === "qs4"
+        ? String(body.ziweiKuiyueSchool)
+        : null,
+    ziweiLeapMonth:
+      body.ziweiLeapMonth === "origin" || body.ziweiLeapMonth === "next" ? String(body.ziweiLeapMonth) : null,
     leapMonth: body.calendarType === "lunar" && body.isLeapMonth === true,
     createdAt: now,
     updatedAt: now,

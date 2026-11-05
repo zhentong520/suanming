@@ -103,6 +103,10 @@ export default function ProfilesPage() {
           useTrueSolar: fd.get("useTrueSolar") !== "off",
           ziweiSihuaSchool: fd.get("ziweiSihuaSchool") || null,
           ziweiBrightnessSchool: fd.get("ziweiBrightnessSchool") || null,
+          ziweiGengSihua: fd.get("ziweiGengSihua") || null,
+          ziweiTianmaSchool: fd.get("ziweiTianmaSchool") || null,
+          ziweiKuiyueSchool: fd.get("ziweiKuiyueSchool") || null,
+          ziweiLeapMonth: fd.get("ziweiLeapMonth") || null,
           setAsActive: true,
         }),
       });
@@ -262,6 +266,40 @@ export default function ProfilesPage() {
               <option value="xiandai">现代修正一（通行软件修正口径）</option>
               <option value="zhongzhou">中州派（五档庙旺平闲陷）</option>
               <option value="xiandai2">现代修正二</option>
+            </select>
+          </label>
+          <label>
+            庚年四化变体
+            <select name="ziweiGengSihua" defaultValue="GYWYT">
+              <option value="GYWYT">阳武阴同（通行本，默认）</option>
+              <option value="GYWTY">阳武同阴（《全书》天同不化忌）</option>
+              <option value="GYWFT">阳武府同（中州派）</option>
+              <option value="GYWFX">阳武府相（天相化忌说）</option>
+              <option value="GYWTX">阳武同相（北派）</option>
+            </select>
+          </label>
+          <label>
+            天马安法
+            <select name="ziweiTianmaSchool" defaultValue="year-branch">
+              <option value="year-branch">年支起（通行）</option>
+              <option value="month-branch">月支起</option>
+            </select>
+          </label>
+          <label>
+            魁钺安诀
+            <select name="ziweiKuiyueSchool" defaultValue="qs1">
+              <option value="qs1">通行诀（甲戊庚牛羊，默认）</option>
+              <option value="qs2">诀二（庚辛午寅）</option>
+              <option value="qs3">诀三（庚辛寅午）</option>
+              <option value="qs4">诀四（辛午寅·癸巳卯）</option>
+            </select>
+          </label>
+          <label>
+            闰月归属
+            <select name="ziweiLeapMonth" defaultValue="split">
+              <option value="split">月中分界（前15本月/后15次月，默认）</option>
+              <option value="origin">整月归本月</option>
+              <option value="next">整月归次月（倪师派）</option>
             </select>
           </label>
           <label>

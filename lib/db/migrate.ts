@@ -272,6 +272,18 @@ function runColumnMigrations(db: Database.Database) {
   if (!profileCols.some((c) => c.name === "ziwei_brightness_school")) {
     db.exec("ALTER TABLE profiles ADD COLUMN ziwei_brightness_school TEXT");
   }
+  if (!profileCols.some((c) => c.name === "ziwei_geng_sihua")) {
+    db.exec("ALTER TABLE profiles ADD COLUMN ziwei_geng_sihua TEXT");
+  }
+  if (!profileCols.some((c) => c.name === "ziwei_tianma_school")) {
+    db.exec("ALTER TABLE profiles ADD COLUMN ziwei_tianma_school TEXT");
+  }
+  if (!profileCols.some((c) => c.name === "ziwei_kuiyue_school")) {
+    db.exec("ALTER TABLE profiles ADD COLUMN ziwei_kuiyue_school TEXT");
+  }
+  if (!profileCols.some((c) => c.name === "ziwei_leap_month")) {
+    db.exec("ALTER TABLE profiles ADD COLUMN ziwei_leap_month TEXT");
+  }
 
   const userCols2 = db.prepare("PRAGMA table_info(users)").all() as Array<{ name: string }>;
   if (!userCols2.some((c) => c.name === "allow_life_insights")) {

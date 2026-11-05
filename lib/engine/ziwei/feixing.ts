@@ -131,19 +131,20 @@ export function computeFeiXingBundle(input: {
   liuRiGan?: string;
   allStars: Array<{ star: string; palace: string; branch?: string; brightness?: string }>;
   school?: import("./sihua-schools").SihuaSchool;
+  gengVariant?: import("./zayao-schools").GengSihua;
 }) {
-  const birth = attachSiHuaPalace(getSiHua(input.yearGan, input.school), input.allStars);
+  const birth = attachSiHuaPalace(getSiHua(input.yearGan, input.school, input.gengVariant), input.allStars);
   const daXianSiHua = input.daXianGan
-    ? attachSiHuaPalace(getSiHua(input.daXianGan, input.school), input.allStars)
+    ? attachSiHuaPalace(getSiHua(input.daXianGan, input.school, input.gengVariant), input.allStars)
     : [];
   const liuNianSiHua = input.liuNianGan
-    ? attachSiHuaPalace(getSiHua(input.liuNianGan, input.school), input.allStars)
+    ? attachSiHuaPalace(getSiHua(input.liuNianGan, input.school, input.gengVariant), input.allStars)
     : [];
   const liuYueSiHua = input.liuYueGan
-    ? attachSiHuaPalace(getSiHua(input.liuYueGan, input.school), input.allStars)
+    ? attachSiHuaPalace(getSiHua(input.liuYueGan, input.school, input.gengVariant), input.allStars)
     : [];
   const liuRiSiHua = input.liuRiGan
-    ? attachSiHuaPalace(getSiHua(input.liuRiGan, input.school), input.allStars)
+    ? attachSiHuaPalace(getSiHua(input.liuRiGan, input.school, input.gengVariant), input.allStars)
     : [];
 
   const feiXing = [

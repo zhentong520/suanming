@@ -18,6 +18,14 @@ export interface BirthInput {
   ziweiSihuaSchool?: string;
   /** 紫微主星亮度流派：quanshu=全书派（默认，同 iztro）/ xiandai / zhongzhou / xiandai2 */
   ziweiBrightnessSchool?: string;
+  /** 庚干生年四化变体：GYWYT（默认）/GYWTY/GYWFT/GYWFX/GYWTX */
+  ziweiGengSihua?: string;
+  /** 天马安法：year-branch（年支，默认）/ month-branch（月支） */
+  ziweiTianmaSchool?: string;
+  /** 魁钺安诀变体：qs1（默认）/qs2/qs3/qs4 */
+  ziweiKuiyueSchool?: string;
+  /** 闰月归属：split（月中分界，默认）/ origin（归本月）/ next（归次月） */
+  ziweiLeapMonth?: string;
   /** 出生地名称（展示用） */
   location?: string;
   /**

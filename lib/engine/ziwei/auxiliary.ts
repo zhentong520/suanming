@@ -1,5 +1,6 @@
 /** 紫微辅星安星规则 */
 import { BRANCHES, branchAtOffset, mingGongPalaceIndex, palaceNameFromBranch } from "./placement";
+import { kuiYueBranches, tianMaBranch, type KuiyueSchool, type TianmaSchool } from "./zayao-schools";
 
 export interface AuxStar {
   star: string;
@@ -30,22 +31,9 @@ export function zuoYouFu(lunarMonth: number, mingIdx: number): AuxStar[] {
   ];
 }
 
-const KUI_YUE: Record<string, [number, number]> = {
-  甲: [1, 7],
-  戊: [1, 7],
-  庚: [1, 7],
-  乙: [0, 8],
-  己: [0, 8],
-  丙: [11, 9],
-  丁: [11, 9],
-  壬: [3, 5],
-  癸: [3, 5],
-  辛: [6, 2],
-};
-
-/** 天魁天钺 */
-export function kuiYue(yearGan: string, mingIdx: number): AuxStar[] {
-  const [kui, yue] = KUI_YUE[yearGan] ?? [1, 7];
+/** 天魁天钺（可切换安诀变体） */
+export function kuiYue(yearGan: string, mingIdx: number, school: KuiyueSchool = "qs1"): AuxStar[] {
+  const [kui, yue] = kuiYueBranches(yearGan, school);
   return [
     { star: "天魁", branch: BRANCHES[kui], palace: palaceNameFromBranch(mingIdx, kui), category: "魁钺系" },
     { star: "天钺", branch: BRANCHES[yue], palace: palaceNameFromBranch(mingIdx, yue), category: "魁钺系" },
@@ -77,19 +65,13 @@ export function luYangTuo(yearGan: string, mingIdx: number): AuxStar[] {
   ];
 }
 
-/** 天马：申子辰→寅，寅午戌→申，亥卯未→巳，巳酉丑→亥 */
-export function tianMa(yearZhiIdx: number, mingIdx: number): AuxStar {
-  const groups = [
-    { zhi: [8, 0, 4], ma: 2 },
-    { zhi: [2, 6, 10], ma: 8 },
-    { zhi: [11, 3, 7], ma: 5 },
-    { zhi: [5, 9, 1], ma: 11 },
-  ];
-  const g = groups.find((x) => x.zhi.includes(yearZhiIdx)) ?? groups[0];
+/** 天马：年支起（通行）或月支起（流派口径） */
+export function tianMa(yearZhiIdx: number, mingIdx: number, school: TianmaSchool = "year-branch"): AuxStar {
+  const ma = tianMaBranch(yearZhiIdx);
   return {
     star: "天马",
-    branch: BRANCHES[g.ma],
-    palace: palaceNameFromBranch(mingIdx, g.ma),
+    branch: BRANCHES[ma],
+    palace: palaceNameFromBranch(mingIdx, ma),
     category: "禄马系",
   };
 }
@@ -227,15 +209,22 @@ export function placeAuxiliaryStars(
   lunarMonth: number,
   hourZhiIdx: number,
   mingGongGz: string,
-  lunarDay = 1
+  lunarDay = 1,
+  options: { tianma?: TianmaSchool; kuiyue?: KuiyueSchool } = {}
 ): AuxStar[] {
   const mingIdx = mingGongPalaceIndex(mingGongGz);
   return [
     ...wenChangQu(hourZhiIdx, mingIdx),
     ...zuoYouFu(lunarMonth, mingIdx),
-    ...kuiYue(yearGan, mingIdx),
+    ...kuiYue(yearGan, mingIdx, options.kuiyue ?? "qs1"),
     ...luYangTuo(yearGan, mingIdx),
-    tianMa(yearZhiIdx, mingIdx),
+    // 天马：年支起（通行）或月支起（寅起正月顺数至斗数月的月支）
+    tianMa(
+      options.tianma === "month-branch"
+        ? (2 + Math.min(12, Math.max(1, lunarMonth)) - 1) % 12
+        : yearZhiIdx,
+      mingIdx
+    ),
     ...huoLingXing(yearZhiIdx, hourZhiIdx, mingIdx),
     ...kongJie(hourZhiIdx, mingIdx),
     ...hongLuanTianXi(yearZhiIdx, mingIdx),

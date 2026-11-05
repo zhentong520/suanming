@@ -21,6 +21,10 @@ export interface UserProfile {
   useTrueSolar?: boolean | null;
   ziweiSihuaSchool?: string | null;
   ziweiBrightnessSchool?: string | null;
+  ziweiGengSihua?: string | null;
+  ziweiTianmaSchool?: string | null;
+  ziweiKuiyueSchool?: string | null;
+  ziweiLeapMonth?: string | null;
   leapMonth?: boolean | null;
   createdAt: string;
 }

@@ -225,6 +225,17 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
   if (typeof facts.brightnessSchoolName === "string") {
     lines.push(`亮度流派: ${facts.brightnessSchoolName}（主星庙旺标注按该派口径）`);
   }
+  const zayaoParts: string[] = [];
+  if (typeof facts.tianmaSchoolName === "string" && facts.tianmaSchoolName !== "年支起（默认）") {
+    zayaoParts.push(`天马${facts.tianmaSchoolName}`);
+  }
+  if (typeof facts.kuiyueSchoolName === "string" && facts.kuiyueSchoolName !== "通行诀（默认）") {
+    zayaoParts.push(`魁钺${facts.kuiyueSchoolName}`);
+  }
+  if (typeof facts.leapMonthSchoolName === "string") {
+    zayaoParts.push(`闰月${facts.leapMonthSchoolName}`);
+  }
+  if (zayaoParts.length) lines.push(`杂曜口径: ${zayaoParts.join("；")}`);
 
   // 紫微全量星曜（iztro 桥接，乙级星+杂耀+亮度+生年化）
   if (Array.isArray(facts.palaces)) {

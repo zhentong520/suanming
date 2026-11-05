@@ -79,6 +79,14 @@ export const profiles = sqliteTable("profiles", {
   ziweiSihuaSchool: text("ziwei_sihua_school"),
   /** 紫微主星亮度流派：quanshu（默认）/xiandai/zhongzhou/xiandai2 */
   ziweiBrightnessSchool: text("ziwei_brightness_school"),
+  /** 庚干四化变体：GYWYT（默认）/GYWTY/GYWFT/GYWFX/GYWTX */
+  ziweiGengSihua: text("ziwei_geng_sihua"),
+  /** 天马安法：year-branch（默认）/month-branch */
+  ziweiTianmaSchool: text("ziwei_tianma_school"),
+  /** 魁钺安诀变体：qs1（默认）/qs2/qs3/qs4 */
+  ziweiKuiyueSchool: text("ziwei_kuiyue_school"),
+  /** 闰月归属：split（默认）/origin/next */
+  ziweiLeapMonth: text("ziwei_leap_month"),
   /** 农历生日是否闰月（calendarType=lunar 时生效） */
   leapMonth: integer("leap_month", { mode: "boolean" }).default(false),
   createdAt: text("created_at").notNull(),

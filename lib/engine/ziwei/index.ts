@@ -23,7 +23,6 @@ import { computeIztroAstrolabe, computeLiuYaoXing } from "./iztro-bridge";
 import {
   normalizeSihuaSchool,
   SIHUA_SCHOOL_META,
-  mutagenMapBySchool,
   schoolAffectsGan,
 } from "./sihua-schools";
 import {
@@ -33,10 +32,26 @@ import {
   schoolMainBrightness,
   brightnessSchoolAffects,
 } from "./brightness-schools";
+import {
+  normalizeGengSihua,
+  normalizeKuiyueSchool,
+  normalizeLeapMonthSchool,
+  normalizeTianmaSchool,
+  GENG_SI_HUA_META,
+  KUIYUE_SCHOOL_META,
+  LEAP_MONTH_META,
+  TIANMA_SCHOOL_META,
+  effectiveDouMonth,
+  type GengSihua,
+} from "./zayao-schools";
 
 export function computeZiwei(input: BirthInput) {
   const sihuaSchool = normalizeSihuaSchool(input.ziweiSihuaSchool);
   const brightnessSchool = normalizeBrightnessSchool(input.ziweiBrightnessSchool);
+  const gengVariant = normalizeGengSihua(input.ziweiGengSihua);
+  const tianmaSchool = normalizeTianmaSchool(input.ziweiTianmaSchool);
+  const kuiyueSchool = normalizeKuiyueSchool(input.ziweiKuiyueSchool);
+  const leapSchool = normalizeLeapMonthSchool(input.ziweiLeapMonth);
   const chart = buildBirthChartCore(input);
   const { lunar, solar, eightChar } = chart;
   // 斗数命宫/身宫：《全书》安命身宫诀（寅起正月顺数生月，月宫起子逆/顺数生时），
@@ -47,8 +62,10 @@ export function computeZiwei(input: BirthInput) {
   const yearGan = douYearGZ[0];
   const yearZhiIdx = BRANCHES.indexOf(douYearGZ[1] as (typeof BRANCHES)[number]);
   const hourZhiIdx = BRANCHES.indexOf(eightChar.getTimeZhi() as (typeof BRANCHES)[number]);
+  // 闰月归属口径 → 斗数有效月序（命宫与月系星共用）
+  const douMonth = effectiveDouMonth(lunar.getMonth(), lunar.getDay(), leapSchool);
   const gong = douShuMingShenGong(
-    Math.abs(lunar.getMonth()) || 1,
+    douMonth,
     hourZhiIdx >= 0 ? hourZhiIdx : 0,
     yearGan
   );
@@ -67,17 +84,18 @@ export function computeZiwei(input: BirthInput) {
   const auxStars = placeAuxiliaryStars(
     yearGan,
     yearZhiIdx >= 0 ? yearZhiIdx : 0,
-    lunar.getMonth(),
+    douMonth,
     hourZhiIdx >= 0 ? hourZhiIdx : 0,
     mingGongGz,
-    lunarDay
+    lunarDay,
+    { tianma: tianmaSchool, kuiyue: kuiyueSchool }
   );
 
   const allStars = [
     ...mainStars,
     ...auxStars.map((a) => ({ star: a.star, palace: a.palace, branch: a.branch, brightness: "辅" })),
   ];
-  const sihua = attachSiHuaPalace(getSiHua(yearGan, sihuaSchool), allStars);
+  const sihua = attachSiHuaPalace(getSiHua(yearGan, sihuaSchool, gengVariant), allStars);
 
   const birthYear = solar.getYear();
   const currentAge = new Date().getFullYear() - birthYear + 1;
@@ -103,9 +121,9 @@ export function computeZiwei(input: BirthInput) {
   const todayEc = todayLunar.getEightChar();
   const todayMonth = Math.abs(todayLunar.getMonth()) || 1;
   const todayDay = todayLunar.getDay();
-  const liuYue = computeLiuYue(liuNianIdx, todayMonth, mingIdx, todayEc.getMonth(), sihuaSchool);
+  const liuYue = computeLiuYue(liuNianIdx, todayMonth, mingIdx, todayEc.getMonth(), sihuaSchool, gengVariant);
   const liuYueIdx = (liuNianIdx + (todayMonth - 1) + 120) % 12;
-  const liuRi = computeLiuRi(liuYueIdx, todayDay, mingIdx, todayEc.getDay(), sihuaSchool);
+  const liuRi = computeLiuRi(liuYueIdx, todayDay, mingIdx, todayEc.getDay(), sihuaSchool, gengVariant);
 
   const currentDaXian = daXian.find((d) => d.isCurrent);
   const palaceStems = computePalaceStems(yearGan, mingIdx, forward);
@@ -122,6 +140,7 @@ export function computeZiwei(input: BirthInput) {
     liuRiGan: liuRi.gan,
     allStars,
     school: sihuaSchool,
+    gengVariant,
   });
   const liuYueWithHua = {
     ...liuYue,
@@ -140,13 +159,17 @@ export function computeZiwei(input: BirthInput) {
   const boShiShiErShen = computeBoShiShiErShen(yearGan, gender, mingIdx);
   // iztro（MIT 开源）全量星曜桥接：乙级星/截空旬空/长生·博士·岁前·将前十二神，覆盖 100+ 颗
   // 非通行本四化流派时重标 [生年化]；非默认亮度流派时按所选派别重标主星亮度
+  const gengAffects = yearGan === "庚" && gengVariant !== "GYWYT";
   const iztro = computeIztroAstrolabe({
     solarYmd: solar.toYmd(),
     hourZhiIdx: hourZhiIdx >= 0 ? hourZhiIdx : 0,
     gender,
-    mutagenOverride: schoolAffectsGan(yearGan, sihuaSchool)
-      ? mutagenMapBySchool(yearGan, sihuaSchool, (g) => getSiHua(g))
-      : undefined,
+    mutagenOverride:
+      schoolAffectsGan(yearGan, sihuaSchool) || gengAffects
+        ? Object.fromEntries(
+            getSiHua(yearGan, sihuaSchool, gengVariant).map((s) => [s.star, s.hua])
+          )
+        : undefined,
     brightnessFn: brightnessSchoolAffects(brightnessSchool)
       ? brightnessFnForSchool(brightnessSchool)
       : undefined,
@@ -208,14 +231,21 @@ export function computeZiwei(input: BirthInput) {
     siHua: sihua,
     sihuaSchool: sihuaSchool,
     sihuaSchoolName: SIHUA_SCHOOL_META[sihuaSchool].name,
+    gengSihuaVariant: gengVariant,
+    gengSihuaName: gengAffects ? GENG_SI_HUA_META[gengVariant].name : undefined,
     brightnessSchool: brightnessSchool,
     brightnessSchoolName: BRIGHTNESS_SCHOOL_META[brightnessSchool].name,
+    tianmaSchoolName: TIANMA_SCHOOL_META[tianmaSchool].name,
+    kuiyueSchoolName: KUIYUE_SCHOOL_META[kuiyueSchool].name,
+    leapMonthSchoolName: leapSchool === "split" ? undefined : LEAP_MONTH_META[leapSchool].name,
     siHuaNote:
-      schoolAffectsGan(yearGan, sihuaSchool)
-        ? `${yearGan}年生年四化按${SIHUA_SCHOOL_META[sihuaSchool].name}取法（${SIHUA_SCHOOL_META[sihuaSchool].source}）：${SIHUA_SCHOOL_META[sihuaSchool].diffNote}。生年/大限/流年/流月/流日四化与全量星曜生年化标签均已按该派别统一。`
-        : sihuaSchool !== "tongxing"
-          ? `所选${SIHUA_SCHOOL_META[sihuaSchool].name}对${yearGan}干无差异（四化流派分歧仅集中在戊、庚、壬三干），本盘与通行本一致。`
-          : undefined,
+      gengAffects
+        ? `庚年四化按${GENG_SI_HUA_META[gengVariant].name}变体取法（${GENG_SI_HUA_META[gengVariant].basis}）。生年/大限/流年/流月/流日四化与全量星曜生年化标签均已统一。`
+        : schoolAffectsGan(yearGan, sihuaSchool)
+          ? `${yearGan}年生年四化按${SIHUA_SCHOOL_META[sihuaSchool].name}取法（${SIHUA_SCHOOL_META[sihuaSchool].source}）：${SIHUA_SCHOOL_META[sihuaSchool].diffNote}。生年/大限/流年/流月/流日四化与全量星曜生年化标签均已按该派别统一。`
+          : sihuaSchool !== "tongxing"
+            ? `所选${SIHUA_SCHOOL_META[sihuaSchool].name}对${yearGan}干无差异（四化流派分歧仅集中在戊、庚、壬三干），本盘与通行本一致。`
+            : undefined,
     daXianSiHua: fei.daXianSiHua,
     liuNianSiHua: fei.liuNianSiHua,
     liuYueSiHua: fei.liuYueSiHua,
