@@ -484,8 +484,8 @@ export async function runModule(input: ModuleInput): Promise<ModuleOutput> {
   }
 
   facts = enrichModuleFacts(input.module, facts, locale);
-  // 口径摘要：凡按出生档案排盘的模块，把口径选择写进事实清单与报告章节（AI 与用户共用同一口径说明）
-  if (profileInput) {
+  // 口径摘要：仅对依赖出生档案的模块注入（卜类/测字等不用出生数据的模块不掺和，防噪声）
+  if (profileInput && def.requiresProfile) {
     const calibText = calibrationSummary(
       normalizeCalibration({ useTrueSolar: profileInput.useTrueSolar !== false, ziSect: profileInput.ziSect ?? 2 }),
       profileInput.longitude ?? null

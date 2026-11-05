@@ -82,9 +82,10 @@ export function lifeDomainsBySignLevel(level: string): {
 
 export function questionContextBlock(question: string | undefined, moduleHint: string): ReadingSection | null {
   if (!question?.trim()) return null;
+  // 问题文本页面顶部已展示，此处只给读盘指引，不复读
   return {
     title: "所问之事",
-    content: `您的问题：${question}\n\n${moduleHint}`,
+    content: moduleHint,
   };
 }
 

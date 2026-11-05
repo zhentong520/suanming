@@ -124,6 +124,29 @@ export function computeQimen(question?: string, date?: Date) {
   const star = normalizeStar(focus.star);
   const gateInfo = GATE_DETAIL[gate];
   const starText = STAR_DETAIL[star] ?? STAR_DETAIL["天辅"];
+  const menPoList = plate.menPo ?? [];
+  const jiXingList = plate.jiXing ?? [];
+  const isWealthQuestion = /财|钱|投资|生意|赚|富|意外之财/.test(qText);
+  const yongShenSource = gatePrefer
+    ? `按所问取${gatePrefer}门为用神`
+    : "未提供所问，按时间起局，用时辰落宫为用神（仅观大局，不代表具体断事）";
+
+  const plainParts: string[] = [
+    `您问「${question ?? "一般问事"}」——${yongShenSource}，落${focus.palace}宫（${focus.position}方）。`,
+    `${gateInfo.meaning}。${starText}`,
+    `乘${focus.god}：${GOD_DETAIL[focus.god] ?? ""}`,
+  ];
+  if (focus.menPo) {
+    plainParts.push(`⚠ 用神${gate}门迫于${focus.palace}宫：门与宫相克，事情推进费力，宜避该方位硬冲、稳扎稳打。`);
+  }
+  if (focus.jiXing) {
+    plainParts.push(`⚠ 用神宫击刑：行动宜缓，防自摆乌龙。`);
+  }
+  plainParts.push(
+    q.luck.includes("吉")
+      ? "总体门星得吉，所问之事有可为之机，宜择吉时吉方行事。"
+      : "总体门星欠力，宜守不宜攻，待吉门吉方再动。"
+  );
 
   return {
     question: question ?? "一般问事",
@@ -153,7 +176,7 @@ export function computeQimen(question?: string, date?: Date) {
     sections: [
       {
         title: "局式",
-        content: `${plate.juName}（${plate.yuan}），节气${plate.jieQi}，${plate.pattern}\n时柱${plate.timeGan}${plate.hourZhi}\n值符${plate.zhiFu} · 值使${plate.zhiShi}\n${plate.jiGong} · 日空${plate.kongWang || "—"} · 马星${plate.maXing}\n门迫：${(plate.menPo ?? []).join("、") || "无"} · 击刑：${(plate.jiXing ?? []).join("、") || "无"}\n所问：${question ?? "一般问事"}\n用神取法：${gatePrefer ? `问事关键词→${gatePrefer}门` : "时辰落宫"}`,
+        content: `${plate.juName}（${plate.yuan}），节气${plate.jieQi}，${plate.pattern}\n时柱${plate.timeGan}${plate.hourZhi}\n值符${plate.zhiFu} · 值使${plate.zhiShi}\n${plate.jiGong} · 日空${plate.kongWang || "—"} · 马星${plate.maXing}\n门迫：${menPoList.join("、") || "无"} · 击刑：${jiXingList.join("、") || "无"}\n用神取法：${yongShenSource}`,
       },
       {
         title: "九宫盘",
@@ -164,7 +187,10 @@ export function computeQimen(question?: string, date?: Date) {
           )
           .join("\n"),
       },
-      { title: "用神宫", content: `${focus.palace}（${focus.position}） — ${gate}门配${star}，${focus.god}当值。${GOD_DETAIL[focus.god] ?? ""}` },
+      {
+        title: "用神直断",
+        content: plainParts.join("\n"),
+      },
       {
         title: "十干克应（《烟波钓叟歌》）",
         content: [
@@ -182,50 +208,26 @@ export function computeQimen(question?: string, date?: Date) {
           .filter((x) => x && x.length > 0)
           .join("\n"),
       },
-      { title: "八神", content: Object.entries(GOD_DETAIL).map(([k, v]) => `${k}：${v}`).join("\n") },
-      { title: "八门", content: `${gate}门 — ${gateInfo.meaning}。${gateInfo.advice}` },
-      { title: "九星", content: `${star} — ${starText}` },
-      { title: "吉凶", content: `奇门${q.luck}，${q.yinYang}。` },
-      { title: "方位", content: `用神在${focus.position}，${gate}门利${gateInfo.direction}方行事。` },
-      { title: "事业", content: `${gateInfo.career}（用神：${focus.palace}${gate}门·${star}·${focus.god}）` },
       {
-        title: "财运",
-        content: [
-          `用神落${focus.palace}，${gate}门配${star}，八神${focus.god}。`,
-          gate === "生" || gate === "开"
-            ? "生门、开门主财，当前利于求财、开业、签约。"
-            : gate === "景"
-              ? "景门主文书与名声，财来于展示、品牌。"
-              : "财运宜守成，大额投资宜缓。",
-          (plate.menPo ?? []).length ? `门迫：${plate.menPo!.join("、")}，推进宜避其方位硬冲。` : "",
-        ]
-          .filter(Boolean)
-          .join(""),
+        title: "八神",
+        content: `${focus.god}临用神宫——${GOD_DETAIL[focus.god] ?? ""}八神为盘中神助或神阻之力：吉神添力、凶神添阻，断事以用神宫所乘之神为要，不必逐宫罗列。`,
       },
+      ...(isWealthQuestion
+        ? [
+            {
+              title: "财运",
+              content: `求财看财门与用神：本局用神落${focus.palace}宫（${focus.position}方），${gateInfo.career}。${
+                focus.menPo
+                  ? "但用神门迫于宫，主求财费力，宜稳扎稳打，忌大额投入与高杠杆。"
+                  : "用神门不相迫，求财路径顺畅度尚可，可按计划推进。"
+              }${focus.god === "玄武" ? "⚠ 用神乘玄武，主欺诈暗耗，账目合同须细核，防被骗。" : ""}`,
+            },
+          ]
+        : []),
       {
-        title: "感情",
-        content: [
-          `用神${gate}门·${focus.god}：${GOD_DETAIL[focus.god] ?? ""}`,
-          q.luck.includes("吉")
-            ? "门星得吉，利婚姻、合作、和解。"
-            : "宜温和沟通，可选生门、开门方位行事。",
-        ].join(""),
+        title: "方位与建议",
+        content: `用神在${focus.position}，${gate}门利${gateInfo.direction}方行事——签约、谈判、求财上门等重大行动优先选该方位。\n${gateInfo.advice}。${plate.juName}${gate}门配${star}（${q.luck}），宜向${gateInfo.direction}行事。`,
       },
-      {
-        title: "健康",
-        content: [
-          `九星${star}落用神宫。`,
-          star === "天芮"
-            ? "天芮主疾，宜体检调养。"
-            : gate === "伤" || gate === "死"
-              ? "防意外与旧疾，宜静养。"
-              : "整体无大碍，规律作息即可。",
-          (plate.jiXing ?? []).length ? `击刑：${plate.jiXing!.join("、")}，行动宜缓。` : "",
-        ]
-          .filter(Boolean)
-          .join(""),
-      },
-      { title: "综合建议", content: `${plate.juName}${gate}门配${star}，${q.luck}。${gateInfo.advice}` },
     ],
     summary: `${plate.juName}${gate}门配${star}（${q.luck}），${plate.yuan}${plate.jieQi}，宜向${gateInfo.direction}行事。`,
     caveat: "三元换局九宫盘已排；含天地盘干、八神、门迫击刑、中宫寄坤、日空与马星。用神按所问关键词优先落门，否则按时辰宫。",
@@ -292,16 +294,6 @@ export function computeDaliuren(question?: string, date?: Date) {
             : "事有波折，宜稳扎稳打，借助贵人，不宜独断。"
         }`,
       },
-      {
-        title: "财运",
-        content: `财看初传${ke.sanChuan[0].zhi}与所乘之将；课式「${ke.takeMethod}」。当前宜量入为出，大额投资需再三斟酌。`,
-      },
-      {
-        title: "感情",
-        content: `三传${ke.sanChuan.map((s) => s.zhi).join("→")}，课传相递则关系有变；初传神将提示：${GENERAL_DETAIL[ke.shenJiang.find((s) => s.branch === ke.sanChuan[0].zhi)?.general ?? ""] ?? "宜开诚布公"}。忌冷战猜疑。`,
-      },
-      { title: "健康", content: `日空${Array.isArray(ke.xunKong) ? ke.xunKong.join("、") : ke.xunKong}，宜防小疾反复，作息规律，减少过劳。` },
-      { title: "建议", content: `大六壬以课传为要，已按日干支、时干支起四课三传（${ke.takeMethod}），宜结合所问细观初传${ke.sanChuan[0].zhi}。` },
     ],
     summary: `日${ke.dayGanZhi}时${ke.timeGanZhi}，三传${ke.sanChuan.map((s) => s.zhi).join("→")}（${ke.takeMethod}），贵人${ke.shenJiang[0]?.general}在${ke.shenJiang[0]?.branch}。`,
     caveat: "四课按月将加时、干支寄宫；三传取传链：贼克→比用→涉害→遥克→昴星/别责→干上发用。",
@@ -371,8 +363,6 @@ export function computeTaiyi(question?: string, date?: Date) {
             : "事业宜观太乙大局，顺势而为。",
       },
       { title: "财运", content: trend === "可进取" ? "财运随进取而开，宜把握机遇。" : "宜守财积累。" },
-      { title: "感情", content: "太乙主宏观，顺运则婚嫁可成，逆运则宜修己待人。" },
-      { title: "健康", content: "身心宜平衡，规律作息以养气。" },
       { title: "综合", content: `${t.star}${t.starType}，三基${junJi}/${chenJi}/${minJi}。${t.song}当前宜${trend}。` },
     ],
     summary: `太乙${t.star}（${t.starType}），三基${junJi}/${chenJi}/${minJi}，六仪${liuYi}。${t.song}`,
