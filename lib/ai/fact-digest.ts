@@ -272,6 +272,39 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
   if (facts.benGua || facts.bianGua) {
     lines.push(`本卦: ${facts.benGua ?? facts.hexagram} 变卦: ${facts.bianGua ?? "—"}`);
   }
+
+  // 河洛理数（真法）：化数天地局 + 动爻
+  const hl = facts as {
+    pillarDetail?: string;
+    tianJu?: number;
+    diJu?: number;
+    total?: number;
+    upperGua?: string;
+    lowerGua?: string;
+    changingYao?: number;
+    benGua?: string;
+    bianGua?: string;
+  };
+  if (typeof hl.tianJu === "number" && typeof hl.diJu === "number") {
+    lines.push(
+      `河洛理数: 四柱化数 ${hl.pillarDetail ?? ""}；天局${hl.tianJu}定上卦${hl.upperGua}，地局${hl.diJu}定下卦${hl.lowerGua}，总数${hl.total}，${hl.changingYao}爻动，本卦${hl.benGua}变${hl.bianGua}`
+    );
+  }
+
+  // 七政四余：十曜落宫（astronomy-engine 星历 + 卯起安命整宫）
+  const qz = facts as {
+    mingGong?: string;
+    planetPositions?: Array<{ name?: string; rashi?: string; house?: string; degree?: string }>;
+    sunHouse?: string;
+    moonHouse?: string;
+  };
+  if (Array.isArray(qz.planetPositions) && qz.planetPositions.length) {
+    lines.push(
+      `七政四余(安命${qz.mingGong ?? "—"}): ${qz.planetPositions
+        .map((p) => `${p.name}${p.rashi}${p.degree}°@${p.house}`)
+        .join("；")}`
+    );
+  }
   if (facts.liuQin && typeof facts.liuQin === "object") {
     lines.push(`六亲摘要: ${JSON.stringify(facts.liuQin)}`);
   }
