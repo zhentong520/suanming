@@ -328,15 +328,6 @@ export function computeTaiyi(question?: string, date?: Date) {
   const starMeaning = TAIYI_DETAIL[star] ?? `${t.starType}，${t.song}`;
   const trend = t.starType.includes("阳") || t.wuXing === "火" ? "可进取" : "守势为宜";
 
-  const yearNum = d.getFullYear() % 10;
-  const monthNum = d.getMonth() + 1;
-  const dayNum = d.getDate();
-  const hourNum = d.getHours();
-  const junJi = yearNum;
-  const chenJi = monthNum % 10;
-  const minJi = dayNum % 10;
-  const liuYi = ["甲子", "甲戌", "甲申", "甲午", "甲辰", "甲寅"][(hourNum + dayNum) % 6];
-
   return {
     question: question ?? "一般问事",
     ju: t.starNumber,
@@ -346,27 +337,15 @@ export function computeTaiyi(question?: string, date?: Date) {
     jieQi: t.jieQi,
     trend,
     starMeaning,
-    sanJi: { 君基: junJi, 臣基: chenJi, 民基: minJi },
-    liuYi,
     sections: [
       { title: "局式", content: `${t.jieQi ? `节气${t.jieQi}，` : ""}太乙${t.starNumber}宫\n${t.song}` },
-      { title: "三基", content: `君基${junJi}（年）· 臣基${chenJi}（月）· 民基${minJi}（日）\n三基和${junJi + chenJi + minJi}，主事体层次。` },
-      { title: "六仪", content: `当前六仪：${liuYi}，与太乙${t.star}联动论吉凶。` },
       { title: "主星", content: `${t.star}（${t.wuXing}） — ${starMeaning}` },
       { title: "星类", content: t.starType },
       { title: "趋势", content: `${trend}。${t.position}当值。` },
-      {
-        title: "事业",
-        content:
-          t.starType.includes("君") || star.includes("白")
-            ? "主星利决策与权威，事业宜争取核心位置。"
-            : "事业宜观太乙大局，顺势而为。",
-      },
-      { title: "财运", content: trend === "可进取" ? "财运随进取而开，宜把握机遇。" : "宜守财积累。" },
-      { title: "综合", content: `${t.star}${t.starType}，三基${junJi}/${chenJi}/${minJi}。${t.song}当前宜${trend}。` },
+      { title: "综合", content: `${t.star}${t.starType}，${t.song}当前宜${trend}。` },
     ],
-    summary: `太乙${t.star}（${t.starType}），三基${junJi}/${chenJi}/${minJi}，六仪${liuYi}。${t.song}`,
-    caveat: "已含三基六仪与时家太乙九星，更细推演可配十六神。",
+    summary: `太乙${t.star}（${t.starType}）。${t.song}`,
+    caveat: "时家太乙九星已排；太乙主宏观大局，不负责具体断事，宜观趋势定方向。",
   };
 }
 
@@ -406,17 +385,9 @@ export function computeBeijiao(question?: string, date?: Date) {
       { title: "签意", content: meaning },
       { title: "详解", content: detail },
       {
-        title: "事业",
-        content:
-          result.includes("圣杯")
-            ? "所问事业得天意默许，可推进求职、签约、开业等事宜。"
-            : result.includes("笑杯")
-              ? "事业时机未明，宜再准备或三日后再问，不可急躁。"
-              : "事业宜暂缓或调整方向，勿强行推进。",
+        title: "建议",
+        content: advice,
       },
-      { title: "财运", content: result.includes("圣杯") ? "财运可试，但宜正大光明求财。" : "不宜大额投资或借贷。" },
-      { title: "感情", content: result.includes("圣杯") ? "感情事宜可推进，宜择吉表达。" : "感情宜等待或反省，忌冲动决定。" },
-      { title: "建议", content: advice },
     ],
     summary: `掷杯得${result}：${meaning} ${detail}`,
     caveat: "掷杯按问事时辰_seed 确定性出象，同问同时结果一致。",
