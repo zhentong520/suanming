@@ -201,20 +201,47 @@ const KE: Record<string, string> = { 木: "土", 土: "水", 水: "火", 火: "�
 export function computeMeihua(question?: string, numbers?: number[], date?: Date) {
   const d = date ?? new Date();
   const lunar = lunarFromDate(d);
-  const n1 = numbers?.[0] ?? lunar.getYear() + lunar.getMonth();
-  const n2 = numbers?.[1] ?? lunar.getDay() + d.getHours();
-  const n3 = numbers?.[2] ?? d.getMinutes() + d.getSeconds() + hashQuestion(question ?? "");
-  const upper = n1 % 8 || 8;
-  const lower = n2 % 8 || 8;
-  const changing = n3 % 6 || 6;
-  const idx = (upper - 1) * 8 + (lower - 1);
+  // 《梅花易数》时间起卦原法：以农历年支序（子1…亥12）加月数加日数，除八取上卦；
+  // 再加时支序，除八取下卦；年月日时总数除六取动爻。
+  const ZHI_COUNT = "子丑寅卯辰巳午未申酉戌亥";
+  const yearNum = ZHI_COUNT.indexOf(lunar.getYearZhi()) + 1; // 年支序 1-12
+  const monthNum = Math.abs(lunar.getMonth());
+  const dayNum = lunar.getDay();
+  const hourNum = ZHI_COUNT.indexOf(lunar.getEightChar().getTimeZhi()) + 1; // 时支序 1-12
+  if (numbers?.length) {
+    // 报数起卦（传统：两数分上下卦，和数取动爻）
+    const n1 = numbers[0];
+    const n2 = numbers[1] ?? numbers[0];
+    const n3 = numbers.slice(0, 3).reduce((a, b) => a + b, 0);
+    const upper = n1 % 8 || 8;
+    const lower = n2 % 8 || 8;
+    const changing = n3 % 6 || 6;
+    return buildMeihuaResult(question, d, lunar, upper, lower, changing, "梅花易数（报数起卦）");
+  }
+  const upperSum = yearNum + monthNum + dayNum;
+  const lowerSum = upperSum + hourNum;
+  const upper = upperSum % 8 || 8;
+  const lower = lowerSum % 8 || 8;
+  const changing = lowerSum % 6 || 6;
+  return buildMeihuaResult(question, d, lunar, upper, lower, changing, "梅花易数（年月日时起卦）");
+}
+
+function buildMeihuaResult(
+  question: string | undefined,
+  d: Date,
+  lunar: ReturnType<typeof lunarFromDate>,
+  upper: number,
+  lower: number,
+  changing: number,
+  method: string,
+) {
   const tiGua = BAGUA[upper];
   const yongGua = BAGUA[lower];
 
   const benName = hexagramNameFromTrigrams(BAGUA[upper], BAGUA[lower]);
   const reading = buildHexagramReading(benName, {
     question,
-    method: "梅花易数（时数起卦）",
+    method,
     changingYao: changing,
   });
 
@@ -262,7 +289,7 @@ export function computeMeihua(question?: string, numbers?: number[], date?: Date
 
   return {
     ...reading,
-    numbers: [n1, n2, n3],
+    method,
     upperGua: upper,
     lowerGua: lower,
     upperName: tiGua,
@@ -287,7 +314,7 @@ export function computeMeihua(question?: string, numbers?: number[], date?: Date
         ].join("\n"),
       },
       { title: "卦气旺衰", content: `${guaQi}\n旺衰是吉凶的放大镜：体宜旺、用宜衰；卦气不足，宜借月建生扶之方与时。` },
-      { title: "起卦数", content: `上卦数${n1}，下卦数${n2}，动爻数${n3}（农历${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}）。` },
+      { title: "起卦数", content: `上卦数${upper}，下卦数${lower}，动爻数${changing}（农历${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}，${method}）。` },
       { title: "外应心法", content: waiYingGuide },
     ],
     summary: `梅花易数得${reading.fullName}，${tiYongAnalysis} ${reading.overview}`,

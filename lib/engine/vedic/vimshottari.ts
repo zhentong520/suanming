@@ -41,6 +41,8 @@ export interface Antardasha {
 export interface VimshottariResult {
   mahadashas: Mahadasha[];
   current: { mahadasha: string; antardasha: string; antardashaCn: string; startAge: number; endAge: number };
+  /** 第三层细分（当前 Antardasha 内九段） */
+  pratyantardasha?: Antardasha;
 }
 
 /**

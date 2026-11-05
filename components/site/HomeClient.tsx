@@ -25,6 +25,8 @@ type AlmanacBrief = {
   yi: string[];
   ji: string[];
   chong: string;
+  /** 当日四柱（首页大字） */
+  pillars?: { year: string; month: string; day: string; time: string };
 };
 
 const COMPASS_OUTER_IDS = ["bazi", "chenggu", "yijing", "liuyao", "word", "almanac", "name", "match"];

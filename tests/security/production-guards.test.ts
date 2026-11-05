@@ -10,7 +10,7 @@ describe("production guards", () => {
   const prev = { ...process.env };
 
   afterEach(() => {
-    process.env.NODE_ENV = prev.NODE_ENV;
+    (process.env as { NODE_ENV?: string }).NODE_ENV = prev.NODE_ENV;
     process.env.JWT_SECRET = prev.JWT_SECRET;
     process.env.ADMIN_PASSWORD = prev.ADMIN_PASSWORD;
     process.env.STRICT_PROD_SECRETS = prev.STRICT_PROD_SECRETS;
@@ -27,16 +27,16 @@ describe("production guards", () => {
 
   it("enables secure cookies in production by default", () => {
     process.env.AUTH_COOKIE_SECURE = undefined;
-    process.env.NODE_ENV = "production";
+    (process.env as { NODE_ENV?: string }).NODE_ENV = "production";
     expect(authCookieSecure()).toBe(true);
-    process.env.NODE_ENV = "development";
+    (process.env as { NODE_ENV?: string }).NODE_ENV = "development";
     expect(authCookieSecure()).toBe(false);
     process.env.AUTH_COOKIE_SECURE = "true";
     expect(authCookieSecure()).toBe(true);
   });
 
   it("throws when STRICT_PROD_SECRETS and weak secrets in production", () => {
-    process.env.NODE_ENV = "production";
+    (process.env as { NODE_ENV?: string }).NODE_ENV = "production";
     process.env.JWT_SECRET = "change-me-in-production";
     process.env.ADMIN_PASSWORD = "admin123";
     process.env.STRICT_PROD_SECRETS = "true";
