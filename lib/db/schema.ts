@@ -77,6 +77,8 @@ export const profiles = sqliteTable("profiles", {
   useTrueSolar: integer("use_true_solar", { mode: "boolean" }).default(true),
   /** 紫微生年四化流派：tongxing（默认）/quanshu/zhongzhou */
   ziweiSihuaSchool: text("ziwei_sihua_school"),
+  /** 紫微主星亮度流派：quanshu（默认）/xiandai/zhongzhou/xiandai2 */
+  ziweiBrightnessSchool: text("ziwei_brightness_school"),
   /** 农历生日是否闰月（calendarType=lunar 时生效） */
   leapMonth: integer("leap_month", { mode: "boolean" }).default(false),
   createdAt: text("created_at").notNull(),

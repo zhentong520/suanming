@@ -1,7 +1,7 @@
 import { BirthInput } from "../calendar";
 import { buildBirthChartCore } from "../shared/birth-chart";
 import { Solar } from "lunar-typescript";
-import { naYinToJu, placeMainStars, BRANCHES, mingGongPalaceIndex } from "./placement";
+import { naYinToJu, naYinOfGanZhi, placeMainStars, BRANCHES, douShuMingShenGong } from "./placement";
 import { placeAuxiliaryStars } from "./auxiliary";
 import {
   getSiHua,
@@ -26,20 +26,38 @@ import {
   mutagenMapBySchool,
   schoolAffectsGan,
 } from "./sihua-schools";
+import {
+  normalizeBrightnessSchool,
+  BRIGHTNESS_SCHOOL_META,
+  brightnessFnForSchool,
+  schoolMainBrightness,
+  brightnessSchoolAffects,
+} from "./brightness-schools";
 
 export function computeZiwei(input: BirthInput) {
   const sihuaSchool = normalizeSihuaSchool(input.ziweiSihuaSchool);
+  const brightnessSchool = normalizeBrightnessSchool(input.ziweiBrightnessSchool);
   const chart = buildBirthChartCore(input);
   const { lunar, solar, eightChar } = chart;
-  const mingGongGz = eightChar.getMingGong();
-  const shenGongGz = eightChar.getShenGong();
-  const mingNaYin = eightChar.getMingGongNaYin();
+  // 斗数命宫/身宫：《全书》安命身宫诀（寅起正月顺数生月，月宫起子逆/顺数生时），
+  // 不得混用八字体系的命宫——五行局、安星全链依赖此宫
+  // 斗数年干支：紫微斗数为农历体系，年干支按农历正月初一换年（与 iztro/主流排盘一致）；
+  // 八字立春界的年干支不用于斗数安星（年界口径如需立春派可另行配置）
+  const douYearGZ = lunar.getYearInGanZhi();
+  const yearGan = douYearGZ[0];
+  const yearZhiIdx = BRANCHES.indexOf(douYearGZ[1] as (typeof BRANCHES)[number]);
+  const hourZhiIdx = BRANCHES.indexOf(eightChar.getTimeZhi() as (typeof BRANCHES)[number]);
+  const gong = douShuMingShenGong(
+    Math.abs(lunar.getMonth()) || 1,
+    hourZhiIdx >= 0 ? hourZhiIdx : 0,
+    yearGan
+  );
+  const mingGongGz = gong.mingGz;
+  const shenGongGz = gong.shenGz;
+  const mingNaYin = naYinOfGanZhi(mingGongGz);
   const ju = naYinToJu(mingNaYin);
   const lunarDay = lunar.getDay();
-  const yearGan = eightChar.getYearGan();
-  const yearZhiIdx = BRANCHES.indexOf(eightChar.getYearZhi() as (typeof BRANCHES)[number]);
-  const hourZhiIdx = BRANCHES.indexOf(eightChar.getTimeZhi() as (typeof BRANCHES)[number]);
-  const mingIdx = mingGongPalaceIndex(mingGongGz);
+  const mingIdx = gong.mingIdx;
 
   const { stars: mainStars, ziweiBranch, tianfuBranch, juName } = placeMainStars(
     lunarDay,
@@ -121,7 +139,7 @@ export function computeZiwei(input: BirthInput) {
   // 博士十二神：禄存起博士，阳男阴女顺、阴男阳女逆（《全书》通行安法）
   const boShiShiErShen = computeBoShiShiErShen(yearGan, gender, mingIdx);
   // iztro（MIT 开源）全量星曜桥接：乙级星/截空旬空/长生·博士·岁前·将前十二神，覆盖 100+ 颗
-  // 非通行本四化流派时，重标全量星曜的 [生年化] 标签与所选派别一致
+  // 非通行本四化流派时重标 [生年化]；非默认亮度流派时按所选派别重标主星亮度
   const iztro = computeIztroAstrolabe({
     solarYmd: solar.toYmd(),
     hourZhiIdx: hourZhiIdx >= 0 ? hourZhiIdx : 0,
@@ -129,9 +147,20 @@ export function computeZiwei(input: BirthInput) {
     mutagenOverride: schoolAffectsGan(yearGan, sihuaSchool)
       ? mutagenMapBySchool(yearGan, sihuaSchool, (g) => getSiHua(g))
       : undefined,
+    brightnessFn: brightnessSchoolAffects(brightnessSchool)
+      ? brightnessFnForSchool(brightnessSchool)
+      : undefined,
   });
-  // 亮度口径统一：自研表与 iztro（业界主流）有分歧（如紫微在巳宫），以 iztro 为准修正主星亮度
+  // 亮度口径：默认以 iztro（=《全书》卷二口径）为准修正自研表；选了其他亮度流派则按所选派别表
   for (const m of mainStars) {
+    if (brightnessSchoolAffects(brightnessSchool)) {
+      const bIdx = BRANCHES.indexOf(m.branch as (typeof BRANCHES)[number]); // BRANCHES 子起 0
+      const bySchool = schoolMainBrightness(m.star, bIdx, brightnessSchool);
+      if (bySchool) {
+        m.brightness = bySchool;
+        continue;
+      }
+    }
     const iz = iztro.brightness[m.star];
     if (iz && iz !== m.brightness) m.brightness = iz;
   }
@@ -179,6 +208,8 @@ export function computeZiwei(input: BirthInput) {
     siHua: sihua,
     sihuaSchool: sihuaSchool,
     sihuaSchoolName: SIHUA_SCHOOL_META[sihuaSchool].name,
+    brightnessSchool: brightnessSchool,
+    brightnessSchoolName: BRIGHTNESS_SCHOOL_META[brightnessSchool].name,
     siHuaNote:
       schoolAffectsGan(yearGan, sihuaSchool)
         ? `${yearGan}年生年四化按${SIHUA_SCHOOL_META[sihuaSchool].name}取法（${SIHUA_SCHOOL_META[sihuaSchool].source}）：${SIHUA_SCHOOL_META[sihuaSchool].diffNote}。生年/大限/流年/流月/流日四化与全量星曜生年化标签均已按该派别统一。`
@@ -210,7 +241,7 @@ export function computeZiwei(input: BirthInput) {
     liuNian,
     liuYue: liuYueWithHua,
     liuRi: liuRiWithHua,
-    summary: `命宫${mingGongGz}，${juName}，紫微在${ziweiBranch}。命宫：${mainInMing || "空宫借对宫"}。四化：${sihua.map((s) => `${s.star}化${s.hua}`).join("、")}。流月落${liuYue.palace}，流日落${liuRi.palace}。`,
+    summary: `命宫${mingGongGz}，${juName}，紫微在${ziweiBranch}。命宫：${mainInMing || "空宫借对宫"}。四化：${sihua.map((s) => `${s.star}化${s.hua}`).join("、")}。亮度流派：${BRIGHTNESS_SCHOOL_META[brightnessSchool].name}。流月落${liuYue.palace}，流日落${liuRi.palace}。`,
     caveat:
       "已安十四主星、扩展辅星（含天哭虚龙凤三台八座）、生年/大限/流年/流月/流日四化飞星、十二宫干。流月流日按今日农历。",
   };

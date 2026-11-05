@@ -20,6 +20,7 @@ export interface UserProfile {
   ziSect?: number | null;
   useTrueSolar?: boolean | null;
   ziweiSihuaSchool?: string | null;
+  ziweiBrightnessSchool?: string | null;
   leapMonth?: boolean | null;
   createdAt: string;
 }

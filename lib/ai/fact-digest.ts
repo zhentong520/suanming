@@ -222,6 +222,9 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
   if (typeof facts.sihuaSchoolName === "string") {
     lines.push(`四化流派: ${facts.sihuaSchoolName}${facts.siHuaNote ? `——${truncate(String(facts.siHuaNote), 200)}` : ""}`);
   }
+  if (typeof facts.brightnessSchoolName === "string") {
+    lines.push(`亮度流派: ${facts.brightnessSchoolName}（主星庙旺标注按该派口径）`);
+  }
 
   // 紫微全量星曜（iztro 桥接，乙级星+杂耀+亮度+生年化）
   if (Array.isArray(facts.palaces)) {

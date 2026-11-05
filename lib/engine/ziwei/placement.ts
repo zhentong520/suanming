@@ -12,13 +12,89 @@ export function naYinToJu(naYin: string): number {
   return map[wx] ?? 5;
 }
 
-/** 安紫微：农历生日 ÷ 局，商为宫位（寅起），不整除则商+1 */
+/** 六十甲子纳音（《六十甲子纳音歌》，三十配对，公版经典数据） */
+const NA_YIN: Record<string, string> = {};
+{
+  const pairs: Array<[string[], string]> = [
+    [["甲子", "乙丑"], "海中金"], [["丙寅", "丁卯"], "炉中火"], [["戊辰", "己巳"], "大林木"],
+    [["庚午", "辛未"], "路旁土"], [["壬申", "癸酉"], "剑锋金"], [["甲戌", "乙亥"], "山头火"],
+    [["丙子", "丁丑"], "涧下水"], [["戊寅", "己卯"], "城头土"], [["庚辰", "辛巳"], "白蜡金"],
+    [["壬午", "癸未"], "杨柳木"], [["甲申", "乙酉"], "泉中水"], [["丙戌", "丁亥"], "屋上土"],
+    [["戊子", "己丑"], "霹雳火"], [["庚寅", "辛卯"], "松柏木"], [["壬辰", "癸巳"], "长流水"],
+    [["甲午", "乙未"], "沙中金"], [["丙申", "丁酉"], "山下火"], [["戊戌", "己亥"], "平地木"],
+    [["庚子", "辛丑"], "壁上土"], [["壬寅", "癸卯"], "金箔金"], [["甲辰", "乙巳"], "覆灯火"],
+    [["丙午", "丁未"], "天河水"], [["戊申", "己酉"], "大驿土"], [["庚戌", "辛亥"], "钗钏金"],
+    [["壬子", "癸丑"], "桑柘木"], [["甲寅", "乙卯"], "大溪水"], [["丙辰", "丁巳"], "沙中土"],
+    [["戊午", "己未"], "天上火"], [["庚申", "辛酉"], "石榴木"], [["壬戌", "癸亥"], "大海水"],
+  ];
+  for (const [gz, ny] of pairs) {
+    NA_YIN[gz[0]] = ny;
+    NA_YIN[gz[1]] = ny;
+  }
+}
+
+export function naYinOfGanZhi(gz: string): string {
+  return NA_YIN[gz] ?? "路旁土";
+}
+
+/** 五虎遁：年干 → 寅宫天干 */
+const WU_HU_DUN: Record<string, string> = {
+  甲: "丙", 己: "丙",
+  乙: "戊", 庚: "戊",
+  丙: "庚", 辛: "庚",
+  丁: "壬", 壬: "壬",
+  戊: "甲", 癸: "甲",
+};
+
+const GAN_ORDER = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"] as const;
+
+/** 年干 → 十二宫天干（寅起五虎遁，顺行） */
+export function palaceGanByYearGan(yearGan: string): string[] {
+  const yinGan = WU_HU_DUN[yearGan] ?? "丙";
+  const start = GAN_ORDER.indexOf(yinGan as (typeof GAN_ORDER)[number]);
+  // 寅=2，十二宫干从寅宫顺行
+  return Array.from({ length: 12 }, (_, i) => {
+    return GAN_ORDER[(start + i) % 10];
+  });
+}
+
+/**
+ * 斗数安命身宫（《紫微斗数全书》安命身宫诀）：
+ * 寅起正月顺数至生月；生月宫起子时，逆数至生时 = 命宫，顺数至生时 = 身宫。
+ * 宫干按五虎遁。闰月暂按当月取（闰月归属另属流派口径）。
+ */
+export function douShuMingShenGong(
+  lunarMonthAbs: number,
+  hourZhiIdx: number,
+  yearGan: string
+): { mingIdx: number; mingGz: string; shenIdx: number; shenGz: string } {
+  const month = Math.min(12, Math.max(1, lunarMonthAbs));
+  const mingIdx = (2 + (month - 1) - hourZhiIdx + 240) % 12;
+  const shenIdx = (2 + (month - 1) + hourZhiIdx) % 12;
+  const gans = palaceGanByYearGan(yearGan);
+  const mingGz = `${gans[(mingIdx - 2 + 12) % 12]}${BRANCHES[mingIdx]}`;
+  const shenGz = `${gans[(shenIdx - 2 + 12) % 12]}${BRANCHES[shenIdx]}`;
+  return { mingIdx, mingGz, shenIdx, shenGz };
+}
+
+/**
+ * 安紫微诀（《全书》）：生日不能被局数整除则借数凑整；
+ * 商数从寅起顺数，借数逆回（offset 奇数逆行、偶数顺行，与主流排盘一致）。
+ * 返回寅起 0 基索引（寅=0 … 丑=11），与 iztro 同基。
+ */
 export function ziweiBranchIndex(lunarDay: number, ju: number): number {
-  const q = Math.floor(lunarDay / ju);
-  const r = lunarDay % ju;
-  const palace = r === 0 ? q : q + 1;
-  // 寅=0, 卯=1 … 丑=11
-  return (palace - 1 + 12) % 12;
+  let offset = -1;
+  let quotient = 0;
+  let remainder = -1;
+  do {
+    offset++;
+    quotient = Math.floor((lunarDay + offset) / ju);
+    remainder = (lunarDay + offset) % ju;
+  } while (remainder !== 0);
+  quotient %= 12;
+  let idx = quotient - 1;
+  idx += offset % 2 === 0 ? offset : -offset;
+  return ((idx % 12) + 12) % 12;
 }
 
 export function branchAtOffset(fromYin: number, offset: number): number {
@@ -78,15 +154,19 @@ export function placeMainStars(
   mingGongGanZhi: string
 ): { stars: StarPlacement[]; ziweiBranch: string; tianfuBranch: string; juName: string } {
   const mingIdx = mingGongPalaceIndex(mingGongGanZhi);
-  const ziweiIdx = ziweiBranchIndex(lunarDay, ju);
-  const fuIdx = tianfuBranchIndex(ziweiIdx);
+  // ziweiBranchIndex 返回寅起 0 基，本项目 BRANCHES 为子起 0，转换 +2
+  const ziweiIdxYin = ziweiBranchIndex(lunarDay, ju);
+  const ziweiIdx = (ziweiIdxYin + 2) % 12;
+  const fuIdx = (tianfuBranchIndex(ziweiIdxYin) + 2) % 12;
 
   const juNames: Record<number, string> = { 2: "水二局", 3: "木三局", 4: "金四局", 5: "土五局", 6: "火六局" };
 
   const stars: StarPlacement[] = [];
 
+  // 紫微系安星诀：「紫微逆去天机星，隔一阳武天同轮，又隔二位廉贞地」
+  const TIAN_OFFSETS = [0, -1, -3, -4, -5, -8];
   TIAN_STARS.forEach((star, i) => {
-    const bIdx = branchAtOffset(ziweiIdx, -i);
+    const bIdx = branchAtOffset(ziweiIdx, TIAN_OFFSETS[i]);
     stars.push({
       star,
       branch: BRANCHES[bIdx],
@@ -95,8 +175,10 @@ export function placeMainStars(
     });
   });
 
+  // 天府系安星诀：天府→太阴→贪狼→巨门→天相→天梁→七杀皆顺行紧邻，「七杀空三是破军」（隔三宫）
+  const FU_OFFSETS = [0, 1, 2, 3, 4, 5, 6, 10];
   FU_STARS.forEach((star, i) => {
-    const bIdx = branchAtOffset(fuIdx, i);
+    const bIdx = branchAtOffset(fuIdx, FU_OFFSETS[i]);
     stars.push({
       star,
       branch: BRANCHES[bIdx],

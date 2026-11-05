@@ -54,6 +54,13 @@ export async function POST(request: Request) {
       body.ziweiSihuaSchool === "quanshu" || body.ziweiSihuaSchool === "zhongzhou"
         ? String(body.ziweiSihuaSchool)
         : null,
+    ziweiBrightnessSchool:
+      body.ziweiBrightnessSchool === "quanshu" ||
+      body.ziweiBrightnessSchool === "xiandai" ||
+      body.ziweiBrightnessSchool === "zhongzhou" ||
+      body.ziweiBrightnessSchool === "xiandai2"
+        ? String(body.ziweiBrightnessSchool)
+        : null,
     leapMonth: body.calendarType === "lunar" && body.isLeapMonth === true,
     createdAt: now,
     updatedAt: now,

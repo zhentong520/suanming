@@ -16,6 +16,8 @@ export interface BirthInput {
   useTrueSolar?: boolean;
   /** 紫微生年四化流派：tongxing=通行本（默认）/ quanshu=《全书》/ zhongzhou=中州派 */
   ziweiSihuaSchool?: string;
+  /** 紫微主星亮度流派：quanshu=全书派（默认，同 iztro）/ xiandai / zhongzhou / xiandai2 */
+  ziweiBrightnessSchool?: string;
   /** 出生地名称（展示用） */
   location?: string;
   /**

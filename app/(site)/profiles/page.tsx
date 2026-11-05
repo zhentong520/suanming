@@ -102,6 +102,7 @@ export default function ProfilesPage() {
           ziSect: fd.get("ziSect") === "1" ? 1 : 2,
           useTrueSolar: fd.get("useTrueSolar") !== "off",
           ziweiSihuaSchool: fd.get("ziweiSihuaSchool") || null,
+          ziweiBrightnessSchool: fd.get("ziweiBrightnessSchool") || null,
           setAsActive: true,
         }),
       });
@@ -251,6 +252,16 @@ export default function ProfilesPage() {
               <option value="tongxing">通行本（《全集》，业界主流）</option>
               <option value="quanshu">《紫微斗数全书》（庚干天同科·太阴忌）</option>
               <option value="zhongzhou">中州派（辅弼不入四化）</option>
+            </select>
+          </label>
+          <label>
+            紫微亮度流派
+            <select name="ziweiBrightnessSchool" defaultValue="iztro">
+              <option value="iztro">iztro 口径（业界主流，默认）</option>
+              <option value="quanshu">全书派（《紫微斗数全书》卷二总表）</option>
+              <option value="xiandai">现代修正一（通行软件修正口径）</option>
+              <option value="zhongzhou">中州派（五档庙旺平闲陷）</option>
+              <option value="xiandai2">现代修正二</option>
             </select>
           </label>
           <label>

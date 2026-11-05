@@ -210,6 +210,7 @@ async function getProfileBirthInput(profileId: string, userId?: string): Promise
     ziSect: profile.ziSect === 1 ? 1 : 2,
     useTrueSolar: profile.useTrueSolar !== false,
     ziweiSihuaSchool: profile.ziweiSihuaSchool ?? undefined,
+    ziweiBrightnessSchool: profile.ziweiBrightnessSchool ?? undefined,
     isLeapMonth: profile.leapMonth === true && profile.calendarType === "lunar",
   };
 }

@@ -14,6 +14,8 @@ export interface IztroBridgeResult {
   brightness: Record<string, string>;
   /** 主星落宫（star → palace），供亮度核对 */
   starPalace: Record<string, string>;
+  /** 宫名 → 地支，供自研安星与 iztro 落宫一致性核对 */
+  palaceBranch: Record<string, string>;
   /** 命主星（真·命主，来自 iztro） */
   soulStar: string;
   /** 身主星 */
@@ -38,8 +40,10 @@ export function computeIztroAstrolabe(params: {
   gender: string;
   /** 星→化 重标映射：非通行本四化流派时按所选派别重标 iztro 的 [生年化] 标签 */
   mutagenOverride?: Record<string, string>;
+  /** (星名, 地支) → 亮度 查询：非默认亮度流派时按所选派别重标主星亮度 */
+  brightnessFn?: (starName: string, branch: string) => string | undefined;
 }): IztroBridgeResult {
-  const { solarYmd, hourZhiIdx, gender, mutagenOverride } = params;
+  const { solarYmd, hourZhiIdx, gender, mutagenOverride, brightnessFn } = params;
   const [y, m, d] = solarYmd.split("-").map((n) => Number(n));
   // iztro timeIndex：0=早子…11=亥，12=晚子时
   const timeIndex = hourZhiIdx === 0 ? 0 : hourZhiIdx;
@@ -54,14 +58,17 @@ export function computeIztroAstrolabe(params: {
   const palaceFullStars: Record<string, string[]> = {};
   const brightness: Record<string, string> = {};
   const starPalace: Record<string, string> = {};
+  const palaceBranch: Record<string, string> = {};
   for (const p of ast.palaces) {
+    palaceBranch[p.name] = p.earthlyBranch;
     for (const s of p.majorStars) {
       brightness[s.name] = s.brightness ?? "";
       starPalace[s.name] = p.name;
     }
     const fmt = (s: { name: string; brightness?: string; mutagen?: string }) => {
       const hua = mutagenOverride?.[s.name] ?? s.mutagen;
-      return `${s.name}${s.brightness ? `(${s.brightness})` : ""}${hua ? `[生年化${hua}]` : ""}`;
+      const b = brightnessFn?.(s.name, p.earthlyBranch) ?? s.brightness;
+      return `${s.name}${b ? `(${b})` : ""}${hua ? `[生年化${hua}]` : ""}`;
     };
     palaceFullStars[p.name] = [
       ...p.majorStars.map(fmt),
@@ -84,6 +91,7 @@ export function computeIztroAstrolabe(params: {
     palaceFullStars,
     brightness,
     starPalace,
+    palaceBranch,
     soulStar: ast.soul,
     bodyStar: ast.body,
     fiveElementsClass: ast.fiveElementsClass,
