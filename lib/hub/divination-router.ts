@@ -3,6 +3,7 @@ import { getDb } from "../db/client";
 import { profiles, reports } from "../db/schema";
 import { getModuleDefinition } from "./module-registry";
 import { BirthInput } from "../engine/calendar";
+import { calibrationSummary, normalizeCalibration } from "../engine/shared/calibration";
 import { computeBazi, computeBaziDayun, computeBaziWithReading, resolveBaziFromPillars } from "../engine/bazi";
 import { computeChenggu } from "../engine/chenggu";
 import { computeZodiac } from "../engine/zodiac";
@@ -207,6 +208,7 @@ async function getProfileBirthInput(profileId: string, userId?: string): Promise
     latitude: profile.birthLatitude ?? undefined,
     location: profile.birthLocation ?? undefined,
     ziSect: profile.ziSect === 1 ? 1 : 2,
+    useTrueSolar: profile.useTrueSolar !== false,
     isLeapMonth: profile.leapMonth === true && profile.calendarType === "lunar",
   };
 }
@@ -476,6 +478,20 @@ export async function runModule(input: ModuleInput): Promise<ModuleOutput> {
   }
 
   facts = enrichModuleFacts(input.module, facts, locale);
+  // 口径摘要：凡按出生档案排盘的模块，把口径选择写进事实清单与报告章节（AI 与用户共用同一口径说明）
+  if (profileInput) {
+    const calibText = calibrationSummary(
+      normalizeCalibration({ useTrueSolar: profileInput.useTrueSolar !== false, ziSect: profileInput.ziSect ?? 2 }),
+      profileInput.longitude ?? null
+    );
+    facts.calibrationSummary = calibText;
+    if (Array.isArray(facts.sections)) {
+      (facts.sections as Array<{ title: string; content: string }>).unshift({
+        title: "排盘口径",
+        content: calibText,
+      });
+    }
+  }
   facts = attachAdminInsights(input.module, facts, profileInput ?? input.birth);
 
   const templateReport = renderTemplateReport(input.module, facts, scores);

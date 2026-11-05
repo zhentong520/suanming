@@ -100,6 +100,7 @@ export default function ProfilesPage() {
           birthLongitude: birthLongitude || null,
           birthLatitude: birthLatitude || null,
           ziSect: fd.get("ziSect") === "1" ? 1 : 2,
+          useTrueSolar: fd.get("useTrueSolar") !== "off",
           setAsActive: true,
         }),
       });
@@ -235,6 +236,13 @@ export default function ProfilesPage() {
               value={birthLatitude}
               onChange={(e) => setBirthLatitude(e.target.value)}
             />
+          </label>
+          <label>
+            排盘口径：真太阳时
+            <select name="useTrueSolar" defaultValue="on">
+              <option value="on">启用（按出生地经度+均时差校正时辰）</option>
+              <option value="off">关闭（按钟表时间直接排盘）</option>
+            </select>
           </label>
           <label>
             晚子时流派

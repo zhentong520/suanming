@@ -10,8 +10,10 @@ export interface BirthInput {
   gender?: string;
   /** 出生地纬度（可选） */
   latitude?: number;
-  /** 出生地经度（可选；有值则按真太阳时修正时辰） */
+  /** 出生地经度（可选；有值且 useTrueSolar!=false 则按真太阳时修正时辰） */
   longitude?: number;
+  /** 真太阳时校正开关：false = 关闭校正、按钟表时间排盘；缺省/true = 启用（默认） */
+  useTrueSolar?: boolean;
   /** 出生地名称（展示用） */
   location?: string;
   /**
@@ -206,8 +208,8 @@ export function buildLunarFromBirth(input: BirthInput): {
   const baseSolar = Solar.fromYmdHms(year, month, day, hour, minute, 0);
   const lon = input.longitude;
 
-  // 3) 无经度：到此为止（已含夏令时校正）
-  if (!timeKnown || lon == null || Number.isNaN(lon)) {
+  // 3) 无经度或口径关闭：到此为止（已含夏令时校正）
+  if (!timeKnown || lon == null || Number.isNaN(lon) || input.useTrueSolar === false) {
     const lunar = baseSolar.getLunar();
     return {
       solar: baseSolar,

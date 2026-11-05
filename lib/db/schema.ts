@@ -73,6 +73,8 @@ export const profiles = sqliteTable("profiles", {
   birthLocation: text("birth_location"),
   /** 晚子时（23:00-23:59）日柱流派：1=算次日，2=算当天（默认） */
   ziSect: integer("zi_sect"),
+  /** 真太阳时校正开关（默认开；false=按钟表时间排盘） */
+  useTrueSolar: integer("use_true_solar", { mode: "boolean" }).default(true),
   /** 农历生日是否闰月（calendarType=lunar 时生效） */
   leapMonth: integer("leap_month", { mode: "boolean" }).default(false),
   createdAt: text("created_at").notNull(),

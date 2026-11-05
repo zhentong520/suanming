@@ -263,6 +263,9 @@ function runColumnMigrations(db: Database.Database) {
   if (!profileCols.some((c) => c.name === "birth_location")) {
     db.exec("ALTER TABLE profiles ADD COLUMN birth_location TEXT");
   }
+  if (!profileCols.some((c) => c.name === "use_true_solar")) {
+    db.exec("ALTER TABLE profiles ADD COLUMN use_true_solar INTEGER NOT NULL DEFAULT 1");
+  }
 
   const userCols2 = db.prepare("PRAGMA table_info(users)").all() as Array<{ name: string }>;
   if (!userCols2.some((c) => c.name === "allow_life_insights")) {
