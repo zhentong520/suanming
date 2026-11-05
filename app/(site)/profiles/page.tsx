@@ -101,6 +101,7 @@ export default function ProfilesPage() {
           birthLatitude: birthLatitude || null,
           ziSect: fd.get("ziSect") === "1" ? 1 : 2,
           useTrueSolar: fd.get("useTrueSolar") !== "off",
+          ziweiSihuaSchool: fd.get("ziweiSihuaSchool") || null,
           setAsActive: true,
         }),
       });
@@ -242,6 +243,14 @@ export default function ProfilesPage() {
             <select name="useTrueSolar" defaultValue="on">
               <option value="on">启用（按出生地经度+均时差校正时辰）</option>
               <option value="off">关闭（按钟表时间直接排盘）</option>
+            </select>
+          </label>
+          <label>
+            紫微四化流派
+            <select name="ziweiSihuaSchool" defaultValue="tongxing">
+              <option value="tongxing">通行本（《全集》，业界主流）</option>
+              <option value="quanshu">《紫微斗数全书》（庚干天同科·太阴忌）</option>
+              <option value="zhongzhou">中州派（辅弼不入四化）</option>
             </select>
           </label>
           <label>

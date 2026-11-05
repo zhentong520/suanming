@@ -36,8 +36,10 @@ export function computeIztroAstrolabe(params: {
   solarYmd: string;
   hourZhiIdx: number;
   gender: string;
+  /** 星→化 重标映射：非通行本四化流派时按所选派别重标 iztro 的 [生年化] 标签 */
+  mutagenOverride?: Record<string, string>;
 }): IztroBridgeResult {
-  const { solarYmd, hourZhiIdx, gender } = params;
+  const { solarYmd, hourZhiIdx, gender, mutagenOverride } = params;
   const [y, m, d] = solarYmd.split("-").map((n) => Number(n));
   // iztro timeIndex：0=早子…11=亥，12=晚子时
   const timeIndex = hourZhiIdx === 0 ? 0 : hourZhiIdx;
@@ -57,8 +59,10 @@ export function computeIztroAstrolabe(params: {
       brightness[s.name] = s.brightness ?? "";
       starPalace[s.name] = p.name;
     }
-    const fmt = (s: { name: string; brightness?: string; mutagen?: string }) =>
-      `${s.name}${s.brightness ? `(${s.brightness})` : ""}${s.mutagen ? `[生年化${s.mutagen}]` : ""}`;
+    const fmt = (s: { name: string; brightness?: string; mutagen?: string }) => {
+      const hua = mutagenOverride?.[s.name] ?? s.mutagen;
+      return `${s.name}${s.brightness ? `(${s.brightness})` : ""}${hua ? `[生年化${hua}]` : ""}`;
+    };
     palaceFullStars[p.name] = [
       ...p.majorStars.map(fmt),
       ...p.minorStars.map(fmt),

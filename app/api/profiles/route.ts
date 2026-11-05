@@ -50,6 +50,10 @@ export async function POST(request: Request) {
     birthLocation: body.birthLocation?.trim() ? String(body.birthLocation).trim() : null,
     ziSect: body.ziSect === 1 || body.ziSect === 2 ? Number(body.ziSect) : null,
     useTrueSolar: body.useTrueSolar !== false,
+    ziweiSihuaSchool:
+      body.ziweiSihuaSchool === "quanshu" || body.ziweiSihuaSchool === "zhongzhou"
+        ? String(body.ziweiSihuaSchool)
+        : null,
     leapMonth: body.calendarType === "lunar" && body.isLeapMonth === true,
     createdAt: now,
     updatedAt: now,

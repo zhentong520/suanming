@@ -14,6 +14,8 @@ export interface BirthInput {
   longitude?: number;
   /** 真太阳时校正开关：false = 关闭校正、按钟表时间排盘；缺省/true = 启用（默认） */
   useTrueSolar?: boolean;
+  /** 紫微生年四化流派：tongxing=通行本（默认）/ quanshu=《全书》/ zhongzhou=中州派 */
+  ziweiSihuaSchool?: string;
   /** 出生地名称（展示用） */
   location?: string;
   /**

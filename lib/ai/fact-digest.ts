@@ -219,6 +219,9 @@ export function buildAiFactDigest(moduleId: string, facts: Record<string, unknow
         .join("、")}`
     );
   }
+  if (typeof facts.sihuaSchoolName === "string") {
+    lines.push(`四化流派: ${facts.sihuaSchoolName}${facts.siHuaNote ? `——${truncate(String(facts.siHuaNote), 200)}` : ""}`);
+  }
 
   // 紫微全量星曜（iztro 桥接，乙级星+杂耀+亮度+生年化）
   if (Array.isArray(facts.palaces)) {

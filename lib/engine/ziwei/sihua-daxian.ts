@@ -1,5 +1,6 @@
 /** 紫微四化与大限流年 */
 import { PALACES, BRANCHES } from "./placement";
+import { getSiHuaBySchool } from "./sihua-schools";
 
 export interface SiHua {
   star: string;
@@ -70,7 +71,10 @@ export const SI_HUA_TABLE: Record<string, SiHua[]> = {
   ],
 };
 
-export function getSiHua(yearGan: string): SiHua[] {
+export function getSiHua(yearGan: string, school?: import("./sihua-schools").SihuaSchool): SiHua[] {
+  if (school && school !== "tongxing") {
+    return getSiHuaBySchool(yearGan, school, (g) => SI_HUA_TABLE[g] ?? []) as SiHua[];
+  }
   return SI_HUA_TABLE[yearGan] ?? [];
 }
 
@@ -176,7 +180,8 @@ export function computeLiuYue(
   liuNianPalaceIdx: number,
   lunarMonth: number,
   mingGongBranchIdx: number,
-  monthGanZhi?: string
+  monthGanZhi?: string,
+  school?: import("./sihua-schools").SihuaSchool
 ): LiuYueInfo {
   const month = Math.min(12, Math.max(1, lunarMonth));
   const palaceIdx = (liuNianPalaceIdx + (month - 1) + 120) % 12;
@@ -188,7 +193,7 @@ export function computeLiuYue(
     branch: BRANCHES[branchIdx],
     gan,
     ganZhi: monthGanZhi,
-    siHua: gan ? getSiHua(gan) : undefined,
+    siHua: gan ? getSiHua(gan, school) : undefined,
   };
 }
 
@@ -197,7 +202,8 @@ export function computeLiuRi(
   liuYuePalaceIdx: number,
   lunarDay: number,
   mingGongBranchIdx: number,
-  dayGanZhi?: string
+  dayGanZhi?: string,
+  school?: import("./sihua-schools").SihuaSchool
 ): LiuRiInfo {
   const day = Math.min(30, Math.max(1, lunarDay));
   const palaceIdx = (liuYuePalaceIdx + (day - 1) + 120) % 12;
@@ -209,7 +215,7 @@ export function computeLiuRi(
     branch: BRANCHES[branchIdx],
     gan,
     ganZhi: dayGanZhi,
-    siHua: gan ? getSiHua(gan) : undefined,
+    siHua: gan ? getSiHua(gan, school) : undefined,
   };
 }
 

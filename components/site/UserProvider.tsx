@@ -19,6 +19,7 @@ export interface UserProfile {
   birthLocation?: string | null;
   ziSect?: number | null;
   useTrueSolar?: boolean | null;
+  ziweiSihuaSchool?: string | null;
   leapMonth?: boolean | null;
   createdAt: string;
 }

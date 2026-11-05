@@ -130,19 +130,20 @@ export function computeFeiXingBundle(input: {
   liuYueGan?: string;
   liuRiGan?: string;
   allStars: Array<{ star: string; palace: string; branch?: string; brightness?: string }>;
+  school?: import("./sihua-schools").SihuaSchool;
 }) {
-  const birth = attachSiHuaPalace(getSiHua(input.yearGan), input.allStars);
+  const birth = attachSiHuaPalace(getSiHua(input.yearGan, input.school), input.allStars);
   const daXianSiHua = input.daXianGan
-    ? attachSiHuaPalace(getSiHua(input.daXianGan), input.allStars)
+    ? attachSiHuaPalace(getSiHua(input.daXianGan, input.school), input.allStars)
     : [];
   const liuNianSiHua = input.liuNianGan
-    ? attachSiHuaPalace(getSiHua(input.liuNianGan), input.allStars)
+    ? attachSiHuaPalace(getSiHua(input.liuNianGan, input.school), input.allStars)
     : [];
   const liuYueSiHua = input.liuYueGan
-    ? attachSiHuaPalace(getSiHua(input.liuYueGan), input.allStars)
+    ? attachSiHuaPalace(getSiHua(input.liuYueGan, input.school), input.allStars)
     : [];
   const liuRiSiHua = input.liuRiGan
-    ? attachSiHuaPalace(getSiHua(input.liuRiGan), input.allStars)
+    ? attachSiHuaPalace(getSiHua(input.liuRiGan, input.school), input.allStars)
     : [];
 
   const feiXing = [
