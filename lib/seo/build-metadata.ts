@@ -35,6 +35,10 @@ function staticPages(locale: Locale): Record<string, { title: string; descriptio
         title: "Reading history",
         description: "Revisit saved reading reports",
       },
+      "/liuyan": {
+        title: "Guestbook",
+        description: `Leave a note at ${SITE_NAME}`,
+      },
     };
   }
   return {
@@ -56,6 +60,10 @@ function staticPages(locale: Locale): Record<string, { title: string; descriptio
     "/reports": {
       title: "测算历史",
       description: "复看过往测算报告",
+    },
+    "/liuyan": {
+      title: "留言墙",
+      description: `有缘相逢，留下几句话 —— ${SITE_NAME}留言墙`,
     },
   };
 }

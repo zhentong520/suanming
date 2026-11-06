@@ -9,6 +9,7 @@ const NAV = [
   { href: "/admin/dashboard", label: "仪表盘" },
   { href: "/admin/operations", label: "操作记录" },
   { href: "/admin/users", label: "用户管理" },
+  { href: "/admin/comments", label: "留言管理" },
   { href: "/admin/ledger", label: "积分流水" },
   { href: "/admin/billing", label: "计费设置" },
   { href: "/admin/modules", label: "模块管理" },

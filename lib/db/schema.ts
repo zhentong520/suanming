@@ -188,6 +188,19 @@ export const moduleStats = sqliteTable("module_stats", {
   lastCalledAt: text("last_called_at"),
 });
 
+/** 全站留言墙（登录用户可发，管理员可隐藏；parentId 为一层回复） */
+export const comments = sqliteTable("comments", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  /** 发言时的昵称快照（用户改名不影响历史留言） */
+  nickname: text("nickname").notNull(),
+  content: text("content").notNull(),
+  parentId: text("parent_id"),
+  /** visible | hidden（管理员隐藏） */
+  status: text("status").notNull().default("visible"),
+  createdAt: text("created_at").notNull(),
+});
+
 /** 报告公开分享 token（免登录只读，可撤销） */
 export const shareTokens = sqliteTable("share_tokens", {
   id: text("id").primaryKey(),

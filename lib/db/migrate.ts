@@ -333,5 +333,17 @@ function runColumnMigrations(db: Database.Database) {
       created_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_share_tokens_token ON share_tokens(token);
+    CREATE TABLE IF NOT EXISTS comments (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      nickname TEXT NOT NULL,
+      content TEXT NOT NULL,
+      parent_id TEXT,
+      status TEXT NOT NULL DEFAULT 'visible',
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_comments_status_created ON comments(status, created_at);
+    CREATE INDEX IF NOT EXISTS idx_comments_user ON comments(user_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_comments_parent ON comments(parent_id);
   `);
 }

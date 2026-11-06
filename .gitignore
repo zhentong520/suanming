@@ -63,3 +63,6 @@ next-env.d.ts
 # editor / agent workspace state
 /.cursor/
 /.workbuddy/
+
+# UI 验证截图（本地验证产物）
+/screenshots/

@@ -68,6 +68,11 @@ export function SiteHeader() {
         <ThemeToggle compact />
 
         <nav className="site-nav site-nav--desktop">
+          {!isAuthPage && (
+            <Link href="/liuyan" className="site-nav-link">
+              {t("nav.liuyan")}
+            </Link>
+          )}
           {!isAuthPage && ctx?.user && (
             <>
               <Link href="/profiles" className="site-nav-link">

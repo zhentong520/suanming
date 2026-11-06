@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: base, lastModified: now, changeFrequency: "daily", priority: 1 },
     { url: `${base}/modules`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${base}/knowledge`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${base}/liuyan`, lastModified: now, changeFrequency: "daily", priority: 0.6 },
   ];
 
   for (const mod of MODULE_DEFINITIONS) {

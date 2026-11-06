@@ -12,6 +12,8 @@ const PUBLIC_API = [
   "/api/auth/logout",
   "/api/init",
   "/api/og",
+  // 留言墙：GET 游客可读；POST/DELETE 在路由内自行校验用户态
+  "/api/comments",
   "/api/wechat/",
   // 微信/Midas 服务端发货回调（无用户态，路由内自行校验）
   "/api/pay/wechat/notify",

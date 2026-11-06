@@ -12,6 +12,7 @@ export const en: Dictionary = {
   "nav.logout": "Log out",
   "nav.admin": "Admin",
   "nav.recharge": "Top up",
+  "nav.liuyan": "Guestbook",
   "nav.all": "All",
   "cat.命": "Destiny",
   "cat.卜": "Divination",

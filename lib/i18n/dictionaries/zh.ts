@@ -12,6 +12,7 @@ export const zh: Dictionary = {
   "nav.logout": "退出",
   "nav.admin": "管理后台",
   "nav.recharge": "充值",
+  "nav.liuyan": "留言墙",
   "nav.all": "全部",
   "cat.命": "命",
   "cat.卜": "卜",

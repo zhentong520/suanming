@@ -3901,3 +3901,173 @@ body.is-wechat .site-header {
     transition: none;
   }
 }
+
+/* ===== 留言墙 ===== */
+.liuyan-wall {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.liuyan-form {
+  padding: 1.25rem 1.4rem;
+  margin-bottom: 1.75rem;
+}
+
+.liuyan-input {
+  width: 100%;
+  min-height: 96px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--paper-warm) 72%, transparent);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.liuyan-input:focus {
+  border-color: color-mix(in srgb, var(--gold) 60%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 14%, transparent);
+  outline: none;
+}
+
+.liuyan-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+}
+
+.liuyan-count {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.liuyan-replying {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  padding: 0.35rem 0.7rem;
+  border-left: 3px solid var(--gold);
+  background: color-mix(in srgb, var(--gold) 8%, transparent);
+  font-size: 0.85rem;
+  color: var(--ink-light);
+}
+
+.liuyan-reply-cancel {
+  margin-left: auto;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  padding: 0 0.2rem;
+}
+
+.liuyan-reply-cancel:hover { color: var(--cinnabar); }
+
+.liuyan-login-hint { text-align: center; padding: 0.5rem 0; }
+.liuyan-login-hint p { color: var(--ink-muted); margin-bottom: 0.9rem; }
+.liuyan-login-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.liuyan-msg {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--jade);
+}
+.liuyan-msg--error { color: var(--cinnabar); }
+
+.liuyan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.liuyan-item {
+  padding: 1rem 1.2rem;
+}
+
+.liuyan-item-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.liuyan-nickname {
+  font-weight: 700;
+  color: var(--gold);
+  font-size: 0.95rem;
+}
+
+.liuyan-time {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.liuyan-reply-tag {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+.liuyan-content {
+  margin: 0.5rem 0 0.6rem;
+  color: var(--ink);
+  font-size: 0.95rem;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.liuyan-item-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.liuyan-action {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+}
+.liuyan-action:hover { color: var(--gold); }
+.liuyan-action--danger:hover { color: var(--cinnabar); }
+
+.liuyan-empty {
+  text-align: center;
+  color: var(--ink-muted);
+  padding: 2rem 0;
+}
+
+.liuyan-more {
+  text-align: center;
+  margin-top: 1.25rem;
+}
+
+.liuyan-more button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.liuyan-more button:disabled { opacity: 0.6; cursor: wait; }
+
+@media (max-width: 640px) {
+  .liuyan-form { padding: 1rem; }
+  .liuyan-item { padding: 0.85rem 1rem; }
+}
